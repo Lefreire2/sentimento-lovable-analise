@@ -36,18 +36,119 @@ const Dashboard = () => {
         queryKey: ['agentMetrics', selectedAgent],
         queryFn: async () => {
             if (!selectedAgent) return null;
+            
+            console.log('Fetching data for agent:', selectedAgent);
+            
             const { data, error } = await supabase
                 .from(selectedAgent as any)
-                .select()
-                .maybeSingle();
+                .select('*');
+            
             if (error) {
                 console.error("Supabase error:", error);
                 throw new Error(error.message);
             }
-            return data as unknown as AgentData | null;
+            
+            console.log('Raw data received:', data);
+            
+            if (!data || data.length === 0) {
+                console.log('No data found for agent:', selectedAgent);
+                return null;
+            }
+            
+            // Aggregate the data from multiple conversations
+            const aggregatedData = aggregateAgentData(data);
+            console.log('Aggregated data:', aggregatedData);
+            
+            return aggregatedData;
         },
         enabled: !!selectedAgent,
     });
+
+    const aggregateAgentData = (conversations: any[]): AgentData => {
+        const validConversations = conversations.filter(conv => conv && Object.keys(conv).length > 0);
+        
+        if (validConversations.length === 0) {
+            return {
+                tempo_primeira_resposta_minutos: '0',
+                tempo_medio_resposta_atendente_minutos: '0',
+                tempo_maximo_resposta_atendente_minutos: '0',
+                sentimento_usuario: 'N/A',
+                sentimento_atendente: 'N/A',
+                sentimento_geral_conversa: 'N/A',
+                duracao_total_conversa_minutos: '0',
+                conversao_indicada_mvp: 'N/A',
+                pontuacao_aderencia_percentual: '0',
+                numero_perguntas_vendedor: '0',
+                aderência_script_nivel: 'N/A',
+                termo_chave_conversao: 'N/A'
+            };
+        }
+
+        // Calculate averages and aggregates
+        const avgFirstResponse = validConversations.reduce((sum, conv) => 
+            sum + (parseFloat(conv.tempo_primeira_resposta_minutos) || 0), 0) / validConversations.length;
+        
+        const avgResponseTime = validConversations.reduce((sum, conv) => 
+            sum + (parseFloat(conv.tempo_medio_resposta_atendente_minutos) || 0), 0) / validConversations.length;
+        
+        const maxResponseTime = Math.max(...validConversations.map(conv => 
+            parseFloat(conv.tempo_maximo_resposta_atendente_minutos) || 0));
+        
+        const totalDuration = validConversations.reduce((sum, conv) => 
+            sum + (parseFloat(conv.duracao_total_conversa_minutos) || 0), 0);
+        
+        const avgAdherence = validConversations.reduce((sum, conv) => 
+            sum + (parseFloat(conv.pontuacao_aderencia_percentual) || 0), 0) / validConversations.length;
+        
+        const totalQuestions = validConversations.reduce((sum, conv) => 
+            sum + (parseInt(conv.numero_perguntas_vendedor) || 0), 0);
+        
+        // Get most common sentiment
+        const sentiments = validConversations.map(conv => conv.sentimento_geral_conversa).filter(Boolean);
+        const mostCommonSentiment = getMostCommon(sentiments) || 'N/A';
+        
+        const userSentiments = validConversations.map(conv => conv.sentimento_usuario).filter(Boolean);
+        const mostCommonUserSentiment = getMostCommon(userSentiments) || 'N/A';
+        
+        const agentSentiments = validConversations.map(conv => conv.sentimento_atendente).filter(Boolean);
+        const mostCommonAgentSentiment = getMostCommon(agentSentiments) || 'N/A';
+        
+        // Check conversion rate
+        const conversions = validConversations.filter(conv => conv.conversao_indicada_mvp === 'Sim').length;
+        const conversionRate = `${((conversions / validConversations.length) * 100).toFixed(1)}%`;
+        
+        // Get most common adherence level
+        const adherenceLevels = validConversations.map(conv => conv.aderência_script_nivel).filter(Boolean);
+        const mostCommonAdherence = getMostCommon(adherenceLevels) || 'N/A';
+        
+        // Get most common conversion term
+        const conversionTerms = validConversations.map(conv => conv.termo_chave_conversao).filter(Boolean);
+        const mostCommonTerm = getMostCommon(conversionTerms) || 'N/A';
+
+        return {
+            tempo_primeira_resposta_minutos: avgFirstResponse.toFixed(1),
+            tempo_medio_resposta_atendente_minutos: avgResponseTime.toFixed(1),
+            tempo_maximo_resposta_atendente_minutos: maxResponseTime.toFixed(1),
+            sentimento_usuario: mostCommonUserSentiment,
+            sentimento_atendente: mostCommonAgentSentiment,
+            sentimento_geral_conversa: mostCommonSentiment,
+            duracao_total_conversa_minutos: totalDuration.toFixed(1),
+            conversao_indicada_mvp: conversionRate,
+            pontuacao_aderencia_percentual: avgAdherence.toFixed(1),
+            numero_perguntas_vendedor: totalQuestions.toString(),
+            aderência_script_nivel: mostCommonAdherence,
+            termo_chave_conversao: mostCommonTerm
+        };
+    };
+
+    const getMostCommon = (arr: string[]): string | null => {
+        if (arr.length === 0) return null;
+        const counts = arr.reduce((acc, val) => {
+            acc[val] = (acc[val] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8">
