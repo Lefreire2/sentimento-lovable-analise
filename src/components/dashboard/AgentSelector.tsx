@@ -8,15 +8,11 @@ interface AgentSelectorProps {
 }
 
 export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorProps) => {
-    const handleAgentChange = (tableName: string) => {
-        console.log('🎯 Agente selecionado (tabela):', tableName);
-        const formattedName = formatAgentName(tableName);
-        console.log('📝 Nome formatado:', formattedName);
-        console.log('🔄 Enviando nome formatado para o hook:', formattedName);
+    const handleAgentChange = (formattedName: string) => {
+        console.log('🎯 Agente selecionado (nome formatado):', formattedName);
         onAgentChange(formattedName);
     };
 
-    // Debug: verificar o valor selecionado atual
     console.log('🎨 AgentSelector - selectedAgent atual:', selectedAgent);
 
     return (
@@ -30,7 +26,7 @@ export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorPro
                         const formattedName = formatAgentName(table);
                         console.log(`📋 Mapeando: ${table} -> ${formattedName}`);
                         return (
-                            <SelectItem key={table} value={table}>
+                            <SelectItem key={table} value={formattedName}>
                                 {formattedName}
                             </SelectItem>
                         );

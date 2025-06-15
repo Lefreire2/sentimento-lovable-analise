@@ -1,3 +1,4 @@
+
 // Tabelas de métricas agregadas (dados processados)
 export const metricsAgentTables = [
     'Lista_mensagens_Adiney_esteves',
@@ -65,38 +66,6 @@ export const basicMessageTables = [
 // Lista principal de agentes (usa as tabelas de métricas como principal)
 export const agentTables = metricsAgentTables;
 
-// Mapeamento corrigido baseado nas tabelas reais do banco de dados
-const agentNameToTable: Record<string, string> = {
-    'Adiney Esteves': 'Lista_mensagens_Adiney_esteves',
-    'Alana Meneses': 'Lista_mensagens_Alana_meneses',
-    'Aline Bigatão': 'Lista_mensagens_Aline_bigatão',
-    'Aline Franzotti': 'Lista_mensagens_Aline_franzotti',
-    'Amanda': 'Lista_mensagens_Amanda',
-    'Ana Beatriz': 'Lista_mensagens_Ana_beatriz',
-    'Andre Araujo': 'Lista_mensagens_Andre_araujo',
-    'Carlos Antunes': 'Lista_mensagens_ Carlos_Antunes', // Note o espaço extra
-    'Danilo Chammas': 'Lista_mensagens_Danilo_Chammas',
-    'Diego Cabrejos': 'Lista_mensagens_Diego_cabrejos',
-    'Haila': 'Lista_mensagens_Haila',
-    'Henrique Maffei': 'Lista_mensagens_Henrique_maffei',
-    'Julia Jorge': 'Lista_mensagens_Julia_jorge',
-    'Karla Fazollo': 'Lista_mensagens_Karla_fazollo',
-    'Karla Resende': 'Lista_mensagens_Karla_resende',
-    'Luiza Murad': 'Lista_mensagens_Luiza_murad',
-    'Marcelo Soeiro': 'Lista_mensagens_Marcelo_soeiro',
-    'Marco Antonio': 'Lista_mensagens_Marco_antonio',
-    'Mariana Araújo': 'Lista_mensagens_Mariana_araújo',
-    'Michelle Meleck': 'Lista_mensagens_Michelle_Meleck',
-    'Patricia Lima': 'Lista_mensagens_Patricia_lima',
-    'Raiany Pimentel': 'Lista_mensagens_Raiany_pimentel',
-    'Roberta Xavier': 'Lista_mensagens_Roberta_xavier',
-    'Roberto Pigini': 'Lista_mensagens_Roberto_pigini',
-    'Roclides Lima': 'Lista_mensagens_Roclides_lima',
-    'Rodrigo Pastore': 'Lista_mensagens_Rodrigo_pastore',
-    'Silvia Joly': 'Lista_mensagens_Silvia_Joly',
-    'Stefanie Lee': 'Lista_mensagens_Stefanie_lee'
-};
-
 export const formatAgentName = (tableName: string) => {
     const name = tableName
         .replace('Lista_mensagens_', '')
@@ -111,21 +80,92 @@ export const formatAgentName = (tableName: string) => {
         .join(' ');
 };
 
-export const getTableNameFromFormattedName = (formattedName: string): string => {
-    console.log('🔍 Buscando tabela para nome formatado:', formattedName);
-    const tableName = agentNameToTable[formattedName];
-    console.log('📋 Tabela encontrada:', tableName);
+export const getMetricsTableName = (formattedName: string): string => {
+    console.log('🔍 Convertendo nome formatado para tabela de métricas:', formattedName);
     
-    if (!tableName) {
-        console.error('❌ Nome formatado não encontrado no mapeamento:', formattedName);
-        console.log('📝 Chaves disponíveis:', Object.keys(agentNameToTable));
-        return formattedName; // Fallback
+    // Converter nome formatado de volta para formato de tabela
+    const tableFormat = formattedName
+        .toLowerCase()
+        .replace(/ /g, '_')
+        .replace(/[áàâã]/g, 'a')
+        .replace(/[éèê]/g, 'e')
+        .replace(/[íìî]/g, 'i')
+        .replace(/[óòôõ]/g, 'o')
+        .replace(/[úùû]/g, 'u')
+        .replace(/[ç]/g, 'c');
+    
+    const metricsTable = `Lista_mensagens_${tableFormat}`;
+    console.log('📊 Tabela de métricas gerada:', metricsTable);
+    
+    // Verificar se a tabela existe na lista
+    const foundTable = metricsAgentTables.find(table => 
+        table.toLowerCase() === metricsTable.toLowerCase()
+    );
+    
+    if (foundTable) {
+        console.log('✅ Tabela encontrada na lista:', foundTable);
+        return foundTable;
     }
     
-    return tableName;
+    console.log('❌ Tabela não encontrada, tentando variações...');
+    
+    // Tentar encontrar por nome parcial
+    const partialMatch = metricsAgentTables.find(table => {
+        const tableName = table.replace('Lista_mensagens_', '').toLowerCase();
+        const searchName = tableFormat.toLowerCase();
+        return tableName.includes(searchName) || searchName.includes(tableName);
+    });
+    
+    if (partialMatch) {
+        console.log('✅ Encontrada correspondência parcial:', partialMatch);
+        return partialMatch;
+    }
+    
+    console.log('❌ Nenhuma tabela encontrada para:', formattedName);
+    return metricsTable; // Retorna o nome gerado mesmo se não encontrado
 };
 
-// Nova função para debug - verificar se tabela existe
+export const getBasicTableName = (formattedName: string): string => {
+    console.log('🔍 Convertendo nome formatado para tabela básica:', formattedName);
+    
+    const tableFormat = formattedName
+        .toLowerCase()
+        .replace(/ /g, '_')
+        .replace(/[áàâã]/g, 'a')
+        .replace(/[éèê]/g, 'e')
+        .replace(/[íìî]/g, 'i')
+        .replace(/[óòôõ]/g, 'o')
+        .replace(/[úùû]/g, 'u')
+        .replace(/[ç]/g, 'c');
+    
+    const basicTable = `Lista_de_Mensagens_${tableFormat}`;
+    console.log('💬 Tabela básica gerada:', basicTable);
+    
+    const foundTable = basicMessageTables.find(table => 
+        table.toLowerCase() === basicTable.toLowerCase()
+    );
+    
+    if (foundTable) {
+        console.log('✅ Tabela básica encontrada:', foundTable);
+        return foundTable;
+    }
+    
+    // Tentar encontrar por nome parcial
+    const partialMatch = basicMessageTables.find(table => {
+        const tableName = table.replace('Lista_de_Mensagens_', '').toLowerCase();
+        const searchName = tableFormat.toLowerCase();
+        return tableName.includes(searchName) || searchName.includes(tableName);
+    });
+    
+    if (partialMatch) {
+        console.log('✅ Encontrada correspondência parcial básica:', partialMatch);
+        return partialMatch;
+    }
+    
+    return basicTable;
+};
+
+// Função para verificar se tabela existe
 export const isValidTableName = (tableName: string): boolean => {
     return metricsAgentTables.includes(tableName) || basicMessageTables.includes(tableName);
 };
