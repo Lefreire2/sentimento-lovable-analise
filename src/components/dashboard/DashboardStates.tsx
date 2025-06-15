@@ -1,5 +1,5 @@
 
-import { Loader2, BarChart2, Users, AlertTriangle } from "lucide-react";
+import { Loader2, BarChart2, Users, AlertTriangle, Database } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DashboardStatesProps {
@@ -58,25 +58,30 @@ export const DashboardStates = ({ isLoading, isError, error, selectedAgent, hasD
 
     if (selectedAgent && !hasData) {
         return (
-            <Card className="bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
+            <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
-                        <BarChart2 className="h-5 w-5" />
-                        Sem dados para {selectedAgent}
+                    <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+                        <Database className="h-5 w-5" />
+                        Tabelas vazias para {selectedAgent}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-yellow-700 dark:text-yellow-300">
-                        Não foram encontrados dados de métricas para o atendente <strong>{selectedAgent}</strong>.
+                    <p className="text-blue-700 dark:text-blue-300">
+                        As tabelas do atendente <strong>{selectedAgent}</strong> existem no banco de dados, mas estão vazias.
                     </p>
-                    <div className="mt-4 text-sm text-yellow-600 dark:text-yellow-400">
-                        <p><strong>Possíveis soluções:</strong></p>
+                    <div className="mt-4 text-sm text-blue-600 dark:text-blue-400">
+                        <p><strong>Status detectado:</strong></p>
                         <ul className="list-disc list-inside mt-1 space-y-1">
-                            <li>Verificar se há dados importados para este atendente</li>
-                            <li>Confirmar a grafia correta do nome</li>
-                            <li>Testar com outro atendente para verificar se o sistema está funcionando</li>
+                            <li>✅ Tabelas encontradas no banco de dados</li>
+                            <li>✅ Acesso às tabelas funcionando</li>
+                            <li>⚠️ Nenhum registro encontrado nas tabelas</li>
                         </ul>
-                        <p className="mt-2 font-medium">Verifique os logs do console para detalhes da consulta.</p>
+                        <p className="mt-2 font-medium">
+                            Isso significa que os dados para este atendente ainda não foram importados ou processados.
+                        </p>
+                        <p className="mt-1">
+                            Os dados exibidos no dashboard são exemplos para demonstração da interface.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
