@@ -1,7 +1,5 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, FunnelChart as RechartsFunnelChart, Funnel, Cell, Tooltip } from "recharts";
 import { Filter, TrendingDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AgentData } from "@/hooks/useAgentData";
@@ -21,13 +19,6 @@ const funnelSteps = [
     { name: "Confirmação Lead", value: 25, color: "#ef4444", description: "Lead confirmou interesse" },
     { name: "Agendamento Confirmado", value: 15, color: "#8b5cf6", description: "Consulta agendada" }
 ];
-
-const chartConfig = {
-    value: {
-        label: "Leads",
-        color: "hsl(var(--chart-1))",
-    },
-};
 
 export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: FunnelChartProps) => {
     // Simular dados baseados no agentData atual
@@ -85,51 +76,24 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
             </CardHeader>
             <CardContent>
                 <div className="space-y-6">
-                    {/* Gráfico de funil em barras horizontais */}
-                    <div className="h-80">
-                        <ChartContainer config={chartConfig}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={simulatedFunnelData}
-                                    layout="horizontal"
-                                    margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
-                                >
-                                    <XAxis type="number" domain={[0, 'dataMax']} />
-                                    <YAxis 
-                                        type="category" 
-                                        dataKey="name" 
-                                        width={80}
-                                        tick={{ fontSize: 12 }}
-                                    />
-                                    <ChartTooltip content={<ChartTooltipContent />} />
-                                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                                        {simulatedFunnelData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </ChartContainer>
-                    </div>
-
-                    {/* Indicadores de etapas */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Cards de etapas do funil em formato de grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {simulatedFunnelData.map((step, index) => {
                             const dropoffRate = index > 0 
                                 ? Math.round(((simulatedFunnelData[index-1].value - step.value) / simulatedFunnelData[index-1].value) * 100)
                                 : 0;
                             
                             return (
-                                <div key={step.name} className="p-3 rounded-lg border bg-card">
-                                    <div className="flex items-center justify-between mb-2">
+                                <div key={step.name} className="p-6 rounded-lg border bg-card hover:shadow-md transition-shadow">
+                                    <div className="flex items-center justify-between mb-4">
                                         <div 
-                                            className="w-3 h-3 rounded-full" 
+                                            className="w-4 h-4 rounded-full" 
                                             style={{ backgroundColor: step.color }}
                                         />
-                                        <span className="text-2xl font-bold">{step.value}</span>
+                                        <span className="text-3xl font-bold text-primary">{step.value}</span>
                                     </div>
-                                    <h4 className="font-medium text-sm mb-1">{step.name}</h4>
-                                    <p className="text-xs text-muted-foreground mb-2">{step.description}</p>
+                                    <h4 className="font-semibold text-lg mb-2">{step.name}</h4>
+                                    <p className="text-sm text-muted-foreground mb-3">{step.description}</p>
                                     {index > 0 && (
                                         <Badge variant="outline" className="text-xs">
                                             -{dropoffRate}% anterior
@@ -140,18 +104,18 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                         })}
                     </div>
 
-                    {/* Resumo de conversão */}
-                    <div className="p-4 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border">
+                    {/* Resumo de conversão destacado */}
+                    <div className="p-6 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 border-2 border-blue-200 dark:border-blue-800">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h4 className="font-medium text-sm mb-1">Taxa de Conversão Geral</h4>
-                                <p className="text-xs text-muted-foreground">
+                                <h4 className="font-semibold text-lg mb-2">Taxa de Conversão Geral</h4>
+                                <p className="text-sm text-muted-foreground">
                                     Do primeiro contato ao agendamento confirmado
                                 </p>
                             </div>
                             <div className="text-right">
-                                <div className="text-2xl font-bold text-primary">{conversionRate}%</div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="text-4xl font-bold text-primary">{conversionRate}%</div>
+                                <div className="text-sm text-muted-foreground mt-1">
                                     {simulatedFunnelData[simulatedFunnelData.length - 1].value} de {simulatedFunnelData[0].value} leads
                                 </div>
                             </div>
