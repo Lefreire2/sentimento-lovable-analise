@@ -8,7 +8,7 @@ export const metricsAgentTables = [
     'Lista_mensagens_Amanda_Mota',
     'Lista_mensagens_Ana_beatriz',
     'Lista_mensagens_Andre_araujo',
-    'Lista_mensagens_ Carlos_Antunes',
+    'Lista_mensagens_Carlos_Antunes',
     'Lista_mensagens_Danilo_Chammas',
     'Lista_mensagens_Diego_cabrejos',
     'Lista_mensagens_Haila',
@@ -40,7 +40,7 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Amanda_Mota',
     'Lista_de_Mensagens_Ana_beatriz',
     'Lista_de_Mensagens_Andre_araujo',
-    'Lista_de_Mensagens_ Carlos_Antunes',
+    'Lista_de_Mensagens_Carlos_Antunes',
     'Lista_de_Mensagens_Danilo_Chammas',
     'Lista_de_Mensagens_Diego_cabrejos',
     'Lista_de_Mensagens_Haila',
@@ -138,10 +138,11 @@ export const getMetricsTableName = (formattedName: string): string => {
         return exactMatch;
     }
     
-    console.log('❌ Nenhuma correspondência exata encontrada para métricas');
+    console.log('❌ Nenhuma tabela de métricas encontrada para:', formattedName);
+    console.log('📋 Tabelas disponíveis:', metricsAgentTables);
     
-    // Fallback - retorna a primeira tabela como exemplo
-    return metricsAgentTables[0];
+    // Retorna string vazia em vez de fallback para detectar o problema
+    return '';
 };
 
 export const getBasicTableName = (formattedName: string): string => {
@@ -160,10 +161,11 @@ export const getBasicTableName = (formattedName: string): string => {
         return exactMatch;
     }
     
-    console.log('❌ Nenhuma correspondência exata encontrada para básica');
+    console.log('❌ Nenhuma tabela básica encontrada para:', formattedName);
+    console.log('📋 Tabelas básicas disponíveis:', basicMessageTables);
     
-    // Fallback - retorna a primeira tabela como exemplo
-    return basicMessageTables[0];
+    // Retorna string vazia em vez de fallback para detectar o problema
+    return '';
 };
 
 // Função para verificar se tabela existe
@@ -174,4 +176,13 @@ export const isValidTableName = (tableName: string): boolean => {
 // Função para listar todas as tabelas disponíveis
 export const getAllAvailableTables = (): string[] => {
     return [...metricsAgentTables, ...basicMessageTables];
+};
+
+// Função para debug - mapear todos os nomes formatados
+export const debugAgentMapping = (): void => {
+    console.log('🔍 MAPEAMENTO COMPLETO DE AGENTES:');
+    metricsAgentTables.forEach(table => {
+        const formatted = formatAgentName(table);
+        console.log(`${table} -> "${formatted}"`);
+    });
 };

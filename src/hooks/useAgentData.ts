@@ -1,7 +1,6 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getMetricsTableName, getBasicTableName } from "@/lib/agents";
+import { getMetricsTableName, getBasicTableName, debugAgentMapping } from "@/lib/agents";
 
 interface AgentData {
     tempo_primeira_resposta_minutos: string;
@@ -123,40 +122,57 @@ export const useAgentData = (selectedAgent: string) => {
             }
             
             console.log('🔍 Iniciando busca para agente:', selectedAgent);
-            console.log('🎯 ANDRÉ ARAÚJO - Busca específica iniciada');
+            
+            // Debug: mostrar mapeamento completo na primeira execução
+            if (selectedAgent === 'André Araújo') {
+                debugAgentMapping();
+            }
             
             // Primeiro, tentar tabela de métricas
             const metricsTableName = getMetricsTableName(selectedAgent);
-            console.log('📊 Tentando buscar métricas na tabela:', metricsTableName);
+            console.log('📊 Tabela de métricas retornada:', metricsTableName);
+            
+            if (!metricsTableName) {
+                console.log('❌ Nenhuma tabela de métricas encontrada para:', selectedAgent);
+            } else {
+                try {
+                    console.log('📊 Tentando consultar tabela de métricas:', metricsTableName);
+                    
+                    // Buscar dados na tabela de métricas
+                    const { data: metricsData, error: metricsError } = await supabase
+                        .from(metricsTableName as any)
+                        .select('*')
+                        .limit(1000);
+                    
+                    console.log('📊 Resultado métricas para', selectedAgent, ':');
+                    console.log('- Data length:', metricsData?.length || 0);
+                    console.log('- Error:', metricsError);
+                    console.log('- Sample data:', metricsData?.[0]);
+                    
+                    if (!metricsError && metricsData && metricsData.length > 0) {
+                        console.log('✅ Dados de métricas encontrados, agregando...');
+                        return aggregateAgentData(metricsData);
+                    } else if (metricsError) {
+                        console.log('❌ Erro ao consultar tabela de métricas:', metricsError);
+                    } else {
+                        console.log('⚠️ Tabela de métricas está vazia para:', selectedAgent);
+                    }
+                } catch (err) {
+                    console.error('💥 Erro na consulta de métricas:', err);
+                }
+            }
+            
+            // Se não encontrou métricas, tentar tabela básica
+            const basicTableName = getBasicTableName(selectedAgent);
+            console.log('💬 Tabela básica retornada:', basicTableName);
+            
+            if (!basicTableName) {
+                console.log('❌ Nenhuma tabela básica encontrada para:', selectedAgent);
+                return null;
+            }
             
             try {
-                // Buscar dados na tabela de métricas com limite aumentado
-                const { data: metricsData, error: metricsError } = await supabase
-                    .from(metricsTableName as any)
-                    .select('*')
-                    .limit(1000);
-                
-                console.log('📊 Resultado métricas para', selectedAgent, ':');
-                console.log('- Data length:', metricsData?.length || 0);
-                console.log('- Error:', metricsError);
-                console.log('- Sample data:', metricsData?.[0]);
-                
-                if (selectedAgent === 'André Araújo') {
-                    console.log('🎯 ANDRÉ ARAÚJO - Dados específicos:');
-                    console.log('- Tabela usada:', metricsTableName);
-                    console.log('- Erro:', metricsError);
-                    console.log('- Quantidade de registros:', metricsData?.length);
-                    console.log('- Primeira linha:', metricsData?.[0]);
-                }
-                
-                if (!metricsError && metricsData && metricsData.length > 0) {
-                    console.log('✅ Dados de métricas encontrados, agregando...');
-                    return aggregateAgentData(metricsData);
-                }
-                
-                // Se não encontrou métricas, tentar tabela básica
-                const basicTableName = getBasicTableName(selectedAgent);
-                console.log('💬 Tentando buscar mensagens básicas na tabela:', basicTableName);
+                console.log('💬 Tentando consultar tabela básica:', basicTableName);
                 
                 const { data: basicData, error: basicError } = await supabase
                     .from(basicTableName as any)
@@ -168,38 +184,20 @@ export const useAgentData = (selectedAgent: string) => {
                 console.log('- Error:', basicError);
                 console.log('- Sample data:', basicData?.[0]);
                 
-                if (selectedAgent === 'André Araújo') {
-                    console.log('🎯 ANDRÉ ARAÚJO - Dados básicos:');
-                    console.log('- Tabela usada:', basicTableName);
-                    console.log('- Erro:', basicError);
-                    console.log('- Quantidade de registros:', basicData?.length);
-                    console.log('- Primeira linha:', basicData?.[0]);
-                }
-                
                 if (!basicError && basicData && basicData.length > 0) {
                     console.log('✅ Mensagens básicas encontradas, criando dados estimados...');
                     return createDataFromBasicMessages(basicData);
+                } else if (basicError) {
+                    console.log('❌ Erro ao consultar tabela básica:', basicError);
+                } else {
+                    console.log('⚠️ Tabela básica está vazia para:', selectedAgent);
                 }
-                
-                console.log('❌ Nenhum dado encontrado em nenhuma tabela para:', selectedAgent);
-                console.log('🔍 Detalhes dos erros:');
-                console.log('- Métricas:', metricsError);
-                console.log('- Básico:', basicError);
-                
-                // Log adicional das tabelas disponíveis
-                console.log('📋 Nome formatado do agente:', selectedAgent);
-                console.log('📋 Tabela de métricas buscada:', metricsTableName);
-                console.log('📋 Tabela básica buscada:', basicTableName);
-                
-                return null;
-                
             } catch (err) {
-                console.error('💥 Erro na busca de dados:', err);
-                if (selectedAgent === 'André Araújo') {
-                    console.error('🎯 ANDRÉ ARAÚJO - Erro crítico:', err);
-                }
-                return null;
+                console.error('💥 Erro na consulta básica:', err);
             }
+            
+            console.log('❌ Nenhum dado encontrado em nenhuma tabela para:', selectedAgent);
+            return null;
         },
         enabled: !!selectedAgent,
         retry: 2,
