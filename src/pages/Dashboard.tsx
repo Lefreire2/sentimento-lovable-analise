@@ -50,7 +50,7 @@ const Dashboard = () => {
                 console.error("Supabase error:", error);
                 throw new Error(error.message);
             }
-            return data as AgentData | null;
+            return data as unknown as AgentData | null;
         },
         enabled: !!selectedAgent,
     });
@@ -135,10 +135,10 @@ const Dashboard = () => {
                         <div>
                             <h2 className="text-xl font-semibold mb-4 flex items-center"><Clock className="mr-2" /> Métricas de Tempo (minutos)</h2>
                              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                <MetricCard title="Duração Total" value={parseFloat(agentData.duracao_total_conversa_minutos).toFixed(1)} unit="min" icon={Clock} />
-                                <MetricCard title="1ª Resposta" value={parseFloat(agentData.tempo_primeira_resposta_minutos).toFixed(1)} unit="min" icon={Clock} />
-                                <MetricCard title="Resposta Média" value={parseFloat(agentData.tempo_medio_resposta_atendente_minutos).toFixed(1)} unit="min" icon={Clock} />
-                                <MetricCard title="Resposta Máxima" value={parseFloat(agentData.tempo_maximo_resposta_atendente_minutos).toFixed(1)} unit="min" icon={Clock} />
+                                <MetricCard title="Duração Total" value={parseFloat(agentData.duracao_total_conversa_minutos || '0').toFixed(1)} unit="min" icon={Clock} />
+                                <MetricCard title="1ª Resposta" value={parseFloat(agentData.tempo_primeira_resposta_minutos || '0').toFixed(1)} unit="min" icon={Clock} />
+                                <MetricCard title="Resposta Média" value={parseFloat(agentData.tempo_medio_resposta_atendente_minutos || '0').toFixed(1)} unit="min" icon={Clock} />
+                                <MetricCard title="Resposta Máxima" value={parseFloat(agentData.tempo_maximo_resposta_atendente_minutos || '0').toFixed(1)} unit="min" icon={Clock} />
                             </div>
                         </div>
                         
@@ -146,7 +146,7 @@ const Dashboard = () => {
                             <h2 className="text-xl font-semibold mb-4 flex items-center"><Star className="mr-2" /> Métricas de Performance</h2>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 <MetricCard title="Conversão MVP" value={agentData.conversao_indicada_mvp || 'N/A'} icon={Star} />
-                                <MetricCard title="Aderência ao Script" value={`${parseFloat(agentData.pontuacao_aderencia_percentual).toFixed(1)}%`} icon={Star} />
+                                <MetricCard title="Aderência ao Script" value={`${parseFloat(agentData.pontuacao_aderencia_percentual || '0').toFixed(1)}%`} icon={Star} />
                                 <MetricCard title="Perguntas do Vendedor" value={agentData.numero_perguntas_vendedor || '0'} icon={Star} />
                             </div>
                         </div>
