@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingDown, Brain, Funnel } from "lucide-react";
+import { Loader2, TrendingDown, Brain, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAgentName } from "@/lib/agents";
 import { useToast } from "@/hooks/use-toast";
@@ -99,7 +99,7 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <div className="flex items-center space-x-2">
-                    <Funnel className="h-5 w-5 text-primary" />
+                    <Filter className="h-5 w-5 text-primary" />
                     <CardTitle>Análise de Funil Conversacional</CardTitle>
                     {aiProvider && (
                         <Badge variant="secondary" className="ml-2">
@@ -113,14 +113,14 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                 </div>
                 <Button onClick={handleGenerateFunnelAnalysis} disabled={isAnalyzing}>
                     {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    <Funnel className="mr-2 h-4 w-4" />
+                    <Filter className="mr-2 h-4 w-4" />
                     Analisar Funil
                 </Button>
             </CardHeader>
             {isAnalyzing && (
                 <CardContent>
                     <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
-                        <Funnel className="h-8 w-8 animate-pulse text-primary" />
+                        <Filter className="h-8 w-8 animate-pulse text-primary" />
                         <p className="text-muted-foreground font-medium">Analisando etapas do funil...</p>
                         <p className="text-sm text-muted-foreground">Identificando pontos de abandono e oportunidades</p>
                     </div>
