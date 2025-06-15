@@ -1,5 +1,5 @@
 
-// Tabelas de métricas agregadas (dados processados)
+// Tabelas de métricas agregadas (dados processados) - corrigindo nomes baseado na estrutura real
 export const metricsAgentTables = [
     'Lista_mensagens_Adiney_esteves',
     'Lista_mensagens_Alana_meneses',
@@ -31,13 +31,13 @@ export const metricsAgentTables = [
     'Lista_mensagens_Stefanie_lee'
 ].sort();
 
-// Tabelas básicas de mensagens (dados brutos)
+// Tabelas básicas de mensagens (dados brutos) - corrigindo nomes baseado na estrutura real
 export const basicMessageTables = [
     'Lista_de_Mensagens_Adiney_esteves',
     'Lista_de_Mensagens_Alana_meneses',
     'Lista_de_Mensagens_Aline_bigatão',
     'Lista_de_Mensagens_Aline_franzotti',
-    'Lista_de_Mensagens_Amanda',
+    'Lista_de_Mensagens_Amanda_Mota',
     'Lista_de_Mensagens_Ana_beatriz',
     'Lista_de_Mensagens_Andre_araujo',
     'Lista_de_Mensagens_ Carlos_Antunes',

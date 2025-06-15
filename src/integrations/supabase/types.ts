@@ -129,7 +129,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_de_Mensagens_Amanda: {
+      Lista_de_Mensagens_Amanda_Mota: {
         Row: {
           id: number
           message: string | null

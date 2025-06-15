@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { AgentSelector } from "@/components/dashboard/AgentSelector";
 import { DashboardStates } from "@/components/dashboard/DashboardStates";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { getAllAvailableTables } from "@/lib/agents";
 
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
@@ -15,6 +16,10 @@ const Dashboard = () => {
     console.log('- isLoading:', isLoading);
     console.log('- isError:', isError);
     console.log('- agentData:', agentData);
+    console.log('- error:', error);
+    
+    // Log das tabelas disponíveis no banco
+    console.log('📊 Tabelas disponíveis no banco:', getAllAvailableTables());
 
     const shouldShowStates = isLoading || isError || !selectedAgent || (selectedAgent && !agentData);
     const shouldShowContent = agentData && !isLoading && !isError;

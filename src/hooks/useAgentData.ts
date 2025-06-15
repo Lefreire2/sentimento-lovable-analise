@@ -129,11 +129,11 @@ export const useAgentData = (selectedAgent: string) => {
             console.log('📊 Tentando buscar métricas na tabela:', metricsTableName);
             
             try {
-                // Testar se a tabela existe fazendo uma query simples
+                // Buscar dados na tabela de métricas com mais limite
                 const { data: metricsData, error: metricsError } = await supabase
                     .from(metricsTableName as any)
                     .select('*')
-                    .limit(100);
+                    .limit(500);
                 
                 console.log('📊 Resultado métricas:');
                 console.log('- Data length:', metricsData?.length || 0);
@@ -152,7 +152,7 @@ export const useAgentData = (selectedAgent: string) => {
                 const { data: basicData, error: basicError } = await supabase
                     .from(basicTableName as any)
                     .select('*')
-                    .limit(100);
+                    .limit(500);
                 
                 console.log('💬 Resultado básico:');
                 console.log('- Data length:', basicData?.length || 0);
@@ -169,6 +169,11 @@ export const useAgentData = (selectedAgent: string) => {
                 console.log('- Métricas:', metricsError);
                 console.log('- Básico:', basicError);
                 
+                // Log adicional das tabelas disponíveis
+                console.log('📋 Nome formatado do agente:', selectedAgent);
+                console.log('📋 Tabela de métricas buscada:', metricsTableName);
+                console.log('📋 Tabela básica buscada:', basicTableName);
+                
                 return null;
                 
             } catch (err) {
@@ -177,8 +182,9 @@ export const useAgentData = (selectedAgent: string) => {
             }
         },
         enabled: !!selectedAgent,
-        retry: 1,
+        retry: 2,
         refetchOnWindowFocus: false,
+        staleTime: 5 * 60 * 1000, // 5 minutos
     });
 };
 
