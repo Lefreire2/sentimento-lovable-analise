@@ -609,7 +609,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_de_Mensagens_Rodrigo_pastore: {
+      Lista_de_Mensagens_Rodrigo_Pastore: {
         Row: {
           id: number
           message: string | null
@@ -2631,7 +2631,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_mensagens_rodrigo_pastore: {
+      Lista_mensagens_Rodrigo_Pastore: {
         Row: {
           aderência_script_nivel: string | null
           contagem_palavras_risco: string | null

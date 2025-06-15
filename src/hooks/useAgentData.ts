@@ -129,11 +129,11 @@ export const useAgentData = (selectedAgent: string) => {
             console.log('📊 Tentando buscar métricas na tabela:', metricsTableName);
             
             try {
-                // Buscar dados na tabela de métricas com mais limite
+                // Buscar dados na tabela de métricas com limite aumentado
                 const { data: metricsData, error: metricsError } = await supabase
                     .from(metricsTableName as any)
                     .select('*')
-                    .limit(500);
+                    .limit(1000);
                 
                 console.log('📊 Resultado métricas:');
                 console.log('- Data length:', metricsData?.length || 0);
@@ -152,7 +152,7 @@ export const useAgentData = (selectedAgent: string) => {
                 const { data: basicData, error: basicError } = await supabase
                     .from(basicTableName as any)
                     .select('*')
-                    .limit(500);
+                    .limit(1000);
                 
                 console.log('💬 Resultado básico:');
                 console.log('- Data length:', basicData?.length || 0);
