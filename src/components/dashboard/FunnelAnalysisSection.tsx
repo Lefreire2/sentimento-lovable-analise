@@ -53,6 +53,7 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
 
         try {
             console.log('🔍 Iniciando análise de funil para:', formatAgentName(selectedAgent));
+            console.log('🔍 Dados enviados:', funnelData);
             
             const { data, error: invokeError } = await supabase.functions.invoke('analise-funil', {
                 body: { 
@@ -61,19 +62,22 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                 },
             });
 
+            console.log('🔍 Resposta da função:', data);
+            console.log('🔍 Erro da invocação:', invokeError);
+
             if (invokeError) {
                 console.error('❌ Erro ao invocar função:', invokeError);
                 throw new Error(`Falha na invocação: ${invokeError.message}`);
             }
 
-            if (data.error) {
+            if (data?.error) {
                 console.error('❌ Erro na análise:', data.error);
                 throw new Error(`Falha na análise: ${data.error}`);
             }
 
             console.log('✅ Análise de funil concluída');
-            setAnalysis(data.analise_gerada);
-            setAIProvider(data.provider || 'unknown');
+            setAnalysis(data?.analise_gerada || 'Análise não disponível');
+            setAIProvider(data?.provider || 'unknown');
             
             toast({
                 title: "Análise de Funil Concluída",
@@ -105,6 +109,8 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                         <Badge variant="secondary" className="ml-2">
                             {aiProvider === 'anthropic' ? (
                                 <><Brain className="h-3 w-3 mr-1" /> Claude</>
+                            ) : aiProvider === 'simulado' ? (
+                                <><Filter className="h-3 w-3 mr-1" /> Simulado</>
                             ) : (
                                 <><TrendingDown className="h-3 w-3 mr-1" /> GPT</>
                             )}
