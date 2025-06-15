@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +12,7 @@ import { SentimentMetrics } from "@/components/dashboard/SentimentMetrics";
 import { TimeMetrics } from "@/components/dashboard/TimeMetrics";
 import { PerformanceMetrics } from "@/components/dashboard/PerformanceMetrics";
 import { ResponseTimeChart } from "@/components/dashboard/ResponseTimeChart";
+import { StrategicAnalysisSection } from "@/components/dashboard/StrategicAnalysisSection";
 
 interface AgentData {
     tempo_primeira_resposta_minutos: string;
@@ -327,6 +327,7 @@ const Dashboard = () => {
 
                 {agentData && !isLoading && !isError && (
                     <div className="space-y-8">
+                        <StrategicAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
                         <AIAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
                         <SentimentMetrics agentData={agentData} />
                         <TimeMetrics agentData={agentData} />
