@@ -70,14 +70,19 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                 throw new Error(`Falha na invocação: ${invokeError.message}`);
             }
 
-            if (data?.error) {
+            if (!data) {
+                console.error('❌ Nenhum dado retornado da função');
+                throw new Error('Nenhum dado retornado da função de análise');
+            }
+
+            if (data.error) {
                 console.error('❌ Erro na análise:', data.error);
                 throw new Error(`Falha na análise: ${data.error}`);
             }
 
             console.log('✅ Análise de funil concluída');
-            setAnalysis(data?.analise_gerada || 'Análise não disponível');
-            setAIProvider(data?.provider || 'unknown');
+            setAnalysis(data.analise_gerada || 'Análise não disponível');
+            setAIProvider(data.provider || 'unknown');
             
             toast({
                 title: "Análise de Funil Concluída",

@@ -33,8 +33,17 @@ serve(async (req) => {
   try {
     console.log('🔍 Processando requisição de análise de funil');
     
-    const requestBody = await req.json();
-    console.log('🔍 Corpo da requisição:', JSON.stringify(requestBody, null, 2));
+    let requestBody;
+    try {
+      requestBody = await req.json();
+      console.log('🔍 Corpo da requisição recebido com sucesso');
+    } catch (parseError) {
+      console.error('❌ Erro ao fazer parse do JSON:', parseError);
+      return new Response(JSON.stringify({ error: "Dados inválidos no corpo da requisição." }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     
     const { funnelData, provider = 'anthropic' }: { 
       funnelData: FunnelAnalysisData, 
@@ -51,26 +60,55 @@ serve(async (req) => {
 
     console.log('🔍 Iniciando análise de funil para:', funnelData.nome);
     console.log('🔍 Provider selecionado:', provider);
-    console.log('🔍 Anthropic API Key disponível:', !!anthropicApiKey);
-    console.log('🔍 OpenAI API Key disponível:', !!openAIApiKey);
 
     // Se não há nenhuma chave de API, retornar análise simulada
     if (!anthropicApiKey && !openAIApiKey) {
       console.log('⚠️ Nenhuma chave de API configurada, retornando análise simulada');
       
-      const simulatedAnalysis = `**Lead:** ${funnelData.nome} (ID: ${funnelData.remoteJid})
-**Última Etapa Alcançada:** Etapa 3 - Levantada de Mão
-**Ponto de Interrupção:** Parou após demonstrar interesse inicial - não respondeu à apresentação da oferta
-**Justificativa:** Lead mostrou interesse mas não reagiu aos valores apresentados. Sentimento detectado: ${funnelData.sentimento_usuario}
-**Reengajamento Possível:** Sim
-**Sugestão:** Recontato em 2-3 dias com abordagem focada em benefícios e não apenas preços. Considerar oferta personalizada ou desconto.
+      const simulatedAnalysis = `**ANÁLISE DE FUNIL CONVERSACIONAL**
 
-**Análise Detalhada:**
-- O lead iniciou a conversa demonstrando interesse genuíno
-- A secretária respondeu adequadamente na primeira abordagem
-- Houve quebra no fluxo após apresentação de valores
-- Sentimento geral da conversa: ${funnelData.sentimento_geral_conversa}
-- Oportunidade de recuperação através de follow-up estratégico`;
+**Lead:** ${funnelData.nome} (ID: ${funnelData.remoteJid})
+**Data da Conversa:** ${funnelData.data_conversa}
+**Origem:** ${funnelData.origem || 'Dados Agregados'}
+
+---
+
+**DIAGNÓSTICO DO FUNIL:**
+
+**Última Etapa Alcançada:** Etapa 3 - Levantada de Mão
+**Ponto de Interrupção:** Lead demonstrou interesse inicial mas não avançou para confirmação
+
+**ANÁLISE DETALHADA:**
+
+1. **Engajamento Inicial:** ✅ Positivo
+   - Lead iniciou contato espontaneamente
+   - Demonstrou interesse claro no serviço
+
+2. **Qualificação:** ⚠️ Parcial
+   - Sentimento do usuário: ${funnelData.sentimento_usuario}
+   - Sentimento do atendente: ${funnelData.sentimento_atendente}
+   - Sentimento geral: ${funnelData.sentimento_geral_conversa}
+
+3. **Apresentação da Oferta:** ❌ Interrompida
+   - Lead não respondeu após apresentação de valores
+   - Possível resistência a preços ou timing inadequado
+
+**OPORTUNIDADES DE MELHORIA:**
+
+1. **Timing da Oferta:** Considerar mais qualificação antes de apresentar valores
+2. **Abordagem de Objeções:** Implementar script para lidar com hesitação
+3. **Follow-up:** Estratégia de reengajamento em 24-48h
+
+**RECOMENDAÇÕES:**
+
+✅ **Reengajamento Possível:** Sim
+🎯 **Estratégia Sugerida:** Recontato focado em benefícios, não apenas preços
+📞 **Timing Ideal:** 2-3 dias após último contato
+💡 **Abordagem:** "Olá ${funnelData.nome}, percebi que você teve interesse em [serviço]. Tem alguma dúvida que posso esclarecer?"
+
+**PONTUAÇÃO DE CONVERSÃO:** 65/100
+- Potencial Alto: Lead qualificado e engajado
+- Necessita: Follow-up estratégico personalizado`;
 
       return new Response(JSON.stringify({ 
         analise_gerada: simulatedAnalysis,
@@ -163,9 +201,9 @@ Analise as mensagens e:
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('❌ Erro da API Anthropic:', errorData);
-          throw new Error(errorData.error?.message || 'Falha na análise com Anthropic');
+          const errorText = await response.text();
+          console.error('❌ Erro da API Anthropic:', errorText);
+          throw new Error(`Falha na análise com Anthropic: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -198,9 +236,9 @@ Analise as mensagens e:
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error('❌ Erro da API OpenAI:', errorData);
-          throw new Error(errorData.error?.message || 'Falha na análise com OpenAI');
+          const errorText = await response.text();
+          console.error('❌ Erro da API OpenAI:', errorText);
+          throw new Error(`Falha na análise com OpenAI: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
