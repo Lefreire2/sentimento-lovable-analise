@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, FunnelChart, Funnel, Cell, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, FunnelChart as RechartsFunnelChart, Funnel, Cell, Tooltip } from "recharts";
 import { Filter, TrendingDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AgentData } from "@/hooks/useAgentData";
