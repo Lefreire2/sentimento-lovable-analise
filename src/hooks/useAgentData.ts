@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMetricsTableName, getBasicTableName, debugAgentMapping } from "@/lib/agents";
@@ -121,88 +122,97 @@ export const useAgentData = (selectedAgent: string) => {
                 return null;
             }
             
-            console.log('🔍 Iniciando busca para agente:', selectedAgent);
+            console.log('🔍 NOVA CONSULTA - Iniciando busca para agente:', selectedAgent);
+            console.log('🕐 Timestamp:', new Date().toISOString());
             
-            // Debug: mostrar mapeamento completo na primeira execução
-            if (selectedAgent === 'André Araújo') {
-                debugAgentMapping();
-            }
+            // Debug: mostrar mapeamento completo
+            debugAgentMapping();
             
             // Primeiro, tentar tabela de métricas
             const metricsTableName = getMetricsTableName(selectedAgent);
-            console.log('📊 Tabela de métricas retornada:', metricsTableName);
+            console.log('📊 MÉTRICA - Tabela retornada:', metricsTableName);
             
-            if (!metricsTableName) {
-                console.log('❌ Nenhuma tabela de métricas encontrada para:', selectedAgent);
-            } else {
+            if (metricsTableName) {
                 try {
-                    console.log('📊 Tentando consultar tabela de métricas:', metricsTableName);
+                    console.log('📊 MÉTRICA - Fazendo consulta para:', metricsTableName);
                     
-                    // Buscar dados na tabela de métricas
-                    const { data: metricsData, error: metricsError } = await supabase
+                    // Verificar se a tabela existe primeiro
+                    const { error: tableExistsError } = await supabase
                         .from(metricsTableName as any)
-                        .select('*')
-                        .limit(1000);
+                        .select('id')
+                        .limit(1);
                     
-                    console.log('📊 Resultado métricas para', selectedAgent, ':');
-                    console.log('- Data length:', metricsData?.length || 0);
-                    console.log('- Error:', metricsError);
-                    console.log('- Sample data:', metricsData?.[0]);
-                    
-                    if (!metricsError && metricsData && metricsData.length > 0) {
-                        console.log('✅ Dados de métricas encontrados, agregando...');
-                        return aggregateAgentData(metricsData);
-                    } else if (metricsError) {
-                        console.log('❌ Erro ao consultar tabela de métricas:', metricsError);
+                    if (tableExistsError) {
+                        console.log('❌ MÉTRICA - Tabela não existe ou erro de acesso:', tableExistsError);
                     } else {
-                        console.log('⚠️ Tabela de métricas está vazia para:', selectedAgent);
+                        console.log('✅ MÉTRICA - Tabela existe e é acessível');
+                        
+                        // Buscar dados na tabela de métricas
+                        const { data: metricsData, error: metricsError } = await supabase
+                            .from(metricsTableName as any)
+                            .select('*');
+                        
+                        console.log('📊 MÉTRICA - Resultado da consulta:');
+                        console.log('- Dados encontrados:', metricsData?.length || 0, 'registros');
+                        console.log('- Erro:', metricsError);
+                        
+                        if (metricsData && metricsData.length > 0) {
+                            console.log('- Exemplo de dados:', metricsData[0]);
+                            console.log('✅ MÉTRICA - Retornando dados agregados');
+                            return aggregateAgentData(metricsData);
+                        }
                     }
                 } catch (err) {
-                    console.error('💥 Erro na consulta de métricas:', err);
+                    console.error('💥 MÉTRICA - Erro na consulta:', err);
                 }
             }
             
             // Se não encontrou métricas, tentar tabela básica
             const basicTableName = getBasicTableName(selectedAgent);
-            console.log('💬 Tabela básica retornada:', basicTableName);
+            console.log('💬 BÁSICA - Tabela retornada:', basicTableName);
             
-            if (!basicTableName) {
-                console.log('❌ Nenhuma tabela básica encontrada para:', selectedAgent);
-                return null;
-            }
-            
-            try {
-                console.log('💬 Tentando consultar tabela básica:', basicTableName);
-                
-                const { data: basicData, error: basicError } = await supabase
-                    .from(basicTableName as any)
-                    .select('*')
-                    .limit(1000);
-                
-                console.log('💬 Resultado básico para', selectedAgent, ':');
-                console.log('- Data length:', basicData?.length || 0);
-                console.log('- Error:', basicError);
-                console.log('- Sample data:', basicData?.[0]);
-                
-                if (!basicError && basicData && basicData.length > 0) {
-                    console.log('✅ Mensagens básicas encontradas, criando dados estimados...');
-                    return createDataFromBasicMessages(basicData);
-                } else if (basicError) {
-                    console.log('❌ Erro ao consultar tabela básica:', basicError);
-                } else {
-                    console.log('⚠️ Tabela básica está vazia para:', selectedAgent);
+            if (basicTableName) {
+                try {
+                    console.log('💬 BÁSICA - Fazendo consulta para:', basicTableName);
+                    
+                    // Verificar se a tabela existe primeiro
+                    const { error: tableExistsError } = await supabase
+                        .from(basicTableName as any)
+                        .select('id')
+                        .limit(1);
+                    
+                    if (tableExistsError) {
+                        console.log('❌ BÁSICA - Tabela não existe ou erro de acesso:', tableExistsError);
+                    } else {
+                        console.log('✅ BÁSICA - Tabela existe e é acessível');
+                        
+                        const { data: basicData, error: basicError } = await supabase
+                            .from(basicTableName as any)
+                            .select('*');
+                        
+                        console.log('💬 BÁSICA - Resultado da consulta:');
+                        console.log('- Dados encontrados:', basicData?.length || 0, 'registros');
+                        console.log('- Erro:', basicError);
+                        
+                        if (basicData && basicData.length > 0) {
+                            console.log('- Exemplo de dados:', basicData[0]);
+                            console.log('✅ BÁSICA - Retornando dados estimados');
+                            return createDataFromBasicMessages(basicData);
+                        }
+                    }
+                } catch (err) {
+                    console.error('💥 BÁSICA - Erro na consulta:', err);
                 }
-            } catch (err) {
-                console.error('💥 Erro na consulta básica:', err);
             }
             
-            console.log('❌ Nenhum dado encontrado em nenhuma tabela para:', selectedAgent);
+            console.log('❌ FINAL - Nenhum dado encontrado para:', selectedAgent);
             return null;
         },
         enabled: !!selectedAgent,
-        retry: 2,
+        retry: 1,
         refetchOnWindowFocus: false,
-        staleTime: 5 * 60 * 1000, // 5 minutos
+        staleTime: 1 * 60 * 1000, // 1 minuto para debug
+        gcTime: 1 * 60 * 1000, // 1 minuto para debug
     });
 };
 
