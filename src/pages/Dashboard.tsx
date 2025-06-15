@@ -42,23 +42,12 @@ const Dashboard = () => {
             console.log('✅ Verificando se a tabela existe na lista:', agentTables.includes(selectedAgent));
             
             try {
-                // Primeiro, vamos verificar quais colunas existem na tabela
-                const { data: schemaCheck, error: schemaError } = await supabase
+                // Buscar dados da tabela do agente selecionado
+                console.log(`🔍 Fazendo query na tabela: "${selectedAgent}"`);
+                
+                const { data, error, count } = await supabase
                     .from(selectedAgent as any)
-                    .select('*')
-                    .limit(1);
-                
-                if (schemaError) {
-                    console.error("❌ Erro ao verificar schema:", schemaError);
-                    throw new Error(`Erro ao verificar tabela: ${schemaError.message}`);
-                }
-                
-                console.log('🔍 Estrutura da tabela (primeira linha):', schemaCheck?.[0] ? Object.keys(schemaCheck[0]) : 'Tabela vazia');
-                
-                // Agora buscar todos os dados
-                const { data, error } = await supabase
-                    .from(selectedAgent as any)
-                    .select('*');
+                    .select('*', { count: 'exact' });
                 
                 if (error) {
                     console.error("❌ Erro do Supabase:", error);
@@ -72,7 +61,8 @@ const Dashboard = () => {
                 }
                 
                 console.log('📈 Dados brutos recebidos:', data);
-                console.log('📏 Número de registros encontrados:', data ? data.length : 0);
+                console.log('📏 Número total de registros:', count);
+                console.log('📏 Número de registros no array:', data ? data.length : 0);
                 
                 if (!data || data.length === 0) {
                     console.log('⚠️ Nenhum dado encontrado para o agente:', selectedAgent);
@@ -104,6 +94,9 @@ const Dashboard = () => {
                     
                     console.log('✅ Colunas encontradas:', availableColumns);
                     console.log('❌ Colunas faltando:', missingColumns);
+                    
+                    // Log de sample data para entender melhor a estrutura
+                    console.log('📝 Sample dos primeiros 3 registros:', data.slice(0, 3));
                 }
                 
                 // Aggregate the data from multiple conversations
@@ -117,6 +110,8 @@ const Dashboard = () => {
             }
         },
         enabled: !!selectedAgent,
+        retry: 1, // Reduzir tentativas para debug mais rápido
+        refetchOnWindowFocus: false, // Evitar refetch desnecessário
     });
 
     const aggregateAgentData = (conversations: any[]): AgentData => {
@@ -326,6 +321,7 @@ const Dashboard = () => {
                         <BarChart2 className="mx-auto h-12 w-12 text-gray-400" />
                         <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sem dados para este atendente</h3>
                         <p className="mt-1 text-sm text-gray-500">Não foram encontrados dados de métricas para o atendente selecionado.</p>
+                        <p className="mt-2 text-xs text-gray-400">Verifique os logs do console para mais detalhes sobre a consulta.</p>
                     </div>
                 )}
 
