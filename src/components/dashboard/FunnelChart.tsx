@@ -1,8 +1,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Filter, TrendingDown } from "lucide-react";
+import { Filter, TrendingDown, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AgentData } from "@/hooks/useAgentData";
+import { useFunnelData } from "@/hooks/useFunnelData";
 import { PeriodFilter } from "./PeriodSelector";
 
 interface FunnelChartProps {
@@ -11,38 +12,8 @@ interface FunnelChartProps {
     selectedPeriod: PeriodFilter;
 }
 
-const funnelSteps = [
-    { name: "Lead Iniciado", value: 100, color: "#3b82f6", description: "Primeiro contato recebido" },
-    { name: "Lead Respondido", value: 85, color: "#06b6d4", description: "Secretária respondeu ao lead" },
-    { name: "Levantada de Mão", value: 65, color: "#10b981", description: "Lead demonstrou interesse" },
-    { name: "Apresentação Oferta", value: 45, color: "#f59e0b", description: "Valores/detalhes apresentados" },
-    { name: "Confirmação Lead", value: 25, color: "#ef4444", description: "Lead confirmou interesse" },
-    { name: "Agendamento Confirmado", value: 15, color: "#8b5cf6", description: "Consulta agendada" }
-];
-
 export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: FunnelChartProps) => {
-    // Simular dados baseados no agentData atual
-    const simulatedFunnelData = funnelSteps.map((step, index) => {
-        // Calcular valores baseados nos dados reais disponíveis
-        let simulatedValue = step.value;
-        
-        if (agentData.conversao_indicada_mvp === 'Sim') {
-            // Se teve conversão, aumentar os valores finais
-            simulatedValue = index < 4 ? step.value + 10 : step.value + 20;
-        } else {
-            // Se não houve conversão, diminuir valores finais
-            simulatedValue = index > 2 ? step.value - 15 : step.value;
-        }
-        
-        return {
-            ...step,
-            value: Math.max(simulatedValue, 0)
-        };
-    });
-
-    const conversionRate = simulatedFunnelData.length > 0 
-        ? Math.round((simulatedFunnelData[simulatedFunnelData.length - 1].value / simulatedFunnelData[0].value) * 100)
-        : 0;
+    const { data: funnelData, isLoading, isError } = useFunnelData(selectedAgent);
 
     const getPeriodDescription = () => {
         switch (selectedPeriod.type) {
@@ -57,6 +28,52 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
         }
     };
 
+    if (isLoading) {
+        return (
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex items-center space-x-2">
+                        <Filter className="h-5 w-5 text-primary" />
+                        <CardTitle>Funil de Conversação</CardTitle>
+                        <Badge variant="outline" className="ml-2">
+                            {getPeriodDescription()}
+                        </Badge>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground font-medium">Carregando dados do funil...</p>
+                        <p className="text-sm text-muted-foreground">
+                            Buscando dados reais de {selectedAgent}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (isError || !funnelData) {
+        return (
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex items-center space-x-2">
+                        <Filter className="h-5 w-5 text-primary" />
+                        <CardTitle>Funil de Conversação</CardTitle>
+                        <Badge variant="outline" className="ml-2">
+                            {getPeriodDescription()}
+                        </Badge>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-center py-8">
+                        <p className="text-muted-foreground">Erro ao carregar dados do funil</p>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -70,7 +87,7 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                 <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="flex items-center gap-1">
                         <TrendingDown className="h-3 w-3" />
-                        Taxa: {conversionRate}%
+                        Taxa: {funnelData.conversionRate}%
                     </Badge>
                 </div>
             </CardHeader>
@@ -78,9 +95,9 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                 <div className="space-y-6">
                     {/* Cards de etapas do funil em formato de grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {simulatedFunnelData.map((step, index) => {
+                        {funnelData.steps.map((step, index) => {
                             const dropoffRate = index > 0 
-                                ? Math.round(((simulatedFunnelData[index-1].value - step.value) / simulatedFunnelData[index-1].value) * 100)
+                                ? Math.round(((funnelData.steps[index-1].value - step.value) / funnelData.steps[index-1].value) * 100)
                                 : 0;
                             
                             return (
@@ -94,7 +111,7 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                                     </div>
                                     <h4 className="font-semibold text-lg mb-2">{step.name}</h4>
                                     <p className="text-sm text-muted-foreground mb-3">{step.description}</p>
-                                    {index > 0 && (
+                                    {index > 0 && funnelData.steps[index-1].value > 0 && (
                                         <Badge variant="outline" className="text-xs">
                                             -{dropoffRate}% anterior
                                         </Badge>
@@ -114,9 +131,9 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                                 </p>
                             </div>
                             <div className="text-right">
-                                <div className="text-4xl font-bold text-primary">{conversionRate}%</div>
+                                <div className="text-4xl font-bold text-primary">{funnelData.conversionRate}%</div>
                                 <div className="text-sm text-muted-foreground mt-1">
-                                    {simulatedFunnelData[simulatedFunnelData.length - 1].value} de {simulatedFunnelData[0].value} leads
+                                    {funnelData.steps[funnelData.steps.length - 1].value} de {funnelData.steps[0].value} leads
                                 </div>
                             </div>
                         </div>
