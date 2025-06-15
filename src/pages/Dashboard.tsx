@@ -4,20 +4,33 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { agentTables, formatAgentName } from "@/lib/agents";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Loader2, ArrowLeft, BarChart2, Smile, Clock, Star, Users } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
-const MetricCard = ({ title, value, unit, icon: Icon }) => (
+interface AgentData {
+  tempo_primeira_resposta_minutos: string;
+  tempo_medio_resposta_atendente_minutos: string;
+  tempo_maximo_resposta_atendente_minutos: string;
+  sentimento_usuario: string;
+  sentimento_atendente: string;
+  sentimento_geral_conversa: string;
+  duracao_total_conversa_minutos: string;
+  conversao_indicada_mvp: string;
+  pontuacao_aderencia_percentual: string;
+  numero_perguntas_vendedor: string;
+}
+
+const MetricCard = ({ title, value, unit, icon: Icon }: { title: string; value: string | number; unit?: string; icon: React.ComponentType<{ className?: string }> }) => (
     <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{title}</CardTitle>
             <Icon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-            <div className="text-2xl font-bold">{value} {unit}</div>
+            <div className="text-2xl font-bold">{value}{unit && ` ${unit}`}</div>
         </CardContent>
     </Card>
 );
@@ -25,19 +38,19 @@ const MetricCard = ({ title, value, unit, icon: Icon }) => (
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
 
-    const { data: agentData, isLoading, isError, error } = useQuery({
+    const { data: agentData, isLoading, isError, error } = useQuery<AgentData | null>({
         queryKey: ['agentMetrics', selectedAgent],
         queryFn: async () => {
             if (!selectedAgent) return null;
             const { data, error } = await supabase
-                .from(selectedAgent)
+                .from(selectedAgent as any)
                 .select()
-                .single();
+                .maybeSingle();
             if (error) {
                 console.error("Supabase error:", error);
                 throw new Error(error.message);
             }
-            return data;
+            return data as AgentData | null;
         },
         enabled: !!selectedAgent,
     });
@@ -87,7 +100,7 @@ const Dashboard = () => {
                         </CardHeader>
                         <CardContent>
                             <p>Não foi possível buscar as métricas. Por favor, tente novamente mais tarde.</p>
-                            <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+                            {error && <p className="text-sm text-muted-foreground mt-2">{error.message}</p>}
                         </CardContent>
                     </Card>
                 )}
@@ -97,6 +110,14 @@ const Dashboard = () => {
                         <Users className="mx-auto h-12 w-12 text-gray-400" />
                         <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhum atendente selecionado</h3>
                         <p className="mt-1 text-sm text-gray-500">Por favor, selecione um atendente para visualizar as métricas.</p>
+                    </div>
+                )}
+
+                {selectedAgent && !isLoading && !isError && !agentData && (
+                    <div className="text-center py-16">
+                        <BarChart2 className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">Sem dados para este atendente</h3>
+                        <p className="mt-1 text-sm text-gray-500">Não foram encontrados dados de métricas para o atendente selecionado.</p>
                     </div>
                 )}
 
