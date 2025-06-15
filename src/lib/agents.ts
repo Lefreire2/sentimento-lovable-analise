@@ -30,6 +30,38 @@ export const agentTables = [
     'Lista_mensagens_Stefanie_lee'
 ].sort();
 
+// Mapeamento direto entre nome formatado e tabela
+const agentNameToTable: Record<string, string> = {
+    'Adiney Esteves': 'Lista_mensagens_Adiney_esteves',
+    'Alana Meneses': 'Lista_mensagens_Alana_meneses',
+    'Aline Bigatão': 'Lista_mensagens_Aline_bigatão',
+    'Aline Franzotti': 'Lista_mensagens_Aline_franzotti',
+    'Amanda': 'Lista_mensagens_Amanda',
+    'Ana Beatriz': 'Lista_mensagens_Ana_beatriz',
+    'Andre Araujo': 'Lista_mensagens_Andre_araujo',
+    'Carlos Antunes': 'Lista_mensagens_ Carlos_Antunes',
+    'Danilo Chammas': 'Lista_mensagens_Danilo_Chammas',
+    'Diego Cabrejos': 'Lista_mensagens_Diego_cabrejos',
+    'Haila': 'Lista_mensagens_Haila',
+    'Henrique Maffei': 'Lista_mensagens_Henrique_maffei',
+    'Julia Jorge': 'Lista_mensagens_Julia_jorge',
+    'Karla Fazollo': 'Lista_mensagens_Karla_fazollo',
+    'Karla Resende': 'Lista_mensagens_Karla_resende',
+    'Luiza Murad': 'Lista_mensagens_Luiza_murad',
+    'Marcelo Soeiro': 'Lista_mensagens_Marcelo_soeiro',
+    'Marco Antonio': 'Lista_mensagens_Marco_antonio',
+    'Mariana Araújo': 'Lista_mensagens_Mariana_araújo',
+    'Michelle Meleck': 'Lista_mensagens_Michelle_Meleck',
+    'Patricia Lima': 'Lista_mensagens_Patricia_lima',
+    'Raiany Pimentel': 'Lista_mensagens_Raiany_pimentel',
+    'Roberta Xavier': 'Lista_mensagens_Roberta_xavier',
+    'Roberto Pigini': 'Lista_mensagens_Roberto_pigini',
+    'Roclides Lima': 'Lista_mensagens_Roclides_lima',
+    'Rodrigo Pastore': 'Lista_mensagens_Rodrigo_pastore',
+    'Silvia Joly': 'Lista_mensagens_Silvia_Joly',
+    'Stefanie Lee': 'Lista_mensagens_Stefanie_lee'
+};
+
 export const formatAgentName = (tableName: string) => {
     const name = tableName
         .replace('Lista_mensagens_', '')
@@ -41,4 +73,11 @@ export const formatAgentName = (tableName: string) => {
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
+};
+
+export const getTableNameFromFormattedName = (formattedName: string): string => {
+    console.log('🔍 Buscando tabela para nome formatado:', formattedName);
+    const tableName = agentNameToTable[formattedName];
+    console.log('📋 Tabela encontrada:', tableName);
+    return tableName || formattedName;
 };

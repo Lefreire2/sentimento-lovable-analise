@@ -8,9 +8,16 @@ interface AgentSelectorProps {
 }
 
 export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorProps) => {
+    const handleAgentChange = (tableName: string) => {
+        console.log('🎯 Agente selecionado (tabela):', tableName);
+        const formattedName = formatAgentName(tableName);
+        console.log('📝 Nome formatado:', formattedName);
+        onAgentChange(formattedName);
+    };
+
     return (
         <div className="mb-6 max-w-sm">
-            <Select onValueChange={onAgentChange} value={selectedAgent}>
+            <Select onValueChange={handleAgentChange} value={selectedAgent}>
                 <SelectTrigger>
                     <SelectValue placeholder="Selecione um atendente..." />
                 </SelectTrigger>

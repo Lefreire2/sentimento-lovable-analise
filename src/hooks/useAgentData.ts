@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getTableNameFromFormattedName } from "@/lib/agents";
 
 interface AgentData {
     tempo_primeira_resposta_minutos: string;
@@ -168,11 +169,15 @@ export const useAgentData = (selectedAgent: string) => {
             
             console.log('🔍 Iniciando busca para o agente:', selectedAgent);
             
+            // Converte o nome formatado para o nome da tabela
+            const tableName = getTableNameFromFormattedName(selectedAgent);
+            console.log('📋 Nome da tabela resolvido:', tableName);
+            
             try {
-                console.log(`🔍 Fazendo query na tabela: "${selectedAgent}"`);
+                console.log(`🔍 Fazendo query na tabela: "${tableName}"`);
                 
                 const { data, error, count } = await supabase
-                    .from(selectedAgent as any)
+                    .from(tableName as any)
                     .select('*', { count: 'exact' });
                 
                 if (error) {
