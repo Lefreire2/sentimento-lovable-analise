@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getTableNameFromFormattedName } from "@/lib/agents";
+import { getTableNameFromFormattedName, isValidTableName, getAllAvailableTables } from "@/lib/agents";
 
 interface AgentData {
     tempo_primeira_resposta_minutos: string;
@@ -168,20 +168,35 @@ export const useAgentData = (selectedAgent: string) => {
             if (!selectedAgent) return null;
             
             console.log('🔍 Iniciando busca para o agente:', selectedAgent);
+            console.log('📋 Tabelas disponíveis:', getAllAvailableTables());
             
             // Converte o nome formatado para o nome da tabela
             const tableName = getTableNameFromFormattedName(selectedAgent);
             console.log('📋 Nome da tabela resolvido:', tableName);
             
+            // Verifica se a tabela é válida
+            if (!isValidTableName(tableName)) {
+                console.error('❌ Tabela não encontrada na lista de tabelas válidas:', tableName);
+                console.log('📝 Tabelas válidas:', getAllAvailableTables());
+                throw new Error(`Tabela não encontrada: ${tableName}`);
+            }
+            
             try {
                 console.log(`🔍 Fazendo query na tabela: "${tableName}"`);
                 
+                // Primeiro, vamos verificar se a tabela existe fazendo uma query simples
                 const { data, error, count } = await supabase
                     .from(tableName as any)
                     .select('*', { count: 'exact' });
                 
                 if (error) {
                     console.error("❌ Erro do Supabase:", error);
+                    console.error("❌ Detalhes do erro:", {
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint,
+                        code: error.code
+                    });
                     throw new Error(`Erro ao buscar dados: ${error.message}`);
                 }
                 
@@ -191,6 +206,23 @@ export const useAgentData = (selectedAgent: string) => {
                 
                 if (!data || data.length === 0) {
                     console.log('⚠️ Nenhum dado encontrado para o agente:', selectedAgent);
+                    console.log('📋 Tabela consultada:', tableName);
+                    
+                    // Vamos tentar uma query alternativa para verificar se há dados de mensagens básicas
+                    console.log('🔄 Tentando buscar dados básicos de mensagens...');
+                    const basicTableName = tableName.replace('Lista_mensagens_', 'Lista_de_Mensagens_');
+                    console.log('🔄 Testando tabela alternativa:', basicTableName);
+                    
+                    const { data: basicData, error: basicError } = await supabase
+                        .from(basicTableName as any)
+                        .select('*', { count: 'exact' });
+                    
+                    if (basicData && basicData.length > 0) {
+                        console.log('✅ Dados encontrados na tabela alternativa:', basicData.length);
+                    } else {
+                        console.log('❌ Nenhum dado na tabela alternativa também');
+                    }
+                    
                     return null;
                 }
                 

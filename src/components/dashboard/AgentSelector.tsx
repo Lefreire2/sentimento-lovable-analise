@@ -12,8 +12,12 @@ export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorPro
         console.log('🎯 Agente selecionado (tabela):', tableName);
         const formattedName = formatAgentName(tableName);
         console.log('📝 Nome formatado:', formattedName);
+        console.log('🔄 Enviando nome formatado para o hook:', formattedName);
         onAgentChange(formattedName);
     };
+
+    // Debug: verificar o valor selecionado atual
+    console.log('🎨 AgentSelector - selectedAgent atual:', selectedAgent);
 
     return (
         <div className="mb-6 max-w-sm">
@@ -22,11 +26,15 @@ export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorPro
                     <SelectValue placeholder="Selecione um atendente..." />
                 </SelectTrigger>
                 <SelectContent>
-                    {agentTables.map(table => (
-                        <SelectItem key={table} value={table}>
-                            {formatAgentName(table)}
-                        </SelectItem>
-                    ))}
+                    {agentTables.map(table => {
+                        const formattedName = formatAgentName(table);
+                        console.log(`📋 Mapeando: ${table} -> ${formattedName}`);
+                        return (
+                            <SelectItem key={table} value={table}>
+                                {formattedName}
+                            </SelectItem>
+                        );
+                    })}
                 </SelectContent>
             </Select>
         </div>

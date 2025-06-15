@@ -30,7 +30,7 @@ export const agentTables = [
     'Lista_mensagens_Stefanie_lee'
 ].sort();
 
-// Mapeamento direto entre nome formatado e tabela
+// Mapeamento corrigido baseado nas tabelas reais do banco de dados
 const agentNameToTable: Record<string, string> = {
     'Adiney Esteves': 'Lista_mensagens_Adiney_esteves',
     'Alana Meneses': 'Lista_mensagens_Alana_meneses',
@@ -39,7 +39,7 @@ const agentNameToTable: Record<string, string> = {
     'Amanda': 'Lista_mensagens_Amanda',
     'Ana Beatriz': 'Lista_mensagens_Ana_beatriz',
     'Andre Araujo': 'Lista_mensagens_Andre_araujo',
-    'Carlos Antunes': 'Lista_mensagens_ Carlos_Antunes',
+    'Carlos Antunes': 'Lista_mensagens_ Carlos_Antunes', // Note o espaço extra
     'Danilo Chammas': 'Lista_mensagens_Danilo_Chammas',
     'Diego Cabrejos': 'Lista_mensagens_Diego_cabrejos',
     'Haila': 'Lista_mensagens_Haila',
@@ -79,5 +79,22 @@ export const getTableNameFromFormattedName = (formattedName: string): string => 
     console.log('🔍 Buscando tabela para nome formatado:', formattedName);
     const tableName = agentNameToTable[formattedName];
     console.log('📋 Tabela encontrada:', tableName);
-    return tableName || formattedName;
+    
+    if (!tableName) {
+        console.error('❌ Nome formatado não encontrado no mapeamento:', formattedName);
+        console.log('📝 Chaves disponíveis:', Object.keys(agentNameToTable));
+        return formattedName; // Fallback
+    }
+    
+    return tableName;
+};
+
+// Nova função para debug - verificar se tabela existe
+export const isValidTableName = (tableName: string): boolean => {
+    return agentTables.includes(tableName);
+};
+
+// Função para listar todas as tabelas disponíveis
+export const getAllAvailableTables = (): string[] => {
+    return agentTables;
 };
