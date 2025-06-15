@@ -7,21 +7,7 @@ import { Loader2, Brain, TrendingUp, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAgentName } from "@/lib/agents";
 import { useToast } from "@/hooks/use-toast";
-
-interface AgentData {
-    tempo_primeira_resposta_minutos: string;
-    tempo_medio_resposta_atendente_minutos: string;
-    tempo_maximo_resposta_atendente_minutos: string;
-    sentimento_usuario: string;
-    sentimento_atendente: string;
-    sentimento_geral_conversa: string;
-    duracao_total_conversa_minutos: string;
-    conversao_indicada_mvp: string;
-    pontuacao_aderencia_percentual: string;
-    numero_perguntas_vendedor: string;
-    aderência_script_nivel: string;
-    termo_chave_conversao: string;
-}
+import { AgentData } from "@/hooks/useAgentData";
 
 interface StrategicAnalysisSectionProps {
     agentData: AgentData;
@@ -41,11 +27,10 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
         setAnalysis('');
         setAIProvider('');
 
-        // Preparar dados da conversa no formato esperado pela edge function
         const conversationData = {
             remoteJid: `dashboard_${selectedAgent}_${Date.now()}`,
             nome: formatAgentName(selectedAgent),
-            origem: 'Dashboard Agregado', // Valor padrão para análise agregada
+            origem: 'Dashboard Agregado',
             levantada_de_mao: agentData.conversao_indicada_mvp === 'Sim' ? 'Sim' : 'Não',
             agendou: agentData.conversao_indicada_mvp === 'Sim' ? 'Sim' : 'Não',
             sentimento_geral_conversa: agentData.sentimento_geral_conversa || 'N/A',
@@ -57,7 +42,7 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
             aderencia_script_nivel: agentData.aderência_script_nivel || 'N/A',
             pontuacao_aderencia_script: parseFloat(agentData.pontuacao_aderencia_percentual || '0'),
             termo_chave_conversao: agentData.termo_chave_conversao || 'N/A',
-            data_conversa: new Date().toISOString().split('T')[0] // Data atual para análise agregada
+            data_conversa: new Date().toISOString().split('T')[0]
         };
 
         try {

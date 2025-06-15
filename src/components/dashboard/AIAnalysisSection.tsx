@@ -6,21 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Brain, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatAgentName } from "@/lib/agents";
-
-interface AgentData {
-    tempo_primeira_resposta_minutos: string;
-    tempo_medio_resposta_atendente_minutos: string;
-    tempo_maximo_resposta_atendente_minutos: string;
-    sentimento_usuario: string;
-    sentimento_atendente: string;
-    sentimento_geral_conversa: string;
-    duracao_total_conversa_minutos: string;
-    conversao_indicada_mvp: string;
-    pontuacao_aderencia_percentual: string;
-    numero_perguntas_vendedor: string;
-    aderência_script_nivel: string;
-    termo_chave_conversao: string;
-}
+import { AgentData } from "@/hooks/useAgentData";
 
 interface AIAnalysisSectionProps {
     agentData: AgentData;
