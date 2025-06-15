@@ -8,17 +8,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatAgentName } from "@/lib/agents";
 import { useToast } from "@/hooks/use-toast";
 import { AgentData } from "@/hooks/useAgentData";
+import { PeriodFilter } from "./PeriodSelector";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface StrategicAnalysisSectionProps {
     agentData: AgentData;
     selectedAgent: string;
+    selectedPeriod: PeriodFilter;
 }
 
-export const StrategicAnalysisSection = ({ agentData, selectedAgent }: StrategicAnalysisSectionProps) => {
+export const StrategicAnalysisSection = ({ agentData, selectedAgent, selectedPeriod }: StrategicAnalysisSectionProps) => {
     const [analysis, setAnalysis] = useState<string>("");
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [aiProvider, setAIProvider] = useState<string>('');
     const { toast } = useToast();
+
+    const getPeriodDescription = () => {
+        switch (selectedPeriod.type) {
+            case 'last7days':
+                return 'últimos 7 dias';
+            case 'last30days':
+                return 'últimos 30 dias';
+            case 'last90days':
+                return 'últimos 90 dias';
+            case 'custom':
+                if (selectedPeriod.startDate && selectedPeriod.endDate) {
+                    return `${format(selectedPeriod.startDate, "dd/MM/yyyy", { locale: ptBR })} até ${format(selectedPeriod.endDate, "dd/MM/yyyy", { locale: ptBR })}`;
+                }
+                return 'período personalizado';
+            default:
+                return 'período selecionado';
+        }
+    };
 
     const handleGenerateStrategicAnalysis = async () => {
         if (!agentData) return;
@@ -27,10 +49,11 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
         setAnalysis('');
         setAIProvider('');
 
+        const periodDescription = getPeriodDescription();
         const conversationData = {
-            remoteJid: `dashboard_${selectedAgent}_${Date.now()}`,
+            remoteJid: `dashboard_${selectedAgent}_${selectedPeriod.type}_${Date.now()}`,
             nome: formatAgentName(selectedAgent),
-            origem: 'Dashboard Agregado',
+            origem: `Dashboard Agregado - ${periodDescription}`,
             levantada_de_mao: agentData.conversao_indicada_mvp === 'Sim' ? 'Sim' : 'Não',
             agendou: agentData.conversao_indicada_mvp === 'Sim' ? 'Sim' : 'Não',
             sentimento_geral_conversa: agentData.sentimento_geral_conversa || 'N/A',
@@ -42,11 +65,13 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
             aderencia_script_nivel: agentData.aderência_script_nivel || 'N/A',
             pontuacao_aderencia_script: parseFloat(agentData.pontuacao_aderencia_percentual || '0'),
             termo_chave_conversao: agentData.termo_chave_conversao || 'N/A',
-            data_conversa: new Date().toISOString().split('T')[0]
+            data_conversa: new Date().toISOString().split('T')[0],
+            periodo_analise: periodDescription
         };
 
         try {
             console.log('📊 Iniciando análise estratégica para:', formatAgentName(selectedAgent));
+            console.log('📊 Período:', periodDescription);
             
             const { data, error: invokeError } = await supabase.functions.invoke('analise-estrategica', {
                 body: { 
@@ -71,7 +96,7 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
             
             toast({
                 title: "Análise Concluída",
-                description: "Análise estratégica gerada com sucesso",
+                description: `Análise estratégica gerada para ${periodDescription}`,
             });
 
         } catch (e: any) {
@@ -95,6 +120,9 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
                 <div className="flex items-center space-x-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
                     <CardTitle>Análise Estratégica de Performance</CardTitle>
+                    <Badge variant="outline" className="ml-2">
+                        {getPeriodDescription()}
+                    </Badge>
                     {aiProvider && (
                         <Badge variant="secondary" className="ml-2">
                             {aiProvider === 'anthropic' ? (
@@ -116,7 +144,9 @@ export const StrategicAnalysisSection = ({ agentData, selectedAgent }: Strategic
                     <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
                         <TrendingUp className="h-8 w-8 animate-pulse text-primary" />
                         <p className="text-muted-foreground font-medium">Analisando estratégia comercial...</p>
-                        <p className="text-sm text-muted-foreground">Avaliando sentimento, aderência e oportunidades de conversão</p>
+                        <p className="text-sm text-muted-foreground">
+                            Avaliando performance para {getPeriodDescription()}
+                        </p>
                     </div>
                 </CardContent>
             )}

@@ -3,16 +3,22 @@ import { useState } from "react";
 import { useAgentData } from "@/hooks/useAgentData";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { AgentSelector } from "@/components/dashboard/AgentSelector";
+import { PeriodSelector, PeriodFilter } from "@/components/dashboard/PeriodSelector";
 import { DashboardStates } from "@/components/dashboard/DashboardStates";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import { getAllAvailableTables } from "@/lib/agents";
 
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
+    const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>({
+        type: 'last30days'
+    });
+    
     const { data: agentData, isLoading, isError, error } = useAgentData(selectedAgent);
 
     console.log('🎛️ Dashboard - Estado atual:');
     console.log('- selectedAgent:', selectedAgent);
+    console.log('- selectedPeriod:', selectedPeriod);
     console.log('- isLoading:', isLoading);
     console.log('- isError:', isError);
     console.log('- agentData:', agentData);
@@ -33,6 +39,7 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto">
                 <DashboardHeader />
                 <AgentSelector selectedAgent={selectedAgent} onAgentChange={setSelectedAgent} />
+                <PeriodSelector selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
                 
                 {shouldShowStates && (
                     <DashboardStates 
@@ -45,7 +52,11 @@ const Dashboard = () => {
                 )}
 
                 {shouldShowContent && (
-                    <DashboardContent agentData={agentData} selectedAgent={selectedAgent} />
+                    <DashboardContent 
+                        agentData={agentData} 
+                        selectedAgent={selectedAgent}
+                        selectedPeriod={selectedPeriod}
+                    />
                 )}
             </div>
         </div>

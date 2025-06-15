@@ -8,17 +8,39 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatAgentName } from "@/lib/agents";
 import { useToast } from "@/hooks/use-toast";
 import { AgentData } from "@/hooks/useAgentData";
+import { PeriodFilter } from "./PeriodSelector";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface FunnelAnalysisSectionProps {
     agentData: AgentData;
     selectedAgent: string;
+    selectedPeriod: PeriodFilter;
 }
 
-export const FunnelAnalysisSection = ({ agentData, selectedAgent }: FunnelAnalysisSectionProps) => {
+export const FunnelAnalysisSection = ({ agentData, selectedAgent, selectedPeriod }: FunnelAnalysisSectionProps) => {
     const [analysis, setAnalysis] = useState<string>("");
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [aiProvider, setAIProvider] = useState<string>('');
     const { toast } = useToast();
+
+    const getPeriodDescription = () => {
+        switch (selectedPeriod.type) {
+            case 'last7days':
+                return 'últimos 7 dias';
+            case 'last30days':
+                return 'últimos 30 dias';
+            case 'last90days':
+                return 'últimos 90 dias';
+            case 'custom':
+                if (selectedPeriod.startDate && selectedPeriod.endDate) {
+                    return `${format(selectedPeriod.startDate, "dd/MM/yyyy", { locale: ptBR })} até ${format(selectedPeriod.endDate, "dd/MM/yyyy", { locale: ptBR })}`;
+                }
+                return 'período personalizado';
+            default:
+                return 'período selecionado';
+        }
+    };
 
     const handleGenerateFunnelAnalysis = async () => {
         if (!agentData) return;
@@ -27,9 +49,10 @@ export const FunnelAnalysisSection = ({ agentData, selectedAgent }: FunnelAnalys
         setAnalysis('');
         setAIProvider('');
 
-        // Criar mensagens simuladas baseadas nos dados agregados
+        // Criar mensagens simuladas baseadas nos dados agregados para o período
+        const periodDescription = getPeriodDescription();
         const simulatedMessages = `
-[CONVERSA SIMULADA BASEADA EM DADOS AGREGADOS]
+[CONVERSA SIMULADA BASEADA EM DADOS AGREGADOS - ${periodDescription.toUpperCase()}]
 
 Secretária: Olá! Obrigada por entrar em contato. Como posso te ajudar?
 Lead: Oi, vi o anúncio de vocês e gostaria de mais informações sobre consultas.
@@ -38,21 +61,25 @@ Lead: Preciso de uma consulta com ${agentData.termo_chave_conversao || 'dermatol
 Secretária: Perfeito! Temos horários disponíveis. A consulta tem o valor de R$ 200,00.
 Lead: ${agentData.conversao_indicada_mvp === 'Sim' ? 'Ok, vou agendar sim!' : 'Deixa eu ver e te retorno...'}
 ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia seria melhor para você?' : ''}
+
+[PERÍODO DE ANÁLISE: ${periodDescription}]
         `.trim();
 
         const funnelData = {
-            remoteJid: `aggregated_${selectedAgent}_${Date.now()}`,
+            remoteJid: `aggregated_${selectedAgent}_${selectedPeriod.type}_${Date.now()}`,
             nome: formatAgentName(selectedAgent),
             data_conversa: new Date().toISOString().split('T')[0],
-            origem: 'Dados Agregados Dashboard',
+            origem: `Dados Agregados Dashboard - ${periodDescription}`,
             mensagens_concatenadas: simulatedMessages,
             sentimento_geral_conversa: agentData.sentimento_geral_conversa || 'Neutro',
             sentimento_usuario: agentData.sentimento_usuario || 'Neutro',
-            sentimento_atendente: agentData.sentimento_atendente || 'Positivo'
+            sentimento_atendente: agentData.sentimento_atendente || 'Positivo',
+            periodo_analise: periodDescription
         };
 
         try {
             console.log('🔍 Iniciando análise de funil para:', formatAgentName(selectedAgent));
+            console.log('🔍 Período:', periodDescription);
             console.log('🔍 Dados enviados:', funnelData);
             
             const { data, error: invokeError } = await supabase.functions.invoke('analise-funil', {
@@ -86,7 +113,7 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
             
             toast({
                 title: "Análise de Funil Concluída",
-                description: "Diagnóstico de etapas do funil gerado com sucesso",
+                description: `Diagnóstico de etapas do funil gerado para ${periodDescription}`,
             });
 
         } catch (e: any) {
@@ -110,6 +137,9 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                 <div className="flex items-center space-x-2">
                     <Filter className="h-5 w-5 text-primary" />
                     <CardTitle>Análise de Funil Conversacional</CardTitle>
+                    <Badge variant="outline" className="ml-2">
+                        {getPeriodDescription()}
+                    </Badge>
                     {aiProvider && (
                         <Badge variant="secondary" className="ml-2">
                             {aiProvider === 'anthropic' ? (
@@ -133,7 +163,9 @@ ${agentData.conversao_indicada_mvp === 'Sim' ? 'Secretária: Ótimo! Qual dia se
                     <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
                         <Filter className="h-8 w-8 animate-pulse text-primary" />
                         <p className="text-muted-foreground font-medium">Analisando etapas do funil...</p>
-                        <p className="text-sm text-muted-foreground">Identificando pontos de abandono e oportunidades</p>
+                        <p className="text-sm text-muted-foreground">
+                            Identificando pontos de abandono para {getPeriodDescription()}
+                        </p>
                     </div>
                 </CardContent>
             )}

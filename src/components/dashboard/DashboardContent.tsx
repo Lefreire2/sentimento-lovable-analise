@@ -6,19 +6,32 @@ import { SentimentMetrics } from "./SentimentMetrics";
 import { TimeMetrics } from "./TimeMetrics";
 import { PerformanceMetrics } from "./PerformanceMetrics";
 import { ResponseTimeChart } from "./ResponseTimeChart";
+import { PeriodFilter } from "./PeriodSelector";
 import { AgentData } from "@/hooks/useAgentData";
 
 interface DashboardContentProps {
     agentData: AgentData;
     selectedAgent: string;
+    selectedPeriod: PeriodFilter;
 }
 
-export const DashboardContent = ({ agentData, selectedAgent }: DashboardContentProps) => {
+export const DashboardContent = ({ agentData, selectedAgent, selectedPeriod }: DashboardContentProps) => {
     return (
         <div className="space-y-8">
-            <FunnelAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
-            <StrategicAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
-            <AIAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
+            <FunnelAnalysisSection 
+                agentData={agentData} 
+                selectedAgent={selectedAgent}
+                selectedPeriod={selectedPeriod}
+            />
+            <StrategicAnalysisSection 
+                agentData={agentData} 
+                selectedAgent={selectedAgent}
+                selectedPeriod={selectedPeriod}
+            />
+            <AIAnalysisSection 
+                agentData={agentData} 
+                selectedAgent={selectedAgent} 
+            />
             <SentimentMetrics agentData={agentData} />
             <TimeMetrics agentData={agentData} />
             <PerformanceMetrics agentData={agentData} />
