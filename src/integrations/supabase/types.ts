@@ -1071,7 +1071,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_mensagens_Amanda: {
+      Lista_mensagens_Amanda_Mota: {
         Row: {
           aderência_script_nivel: string | null
           contagem_palavras_risco: string | null

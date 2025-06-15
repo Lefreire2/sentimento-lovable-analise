@@ -35,14 +35,11 @@ const createDefaultAgentData = (): AgentData => ({
 
 const aggregateAgentData = (conversations: any[]): AgentData => {
     console.log('🔄 Agregando dados de', conversations.length, 'conversas');
+    console.log('📊 Primeira conversa (exemplo):', conversations[0]);
     
     if (conversations.length === 0) {
         return createDefaultAgentData();
     }
-
-    // Pegar valores da primeira conversa ou calcular médias
-    const firstConv = conversations[0];
-    console.log('📊 Primeira conversa:', firstConv);
 
     const getAverage = (field: string): string => {
         const values = conversations
@@ -125,48 +122,57 @@ export const useAgentData = (selectedAgent: string) => {
                 return null;
             }
             
-            console.log('🔍 Buscando dados para:', selectedAgent);
+            console.log('🔍 Iniciando busca para agente:', selectedAgent);
             
             // Primeiro, tentar tabela de métricas
             const metricsTableName = getMetricsTableName(selectedAgent);
-            console.log('📊 Tentando buscar métricas em:', metricsTableName);
+            console.log('📊 Tentando buscar métricas na tabela:', metricsTableName);
             
             try {
+                // Testar se a tabela existe fazendo uma query simples
                 const { data: metricsData, error: metricsError } = await supabase
                     .from(metricsTableName as any)
                     .select('*')
-                    .limit(10);
+                    .limit(100);
                 
-                console.log('📊 Resultado métricas - Data:', metricsData?.length || 0, 'Error:', metricsError?.message);
+                console.log('📊 Resultado métricas:');
+                console.log('- Data length:', metricsData?.length || 0);
+                console.log('- Error:', metricsError);
+                console.log('- Sample data:', metricsData?.[0]);
                 
                 if (!metricsError && metricsData && metricsData.length > 0) {
-                    console.log('✅ Dados de métricas encontrados:', metricsData.length);
+                    console.log('✅ Dados de métricas encontrados, agregando...');
                     return aggregateAgentData(metricsData);
                 }
                 
                 // Se não encontrou métricas, tentar tabela básica
                 const basicTableName = getBasicTableName(selectedAgent);
-                console.log('💬 Tentando buscar mensagens básicas em:', basicTableName);
+                console.log('💬 Tentando buscar mensagens básicas na tabela:', basicTableName);
                 
                 const { data: basicData, error: basicError } = await supabase
                     .from(basicTableName as any)
                     .select('*')
-                    .limit(50);
+                    .limit(100);
                 
-                console.log('💬 Resultado básico - Data:', basicData?.length || 0, 'Error:', basicError?.message);
+                console.log('💬 Resultado básico:');
+                console.log('- Data length:', basicData?.length || 0);
+                console.log('- Error:', basicError);
+                console.log('- Sample data:', basicData?.[0]);
                 
                 if (!basicError && basicData && basicData.length > 0) {
-                    console.log('✅ Mensagens básicas encontradas:', basicData.length);
+                    console.log('✅ Mensagens básicas encontradas, criando dados estimados...');
                     return createDataFromBasicMessages(basicData);
                 }
                 
-                console.log('❌ Nenhum dado encontrado em ambas as tabelas');
-                console.log('🔍 Erros - Métricas:', metricsError?.message, 'Básico:', basicError?.message);
+                console.log('❌ Nenhum dado encontrado em nenhuma tabela');
+                console.log('🔍 Detalhes dos erros:');
+                console.log('- Métricas:', metricsError);
+                console.log('- Básico:', basicError);
                 
                 return null;
                 
             } catch (err) {
-                console.error('💥 Erro na busca:', err);
+                console.error('💥 Erro na busca de dados:', err);
                 return null;
             }
         },

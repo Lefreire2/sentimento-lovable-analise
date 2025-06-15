@@ -9,11 +9,12 @@ interface AgentSelectorProps {
 
 export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorProps) => {
     const handleAgentChange = (formattedName: string) => {
-        console.log('🎯 Agente selecionado (nome formatado):', formattedName);
+        console.log('🎯 Agente selecionado:', formattedName);
         onAgentChange(formattedName);
     };
 
-    console.log('🎨 AgentSelector - selectedAgent atual:', selectedAgent);
+    console.log('🎨 AgentSelector renderizando - selectedAgent:', selectedAgent);
+    console.log('📋 Total de agentes disponíveis:', agentTables.length);
 
     return (
         <div className="mb-6 max-w-sm">
@@ -24,7 +25,7 @@ export const AgentSelector = ({ selectedAgent, onAgentChange }: AgentSelectorPro
                 <SelectContent>
                     {agentTables.map(table => {
                         const formattedName = formatAgentName(table);
-                        console.log(`📋 Mapeando: ${table} -> ${formattedName}`);
+                        console.log(`📋 Opção: ${table} -> ${formattedName}`);
                         return (
                             <SelectItem key={table} value={formattedName}>
                                 {formattedName}

@@ -5,7 +5,7 @@ export const metricsAgentTables = [
     'Lista_mensagens_Alana_meneses',
     'Lista_mensagens_Aline_bigatão',
     'Lista_mensagens_Aline_franzotti',
-    'Lista_mensagens_Amanda',
+    'Lista_mensagens_Amanda_Mota',
     'Lista_mensagens_Ana_beatriz',
     'Lista_mensagens_Andre_araujo',
     'Lista_mensagens_ Carlos_Antunes',
@@ -63,10 +63,12 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Stefanie_lee'
 ].sort();
 
-// Lista principal de agentes (usa as tabelas de métricas como principal)
+// Lista principal de agentes
 export const agentTables = metricsAgentTables;
 
 export const formatAgentName = (tableName: string) => {
+    console.log('🎯 Formatando nome da tabela:', tableName);
+    
     const name = tableName
         .replace('Lista_mensagens_', '')
         .replace('Lista_de_Mensagens_', '')
@@ -74,95 +76,57 @@ export const formatAgentName = (tableName: string) => {
         .trim();
     
     // Capitalize each word
-    return name
+    const formatted = name
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
+    
+    console.log('✅ Nome formatado:', formatted);
+    return formatted;
 };
 
 export const getMetricsTableName = (formattedName: string): string => {
-    console.log('🔍 Convertendo nome formatado para tabela de métricas:', formattedName);
+    console.log('🔍 Buscando tabela de métricas para:', formattedName);
     
-    // Converter nome formatado de volta para formato de tabela
-    const tableFormat = formattedName
-        .toLowerCase()
-        .replace(/ /g, '_')
-        .replace(/[áàâã]/g, 'a')
-        .replace(/[éèê]/g, 'e')
-        .replace(/[íìî]/g, 'i')
-        .replace(/[óòôõ]/g, 'o')
-        .replace(/[úùû]/g, 'u')
-        .replace(/[ç]/g, 'c');
-    
-    const metricsTable = `Lista_mensagens_${tableFormat}`;
-    console.log('📊 Tabela de métricas gerada:', metricsTable);
-    
-    // Verificar se a tabela existe na lista
-    const foundTable = metricsAgentTables.find(table => 
-        table.toLowerCase() === metricsTable.toLowerCase()
-    );
-    
-    if (foundTable) {
-        console.log('✅ Tabela encontrada na lista:', foundTable);
-        return foundTable;
-    }
-    
-    console.log('❌ Tabela não encontrada, tentando variações...');
-    
-    // Tentar encontrar por nome parcial
-    const partialMatch = metricsAgentTables.find(table => {
-        const tableName = table.replace('Lista_mensagens_', '').toLowerCase();
-        const searchName = tableFormat.toLowerCase();
-        return tableName.includes(searchName) || searchName.includes(tableName);
+    // Busca direta por correspondência exata no nome formatado
+    const exactMatch = metricsAgentTables.find(table => {
+        const tableFormatted = formatAgentName(table);
+        const isMatch = tableFormatted.toLowerCase() === formattedName.toLowerCase();
+        console.log(`📋 Comparando: "${tableFormatted}" === "${formattedName}" = ${isMatch}`);
+        return isMatch;
     });
     
-    if (partialMatch) {
-        console.log('✅ Encontrada correspondência parcial:', partialMatch);
-        return partialMatch;
+    if (exactMatch) {
+        console.log('✅ Correspondência exata encontrada:', exactMatch);
+        return exactMatch;
     }
     
-    console.log('❌ Nenhuma tabela encontrada para:', formattedName);
-    return metricsTable; // Retorna o nome gerado mesmo se não encontrado
+    console.log('❌ Nenhuma correspondência exata encontrada para métricas');
+    
+    // Fallback - retorna a primeira tabela como exemplo
+    return metricsAgentTables[0];
 };
 
 export const getBasicTableName = (formattedName: string): string => {
-    console.log('🔍 Convertendo nome formatado para tabela básica:', formattedName);
+    console.log('🔍 Buscando tabela básica para:', formattedName);
     
-    const tableFormat = formattedName
-        .toLowerCase()
-        .replace(/ /g, '_')
-        .replace(/[áàâã]/g, 'a')
-        .replace(/[éèê]/g, 'e')
-        .replace(/[íìî]/g, 'i')
-        .replace(/[óòôõ]/g, 'o')
-        .replace(/[úùû]/g, 'u')
-        .replace(/[ç]/g, 'c');
-    
-    const basicTable = `Lista_de_Mensagens_${tableFormat}`;
-    console.log('💬 Tabela básica gerada:', basicTable);
-    
-    const foundTable = basicMessageTables.find(table => 
-        table.toLowerCase() === basicTable.toLowerCase()
-    );
-    
-    if (foundTable) {
-        console.log('✅ Tabela básica encontrada:', foundTable);
-        return foundTable;
-    }
-    
-    // Tentar encontrar por nome parcial
-    const partialMatch = basicMessageTables.find(table => {
-        const tableName = table.replace('Lista_de_Mensagens_', '').toLowerCase();
-        const searchName = tableFormat.toLowerCase();
-        return tableName.includes(searchName) || searchName.includes(tableName);
+    // Busca direta por correspondência exata no nome formatado
+    const exactMatch = basicMessageTables.find(table => {
+        const tableFormatted = formatAgentName(table);
+        const isMatch = tableFormatted.toLowerCase() === formattedName.toLowerCase();
+        console.log(`📋 Comparando básica: "${tableFormatted}" === "${formattedName}" = ${isMatch}`);
+        return isMatch;
     });
     
-    if (partialMatch) {
-        console.log('✅ Encontrada correspondência parcial básica:', partialMatch);
-        return partialMatch;
+    if (exactMatch) {
+        console.log('✅ Correspondência exata básica encontrada:', exactMatch);
+        return exactMatch;
     }
     
-    return basicTable;
+    console.log('❌ Nenhuma correspondência exata encontrada para básica');
+    
+    // Fallback - retorna a primeira tabela como exemplo
+    return basicMessageTables[0];
 };
 
 // Função para verificar se tabela existe
