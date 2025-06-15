@@ -1,6 +1,7 @@
 
 // Tabelas de métricas agregadas (dados processados) - nomes exatos do banco
 export const metricsAgentTables = [
+    'Lista_mensagens_ Carlos_Antunes',
     'Lista_mensagens_Adiney_esteves',
     'Lista_mensagens_Alana_meneses',
     'Lista_mensagens_Aline_bigatão',
@@ -8,7 +9,6 @@ export const metricsAgentTables = [
     'Lista_mensagens_Amanda_Mota',
     'Lista_mensagens_Ana_beatriz',
     'Lista_mensagens_Andre_araujo',
-    'Lista_mensagens_ Carlos_Antunes', // Note o espaço antes de Carlos
     'Lista_mensagens_Danilo_Chammas',
     'Lista_mensagens_Diego_cabrejos',
     'Lista_mensagens_Haila',
@@ -55,7 +55,7 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Michelle_Meleck',
     'Lista_de_Mensagens_Patricia_lima',
     'Lista_de_Mensagens_Raiany_pimentel',
-    'Lista_de_Mensagens_Roberta_xavier', // Corrigido Xavier com X maiúsculo
+    'Lista_de_Mensagens_Roberta_Xavier', // Corrigido Xavier com X maiúsculo
     'Lista_de_Mensagens_Roberto_pigini',
     'Lista_de_Mensagens_Roclides_lima',
     'Lista_de_Mensagens_Rodrigo_Pastore', // Corrigido Pastore com P maiúsculo
@@ -66,9 +66,10 @@ export const basicMessageTables = [
 // Lista principal de agentes
 export const agentTables = metricsAgentTables;
 
-// Mapeamento direto de nomes formatados para nomes de tabelas
+// Mapeamento DIRETO e DEFINITIVO de nomes formatados para sufixos de tabelas
 const nameToTableMapping: Record<string, string> = {
-    'André Araújo': 'Andre_araujo',
+    // ⚠️ ATENÇÃO: André Araújo no banco está SEM acento (Andre_araujo)
+    'André Araújo': 'Andre_araujo', // CORRIGIDO: sem acento no banco
     'Mariana Araújo': 'Mariana_araújo',
     'Aline Bigatão': 'Aline_bigatão',
     'Ana Beatriz': 'Ana_beatriz',
@@ -109,6 +110,7 @@ export const formatAgentName = (tableName: string) => {
     
     // Casos especiais para nomes com acentos e formatação
     const specialCases: Record<string, string> = {
+        // ⚠️ CORRIGIDO: Andre araujo (SEM acento) -> André Araújo (COM acento na UI)
         'Andre araujo': 'André Araújo',
         'Mariana araújo': 'Mariana Araújo',
         'Aline bigatão': 'Aline Bigatão',
@@ -168,8 +170,14 @@ export const getMetricsTableName = (formattedName: string): string => {
         
         // Verifica se a tabela realmente existe na lista
         if (metricsAgentTables.includes(tableNameMetrics)) {
+            console.log('✅ Tabela confirmada na lista de métricas');
             return tableNameMetrics;
+        } else {
+            console.log('❌ Tabela NÃO encontrada na lista de métricas:', tableNameMetrics);
         }
+    } else {
+        console.log('❌ Nenhum mapeamento direto encontrado para:', formattedName);
+        console.log('📋 Mapeamentos disponíveis:', Object.keys(nameToTableMapping));
     }
     
     // Busca direta por correspondência exata no nome formatado
@@ -202,8 +210,13 @@ export const getBasicTableName = (formattedName: string): string => {
         
         // Verifica se a tabela realmente existe na lista
         if (basicMessageTables.includes(tableNameBasic)) {
+            console.log('✅ Tabela básica confirmada na lista');
             return tableNameBasic;
+        } else {
+            console.log('❌ Tabela básica NÃO encontrada na lista:', tableNameBasic);
         }
+    } else {
+        console.log('❌ Nenhum mapeamento direto básico encontrado para:', formattedName);
     }
     
     // Busca direta por correspondência exata no nome formatado
