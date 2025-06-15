@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +20,8 @@ interface AgentData {
   conversao_indicada_mvp: string;
   pontuacao_aderencia_percentual: string;
   numero_perguntas_vendedor: string;
+  aderência_script_nivel: string;
+  termo_chave_conversao: string;
 }
 
 const MetricCard = ({ title, value, unit, icon: Icon }: { title: string; value: string | number; unit?: string; icon: React.ComponentType<{ className?: string }> }) => (
@@ -37,6 +38,8 @@ const MetricCard = ({ title, value, unit, icon: Icon }: { title: string; value: 
 
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
+    const [analysis, setAnalysis] = useState<string>("");
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
 
     const { data: agentData, isLoading, isError, error } = useQuery<AgentData | null>({
         queryKey: ['agentMetrics', selectedAgent],
@@ -54,6 +57,86 @@ const Dashboard = () => {
         },
         enabled: !!selectedAgent,
     });
+
+    const handleGenerateAnalysis = async () => {
+        if (!agentData) return;
+
+        setIsAnalyzing(true);
+        setAnalysis('');
+
+        const promptTemplate = `Você é um analista sênior especializado em atendimento via WhatsApp em clínicas médicas. Receberá os dados de uma conversa com um lead e deverá fazer uma análise completa, respondendo com clareza e foco em melhoria contínua.
+
+Avalie os seguintes pontos com base nos dados:
+
+1. A qualidade emocional da conversa (empatia, tom, acolhimento)
+2. A aderência ao script e qualidade técnica das respostas
+3. O potencial real de conversão dessa conversa
+4. Problemas identificados: demora, resistência, desinteresse, ruídos, etc.
+5. Recomendações para melhorar o atendimento deste lead
+
+Responda no seguinte formato:
+
+---
+
+### 📊 Avaliação da Conversa com {{nome}}
+
+**Sentimento Geral:** {{sentimento_geral_conversa}}  
+**Sentimento do Atendente:** {{sentimento_atendente}}  
+**Sentimento do Usuário:** {{sentimento_usuario}}  
+**Tempo Médio de Resposta:** {{tempo_medio_resposta}} minutos  
+**Aderência ao Script:** {{aderência_script_nivel}} (nota: {{pontuacao_aderencia_script}})  
+**Conversão Identificada:** {{conversao_indicada_sim_nao}}  
+**Termos-chave:** {{termo_chave_conversao}}
+
+---
+
+### ✅ Pontos Positivos
+[listar pontos fortes]
+
+---
+
+### ⚠️ Pontos de Atenção
+[listar falhas observadas]
+
+---
+
+### 🧠 Nota Final: X.X / 10
+
+### 💡 Recomendações:
+[ações práticas para o atendente]`;
+
+        const prompt = promptTemplate
+            .replace('{{nome}}', formatAgentName(selectedAgent))
+            .replace('{{sentimento_geral_conversa}}', agentData.sentimento_geral_conversa || 'N/A')
+            .replace('{{sentimento_atendente}}', agentData.sentimento_atendente || 'N/A')
+            .replace('{{sentimento_usuario}}', agentData.sentimento_usuario || 'N/A')
+            .replace('{{tempo_medio_resposta}}', parseFloat(agentData.tempo_medio_resposta_atendente_minutos || '0').toFixed(1))
+            .replace('{{aderência_script_nivel}}', agentData.aderência_script_nivel || 'N/A')
+            .replace('{{pontuacao_aderencia_script}}', parseFloat(agentData.pontuacao_aderencia_percentual || '0').toFixed(1))
+            .replace('{{conversao_indicada_sim_nao}}', agentData.conversao_indicada_mvp || 'N/A')
+            .replace('{{termo_chave_conversao}}', agentData.termo_chave_conversao || 'N/A');
+
+        try {
+            const { data, error: invokeError } = await supabase.functions.invoke('generate-analysis', {
+                body: { prompt },
+            });
+
+            if (invokeError) {
+                throw new Error(`A invocação da função falhou: ${invokeError.message}`);
+            }
+
+            if (data.error) {
+                throw new Error(`A geração da análise falhou: ${data.error}`);
+            }
+
+            setAnalysis(data.generatedText);
+        } catch (e: any) {
+            console.error('Error generating analysis:', e);
+            setAnalysis(`Ocorreu um erro ao gerar a análise: ${e.message}`);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
 
     const chartData = agentData ? [
         { name: 'Primeira Resposta', minutos: parseFloat(agentData.tempo_primeira_resposta_minutos) || 0 },
@@ -123,6 +206,32 @@ const Dashboard = () => {
 
                 {agentData && !isLoading && !isError && (
                     <div className="space-y-8">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                <CardTitle>Análise de Conversa com IA</CardTitle>
+                                <Button onClick={handleGenerateAnalysis} disabled={isAnalyzing}>
+                                    {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Gerar Análise
+                                </Button>
+                            </CardHeader>
+                            {isAnalyzing && (
+                                <CardContent>
+                                    <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
+                                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                        <p className="text-muted-foreground">Aguarde, a IA está analisando a conversa...</p>
+                                        <p className="text-sm text-muted-foreground">(Isso pode levar alguns instantes)</p>
+                                    </div>
+                                </CardContent>
+                            )}
+                            {analysis && !isAnalyzing && (
+                                <CardContent>
+                                    <div className="prose prose-sm dark:prose-invert max-w-none rounded-md border p-4 bg-muted/20">
+                                        <pre className="whitespace-pre-wrap font-sans text-sm bg-transparent border-0 p-0">{analysis}</pre>
+                                    </div>
+                                </CardContent>
+                            )}
+                        </Card>
+                        
                         <div>
                             <h2 className="text-xl font-semibold mb-4 flex items-center"><Smile className="mr-2" /> Análise de Sentimento</h2>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
