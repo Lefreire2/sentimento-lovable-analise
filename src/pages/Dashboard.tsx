@@ -37,37 +37,68 @@ const Dashboard = () => {
         queryFn: async () => {
             if (!selectedAgent) return null;
             
-            console.log('Fetching data for agent:', selectedAgent);
+            console.log('🔍 Iniciando busca para o agente:', selectedAgent);
+            console.log('📊 Tabelas disponíveis:', agentTables);
+            console.log('✅ Verificando se a tabela existe na lista:', agentTables.includes(selectedAgent));
             
-            const { data, error } = await supabase
-                .from(selectedAgent as any)
-                .select('*');
-            
-            if (error) {
-                console.error("Supabase error:", error);
-                throw new Error(error.message);
+            try {
+                const { data, error } = await supabase
+                    .from(selectedAgent as any)
+                    .select('*');
+                
+                if (error) {
+                    console.error("❌ Erro do Supabase:", error);
+                    console.error("📋 Detalhes do erro:", {
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint,
+                        code: error.code
+                    });
+                    throw new Error(`Erro ao buscar dados: ${error.message}`);
+                }
+                
+                console.log('📈 Dados brutos recebidos:', data);
+                console.log('📏 Número de registros encontrados:', data ? data.length : 0);
+                
+                if (!data || data.length === 0) {
+                    console.log('⚠️ Nenhum dado encontrado para o agente:', selectedAgent);
+                    return null;
+                }
+                
+                // Log das colunas disponíveis no primeiro registro
+                if (data[0]) {
+                    console.log('🗂️ Colunas disponíveis no primeiro registro:', Object.keys(data[0]));
+                }
+                
+                // Aggregate the data from multiple conversations
+                const aggregatedData = aggregateAgentData(data);
+                console.log('🔄 Dados agregados finais:', aggregatedData);
+                
+                return aggregatedData;
+            } catch (err) {
+                console.error('💥 Erro durante a execução da query:', err);
+                throw err;
             }
-            
-            console.log('Raw data received:', data);
-            
-            if (!data || data.length === 0) {
-                console.log('No data found for agent:', selectedAgent);
-                return null;
-            }
-            
-            // Aggregate the data from multiple conversations
-            const aggregatedData = aggregateAgentData(data);
-            console.log('Aggregated data:', aggregatedData);
-            
-            return aggregatedData;
         },
         enabled: !!selectedAgent,
     });
 
     const aggregateAgentData = (conversations: any[]): AgentData => {
-        const validConversations = conversations.filter(conv => conv && Object.keys(conv).length > 0);
+        console.log('🔄 Iniciando agregação de dados...');
+        console.log('📊 Total de conversas para agregar:', conversations.length);
+        
+        const validConversations = conversations.filter(conv => {
+            const isValid = conv && Object.keys(conv).length > 0;
+            if (!isValid) {
+                console.log('⚠️ Conversa inválida encontrada:', conv);
+            }
+            return isValid;
+        });
+        
+        console.log('✅ Conversas válidas após filtro:', validConversations.length);
         
         if (validConversations.length === 0) {
+            console.log('❌ Nenhuma conversa válida encontrada, retornando dados padrão');
             return {
                 tempo_primeira_resposta_minutos: '0',
                 tempo_medio_resposta_atendente_minutos: '0',
@@ -84,48 +115,76 @@ const Dashboard = () => {
             };
         }
 
+        // Log sample data to understand structure
+        console.log('🔍 Amostra de dados da primeira conversa válida:', validConversations[0]);
+
         // Calculate averages and aggregates
-        const avgFirstResponse = validConversations.reduce((sum, conv) => 
-            sum + (parseFloat(conv.tempo_primeira_resposta_minutos) || 0), 0) / validConversations.length;
+        const avgFirstResponse = validConversations.reduce((sum, conv) => {
+            const value = parseFloat(conv.tempo_primeira_resposta_minutos) || 0;
+            console.log(`⏱️ Tempo primeira resposta: ${conv.tempo_primeira_resposta_minutos} -> ${value}`);
+            return sum + value;
+        }, 0) / validConversations.length;
         
-        const avgResponseTime = validConversations.reduce((sum, conv) => 
-            sum + (parseFloat(conv.tempo_medio_resposta_atendente_minutos) || 0), 0) / validConversations.length;
+        const avgResponseTime = validConversations.reduce((sum, conv) => {
+            const value = parseFloat(conv.tempo_medio_resposta_atendente_minutos) || 0;
+            console.log(`⏱️ Tempo médio resposta: ${conv.tempo_medio_resposta_atendente_minutos} -> ${value}`);
+            return sum + value;
+        }, 0) / validConversations.length;
         
-        const maxResponseTime = Math.max(...validConversations.map(conv => 
-            parseFloat(conv.tempo_maximo_resposta_atendente_minutos) || 0));
+        const maxResponseTime = Math.max(...validConversations.map(conv => {
+            const value = parseFloat(conv.tempo_maximo_resposta_atendente_minutos) || 0;
+            console.log(`⏱️ Tempo máximo resposta: ${conv.tempo_maximo_resposta_atendente_minutos} -> ${value}`);
+            return value;
+        }));
         
-        const totalDuration = validConversations.reduce((sum, conv) => 
-            sum + (parseFloat(conv.duracao_total_conversa_minutos) || 0), 0);
+        const totalDuration = validConversations.reduce((sum, conv) => {
+            const value = parseFloat(conv.duracao_total_conversa_minutos) || 0;
+            console.log(`⏱️ Duração total: ${conv.duracao_total_conversa_minutos} -> ${value}`);
+            return sum + value;
+        }, 0);
         
-        const avgAdherence = validConversations.reduce((sum, conv) => 
-            sum + (parseFloat(conv.pontuacao_aderencia_percentual) || 0), 0) / validConversations.length;
+        const avgAdherence = validConversations.reduce((sum, conv) => {
+            const value = parseFloat(conv.pontuacao_aderencia_percentual) || 0;
+            console.log(`📊 Pontuação aderência: ${conv.pontuacao_aderencia_percentual} -> ${value}`);
+            return sum + value;
+        }, 0) / validConversations.length;
         
-        const totalQuestions = validConversations.reduce((sum, conv) => 
-            sum + (parseInt(conv.numero_perguntas_vendedor) || 0), 0);
+        const totalQuestions = validConversations.reduce((sum, conv) => {
+            const value = parseInt(conv.numero_perguntas_vendedor) || 0;
+            console.log(`❓ Número de perguntas: ${conv.numero_perguntas_vendedor} -> ${value}`);
+            return sum + value;
+        }, 0);
         
         // Get most common sentiment
         const sentiments = validConversations.map(conv => conv.sentimento_geral_conversa).filter(Boolean);
         const mostCommonSentiment = getMostCommon(sentiments) || 'N/A';
+        console.log('😊 Sentimentos gerais encontrados:', sentiments);
+        console.log('😊 Sentimento mais comum:', mostCommonSentiment);
         
         const userSentiments = validConversations.map(conv => conv.sentimento_usuario).filter(Boolean);
         const mostCommonUserSentiment = getMostCommon(userSentiments) || 'N/A';
+        console.log('👤 Sentimentos do usuário:', userSentiments);
         
         const agentSentiments = validConversations.map(conv => conv.sentimento_atendente).filter(Boolean);
         const mostCommonAgentSentiment = getMostCommon(agentSentiments) || 'N/A';
+        console.log('🎧 Sentimentos do atendente:', agentSentiments);
         
         // Check conversion rate
         const conversions = validConversations.filter(conv => conv.conversao_indicada_mvp === 'Sim').length;
         const conversionRate = `${((conversions / validConversations.length) * 100).toFixed(1)}%`;
+        console.log(`💰 Conversões: ${conversions}/${validConversations.length} = ${conversionRate}`);
         
         // Get most common adherence level
         const adherenceLevels = validConversations.map(conv => conv.aderência_script_nivel).filter(Boolean);
         const mostCommonAdherence = getMostCommon(adherenceLevels) || 'N/A';
+        console.log('📋 Níveis de aderência:', adherenceLevels);
         
         // Get most common conversion term
         const conversionTerms = validConversations.map(conv => conv.termo_chave_conversao).filter(Boolean);
         const mostCommonTerm = getMostCommon(conversionTerms) || 'N/A';
+        console.log('🔑 Termos de conversão:', conversionTerms);
 
-        return {
+        const finalData = {
             tempo_primeira_resposta_minutos: avgFirstResponse.toFixed(1),
             tempo_medio_resposta_atendente_minutos: avgResponseTime.toFixed(1),
             tempo_maximo_resposta_atendente_minutos: maxResponseTime.toFixed(1),
@@ -139,6 +198,9 @@ const Dashboard = () => {
             aderência_script_nivel: mostCommonAdherence,
             termo_chave_conversao: mostCommonTerm
         };
+
+        console.log('🎯 Dados finais agregados:', finalData);
+        return finalData;
     };
 
     const getMostCommon = (arr: string[]): string | null => {
