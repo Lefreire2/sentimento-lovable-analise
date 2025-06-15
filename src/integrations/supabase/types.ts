@@ -537,7 +537,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_de_Mensagens_Roberta_xavier: {
+      Lista_de_Mensagens_Roberta_Xavier: {
         Row: {
           id: number
           message: string | null
@@ -2397,7 +2397,7 @@ export type Database = {
         }
         Relationships: []
       }
-      Lista_mensagens_Roberta_xavier: {
+      Lista_mensagens_Roberta_Xavier: {
         Row: {
           aderência_script_nivel: string | null
           contagem_palavras_risco: string | null

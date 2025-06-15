@@ -1,6 +1,7 @@
 
 import { StrategicAnalysisSection } from "./StrategicAnalysisSection";
 import { AIAnalysisSection } from "./AIAnalysisSection";
+import { FunnelAnalysisSection } from "./FunnelAnalysisSection";
 import { SentimentMetrics } from "./SentimentMetrics";
 import { TimeMetrics } from "./TimeMetrics";
 import { PerformanceMetrics } from "./PerformanceMetrics";
@@ -15,6 +16,7 @@ interface DashboardContentProps {
 export const DashboardContent = ({ agentData, selectedAgent }: DashboardContentProps) => {
     return (
         <div className="space-y-8">
+            <FunnelAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
             <StrategicAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
             <AIAnalysisSection agentData={agentData} selectedAgent={selectedAgent} />
             <SentimentMetrics agentData={agentData} />
