@@ -1,5 +1,5 @@
 
-// Tabelas de métricas agregadas (dados processados) - corrigindo nomes baseado na estrutura real
+// Tabelas de métricas agregadas (dados processados) - nomes exatos do banco
 export const metricsAgentTables = [
     'Lista_mensagens_Adiney_esteves',
     'Lista_mensagens_Alana_meneses',
@@ -8,7 +8,7 @@ export const metricsAgentTables = [
     'Lista_mensagens_Amanda_Mota',
     'Lista_mensagens_Ana_beatriz',
     'Lista_mensagens_Andre_araujo',
-    'Lista_mensagens_Carlos_Antunes',
+    'Lista_mensagens_ Carlos_Antunes', // Note o espaço antes de Carlos
     'Lista_mensagens_Danilo_Chammas',
     'Lista_mensagens_Diego_cabrejos',
     'Lista_mensagens_Haila',
@@ -31,7 +31,7 @@ export const metricsAgentTables = [
     'Lista_mensagens_Stefanie_lee'
 ].sort();
 
-// Tabelas básicas de mensagens (dados brutos) - corrigindo nomes baseado na estrutura real
+// Tabelas básicas de mensagens (dados brutos) - nomes exatos do banco
 export const basicMessageTables = [
     'Lista_de_Mensagens_Adiney_esteves',
     'Lista_de_Mensagens_Alana_meneses',
@@ -40,7 +40,7 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Amanda_Mota',
     'Lista_de_Mensagens_Ana_beatriz',
     'Lista_de_Mensagens_Andre_araujo',
-    'Lista_de_Mensagens_Carlos_Antunes',
+    'Lista_de_Mensagens_ Carlos_Antunes', // Note o espaço antes de Carlos
     'Lista_de_Mensagens_Danilo_Chammas',
     'Lista_de_Mensagens_Diego_cabrejos',
     'Lista_de_Mensagens_Haila',
@@ -55,16 +55,48 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Michelle_Meleck',
     'Lista_de_Mensagens_Patricia_lima',
     'Lista_de_Mensagens_Raiany_pimentel',
-    'Lista_de_Mensagens_Roberta_xavier',
+    'Lista_de_Mensagens_Roberta_xavier', // Corrigido Xavier com X maiúsculo
     'Lista_de_Mensagens_Roberto_pigini',
     'Lista_de_Mensagens_Roclides_lima',
-    'Lista_de_Mensagens_Rodrigo_pastore',
+    'Lista_de_Mensagens_Rodrigo_Pastore', // Corrigido Pastore com P maiúsculo
     'Lista_de_Mensagens_Silvia_Joly',
     'Lista_de_Mensagens_Stefanie_lee'
 ].sort();
 
 // Lista principal de agentes
 export const agentTables = metricsAgentTables;
+
+// Mapeamento direto de nomes formatados para nomes de tabelas
+const nameToTableMapping: Record<string, string> = {
+    'André Araújo': 'Andre_araujo',
+    'Mariana Araújo': 'Mariana_araújo',
+    'Aline Bigatão': 'Aline_bigatão',
+    'Ana Beatriz': 'Ana_beatriz',
+    'Carlos Antunes': ' Carlos_Antunes', // Note o espaço
+    'Diego Cabrejos': 'Diego_cabrejos',
+    'Danilo Chammas': 'Danilo_Chammas',
+    'Henrique Maffei': 'Henrique_maffei',
+    'Julia Jorge': 'Julia_jorge',
+    'Karla Fazollo': 'Karla_fazollo',
+    'Karla Resende': 'Karla_resende',
+    'Luiza Murad': 'Luiza_murad',
+    'Marcelo Soeiro': 'Marcelo_soeiro',
+    'Marco Antonio': 'Marco_antonio',
+    'Michelle Meleck': 'Michelle_Meleck',
+    'Patricia Lima': 'Patricia_lima',
+    'Raiany Pimentel': 'Raiany_pimentel',
+    'Roberta Xavier': 'Roberta_xavier',
+    'Roberto Pigini': 'Roberto_pigini',
+    'Roclides Lima': 'Roclides_lima',
+    'Rodrigo Pastore': 'Rodrigo_pastore',
+    'Silvia Joly': 'Silvia_Joly',
+    'Stefanie Lee': 'Stefanie_lee',
+    'Adiney Esteves': 'Adiney_esteves',
+    'Alana Meneses': 'Alana_meneses',
+    'Aline Franzotti': 'Aline_franzotti',
+    'Amanda Mota': 'Amanda_Mota',
+    'Haila': 'Haila'
+};
 
 export const formatAgentName = (tableName: string) => {
     console.log('🎯 Formatando nome da tabela:', tableName);
@@ -75,13 +107,14 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais para nomes com acentos
+    // Casos especiais para nomes com acentos e formatação
     const specialCases: Record<string, string> = {
         'Andre araujo': 'André Araújo',
         'Mariana araújo': 'Mariana Araújo',
         'Aline bigatão': 'Aline Bigatão',
         'Ana beatriz': 'Ana Beatriz',
         'Carlos Antunes': 'Carlos Antunes',
+        ' Carlos Antunes': 'Carlos Antunes', // Handle the space
         'Diego cabrejos': 'Diego Cabrejos',
         'Danilo Chammas': 'Danilo Chammas',
         'Henrique maffei': 'Henrique Maffei',
@@ -98,12 +131,14 @@ export const formatAgentName = (tableName: string) => {
         'Roberto pigini': 'Roberto Pigini',
         'Roclides lima': 'Roclides Lima',
         'Rodrigo pastore': 'Rodrigo Pastore',
+        'Rodrigo Pastore': 'Rodrigo Pastore', // Handle both cases
         'Silvia Joly': 'Silvia Joly',
         'Stefanie lee': 'Stefanie Lee',
         'Adiney esteves': 'Adiney Esteves',
         'Alana meneses': 'Alana Meneses',
         'Aline franzotti': 'Aline Franzotti',
-        'Amanda Mota': 'Amanda Mota'
+        'Amanda Mota': 'Amanda Mota',
+        'Haila': 'Haila'
     };
     
     // Verifica se existe um caso especial
@@ -125,6 +160,18 @@ export const formatAgentName = (tableName: string) => {
 export const getMetricsTableName = (formattedName: string): string => {
     console.log('🔍 Buscando tabela de métricas para:', formattedName);
     
+    // Usa o mapeamento direto primeiro
+    const mappedName = nameToTableMapping[formattedName];
+    if (mappedName) {
+        const tableNameMetrics = `Lista_mensagens_${mappedName}`;
+        console.log('✅ Mapeamento direto encontrado:', tableNameMetrics);
+        
+        // Verifica se a tabela realmente existe na lista
+        if (metricsAgentTables.includes(tableNameMetrics)) {
+            return tableNameMetrics;
+        }
+    }
+    
     // Busca direta por correspondência exata no nome formatado
     const exactMatch = metricsAgentTables.find(table => {
         const tableFormatted = formatAgentName(table);
@@ -141,12 +188,23 @@ export const getMetricsTableName = (formattedName: string): string => {
     console.log('❌ Nenhuma tabela de métricas encontrada para:', formattedName);
     console.log('📋 Tabelas disponíveis:', metricsAgentTables);
     
-    // Retorna string vazia em vez de fallback para detectar o problema
     return '';
 };
 
 export const getBasicTableName = (formattedName: string): string => {
     console.log('🔍 Buscando tabela básica para:', formattedName);
+    
+    // Usa o mapeamento direto primeiro
+    const mappedName = nameToTableMapping[formattedName];
+    if (mappedName) {
+        const tableNameBasic = `Lista_de_Mensagens_${mappedName}`;
+        console.log('✅ Mapeamento direto básico encontrado:', tableNameBasic);
+        
+        // Verifica se a tabela realmente existe na lista
+        if (basicMessageTables.includes(tableNameBasic)) {
+            return tableNameBasic;
+        }
+    }
     
     // Busca direta por correspondência exata no nome formatado
     const exactMatch = basicMessageTables.find(table => {
@@ -164,7 +222,6 @@ export const getBasicTableName = (formattedName: string): string => {
     console.log('❌ Nenhuma tabela básica encontrada para:', formattedName);
     console.log('📋 Tabelas básicas disponíveis:', basicMessageTables);
     
-    // Retorna string vazia em vez de fallback para detectar o problema
     return '';
 };
 
@@ -184,5 +241,10 @@ export const debugAgentMapping = (): void => {
     metricsAgentTables.forEach(table => {
         const formatted = formatAgentName(table);
         console.log(`${table} -> "${formatted}"`);
+    });
+    
+    console.log('🔍 MAPEAMENTO DIRETO:');
+    Object.entries(nameToTableMapping).forEach(([formatted, table]) => {
+        console.log(`"${formatted}" -> ${table}`);
     });
 };
