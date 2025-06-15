@@ -75,7 +75,44 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Capitalize each word
+    // Casos especiais para nomes com acentos
+    const specialCases: Record<string, string> = {
+        'Andre araujo': 'André Araújo',
+        'Mariana araújo': 'Mariana Araújo',
+        'Aline bigatão': 'Aline Bigatão',
+        'Ana beatriz': 'Ana Beatriz',
+        'Carlos Antunes': 'Carlos Antunes',
+        'Diego cabrejos': 'Diego Cabrejos',
+        'Danilo Chammas': 'Danilo Chammas',
+        'Henrique maffei': 'Henrique Maffei',
+        'Julia jorge': 'Julia Jorge',
+        'Karla fazollo': 'Karla Fazollo',
+        'Karla resende': 'Karla Resende',
+        'Luiza murad': 'Luiza Murad',
+        'Marcelo soeiro': 'Marcelo Soeiro',
+        'Marco antonio': 'Marco Antonio',
+        'Michelle Meleck': 'Michelle Meleck',
+        'Patricia lima': 'Patricia Lima',
+        'Raiany pimentel': 'Raiany Pimentel',
+        'Roberta xavier': 'Roberta Xavier',
+        'Roberto pigini': 'Roberto Pigini',
+        'Roclides lima': 'Roclides Lima',
+        'Rodrigo pastore': 'Rodrigo Pastore',
+        'Silvia Joly': 'Silvia Joly',
+        'Stefanie lee': 'Stefanie Lee',
+        'Adiney esteves': 'Adiney Esteves',
+        'Alana meneses': 'Alana Meneses',
+        'Aline franzotti': 'Aline Franzotti',
+        'Amanda Mota': 'Amanda Mota'
+    };
+    
+    // Verifica se existe um caso especial
+    if (specialCases[name]) {
+        console.log('✅ Nome formatado (caso especial):', specialCases[name]);
+        return specialCases[name];
+    }
+    
+    // Capitalize each word para nomes não especiais
     const formatted = name
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))

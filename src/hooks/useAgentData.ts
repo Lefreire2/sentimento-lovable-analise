@@ -123,6 +123,7 @@ export const useAgentData = (selectedAgent: string) => {
             }
             
             console.log('🔍 Iniciando busca para agente:', selectedAgent);
+            console.log('🎯 ANDRÉ ARAÚJO - Busca específica iniciada');
             
             // Primeiro, tentar tabela de métricas
             const metricsTableName = getMetricsTableName(selectedAgent);
@@ -135,10 +136,18 @@ export const useAgentData = (selectedAgent: string) => {
                     .select('*')
                     .limit(1000);
                 
-                console.log('📊 Resultado métricas:');
+                console.log('📊 Resultado métricas para', selectedAgent, ':');
                 console.log('- Data length:', metricsData?.length || 0);
                 console.log('- Error:', metricsError);
                 console.log('- Sample data:', metricsData?.[0]);
+                
+                if (selectedAgent === 'André Araújo') {
+                    console.log('🎯 ANDRÉ ARAÚJO - Dados específicos:');
+                    console.log('- Tabela usada:', metricsTableName);
+                    console.log('- Erro:', metricsError);
+                    console.log('- Quantidade de registros:', metricsData?.length);
+                    console.log('- Primeira linha:', metricsData?.[0]);
+                }
                 
                 if (!metricsError && metricsData && metricsData.length > 0) {
                     console.log('✅ Dados de métricas encontrados, agregando...');
@@ -154,17 +163,25 @@ export const useAgentData = (selectedAgent: string) => {
                     .select('*')
                     .limit(1000);
                 
-                console.log('💬 Resultado básico:');
+                console.log('💬 Resultado básico para', selectedAgent, ':');
                 console.log('- Data length:', basicData?.length || 0);
                 console.log('- Error:', basicError);
                 console.log('- Sample data:', basicData?.[0]);
+                
+                if (selectedAgent === 'André Araújo') {
+                    console.log('🎯 ANDRÉ ARAÚJO - Dados básicos:');
+                    console.log('- Tabela usada:', basicTableName);
+                    console.log('- Erro:', basicError);
+                    console.log('- Quantidade de registros:', basicData?.length);
+                    console.log('- Primeira linha:', basicData?.[0]);
+                }
                 
                 if (!basicError && basicData && basicData.length > 0) {
                     console.log('✅ Mensagens básicas encontradas, criando dados estimados...');
                     return createDataFromBasicMessages(basicData);
                 }
                 
-                console.log('❌ Nenhum dado encontrado em nenhuma tabela');
+                console.log('❌ Nenhum dado encontrado em nenhuma tabela para:', selectedAgent);
                 console.log('🔍 Detalhes dos erros:');
                 console.log('- Métricas:', metricsError);
                 console.log('- Básico:', basicError);
@@ -178,6 +195,9 @@ export const useAgentData = (selectedAgent: string) => {
                 
             } catch (err) {
                 console.error('💥 Erro na busca de dados:', err);
+                if (selectedAgent === 'André Araújo') {
+                    console.error('🎯 ANDRÉ ARAÚJO - Erro crítico:', err);
+                }
                 return null;
             }
         },
