@@ -1,5 +1,6 @@
-
 import SentimentAnalyzer from "@/components/SentimentAnalyzer";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -13,6 +14,11 @@ const Index = () => {
             Uma ferramenta inteligente que utiliza IA para analisar o sentimento de um texto diretamente no seu navegador.
           </p>
         </header>
+        <div className="flex justify-center">
+            <Button asChild>
+                <Link to="/dashboard">Ver Dashboard de Métricas</Link>
+            </Button>
+        </div>
         <main>
           <SentimentAnalyzer />
         </main>
