@@ -1,5 +1,5 @@
-
-export const agentTables = [
+// Tabelas de métricas agregadas (dados processados)
+export const metricsAgentTables = [
     'Lista_mensagens_Adiney_esteves',
     'Lista_mensagens_Alana_meneses',
     'Lista_mensagens_Aline_bigatão',
@@ -29,6 +29,41 @@ export const agentTables = [
     'Lista_mensagens_Silvia_Joly',
     'Lista_mensagens_Stefanie_lee'
 ].sort();
+
+// Tabelas básicas de mensagens (dados brutos)
+export const basicMessageTables = [
+    'Lista_de_Mensagens_Adiney_esteves',
+    'Lista_de_Mensagens_Alana_meneses',
+    'Lista_de_Mensagens_Aline_bigatão',
+    'Lista_de_Mensagens_Aline_franzotti',
+    'Lista_de_Mensagens_Amanda',
+    'Lista_de_Mensagens_Ana_beatriz',
+    'Lista_de_Mensagens_Andre_araujo',
+    'Lista_de_Mensagens_ Carlos_Antunes',
+    'Lista_de_Mensagens_Danilo_Chammas',
+    'Lista_de_Mensagens_Diego_cabrejos',
+    'Lista_de_Mensagens_Haila',
+    'Lista_de_Mensagens_Henrique_maffei',
+    'Lista_de_Mensagens_Julia_jorge',
+    'Lista_de_Mensagens_Karla_fazollo',
+    'Lista_de_Mensagens_Karla_resende',
+    'Lista_de_Mensagens_Luiza_murad',
+    'Lista_de_Mensagens_Marcelo_soeiro',
+    'Lista_de_Mensagens_Marco_antonio',
+    'Lista_de_Mensagens_Mariana_araújo',
+    'Lista_de_Mensagens_Michelle_Meleck',
+    'Lista_de_Mensagens_Patricia_lima',
+    'Lista_de_Mensagens_Raiany_pimentel',
+    'Lista_de_Mensagens_Roberta_xavier',
+    'Lista_de_Mensagens_Roberto_pigini',
+    'Lista_de_Mensagens_Roclides_lima',
+    'Lista_de_Mensagens_Rodrigo_pastore',
+    'Lista_de_Mensagens_Silvia_Joly',
+    'Lista_de_Mensagens_Stefanie_lee'
+].sort();
+
+// Lista principal de agentes (usa as tabelas de métricas como principal)
+export const agentTables = metricsAgentTables;
 
 // Mapeamento corrigido baseado nas tabelas reais do banco de dados
 const agentNameToTable: Record<string, string> = {
@@ -65,6 +100,7 @@ const agentNameToTable: Record<string, string> = {
 export const formatAgentName = (tableName: string) => {
     const name = tableName
         .replace('Lista_mensagens_', '')
+        .replace('Lista_de_Mensagens_', '')
         .replace(/_/g, ' ')
         .trim();
     
@@ -91,10 +127,10 @@ export const getTableNameFromFormattedName = (formattedName: string): string => 
 
 // Nova função para debug - verificar se tabela existe
 export const isValidTableName = (tableName: string): boolean => {
-    return agentTables.includes(tableName);
+    return metricsAgentTables.includes(tableName) || basicMessageTables.includes(tableName);
 };
 
 // Função para listar todas as tabelas disponíveis
 export const getAllAvailableTables = (): string[] => {
-    return agentTables;
+    return [...metricsAgentTables, ...basicMessageTables];
 };
