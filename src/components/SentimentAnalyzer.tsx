@@ -28,9 +28,7 @@ const SentimentAnalyzer = () => {
     try {
       if (!classifier.current) {
         const { pipeline } = await import('@huggingface/transformers');
-        classifier.current = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english', {
-          quantized: true,
-        });
+        classifier.current = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
       }
       const output = await classifier.current(text);
       if (output && output.length > 0) {
