@@ -1,5 +1,5 @@
 
-// Tabelas de métricas agregadas (dados processados) - nomes exatos do banco
+// Tabelas de métricas agregadas (dados processados) - nomes exatos do banco conforme screenshots
 export const metricsAgentTables = [
     'Lista_mensagens_ Carlos_Antunes',
     'Lista_mensagens_Adiney_esteves', 
@@ -23,15 +23,15 @@ export const metricsAgentTables = [
     'Lista_mensagens_Michelle_Meleck',
     'Lista_mensagens_Patricia_lima',
     'Lista_mensagens_Raiany_pimentel',
-    'Lista_mensagens_Roberta_xavier',
+    'Lista_mensagens_Roberta_Xavier',
     'Lista_mensagens_Roberto_pigini',
     'Lista_mensagens_Roclides_lima',
-    'Lista_mensagens_Rodrigo_pastore',
+    'Lista_mensagens_Rodrigo_Pastore',
     'Lista_mensagens_Silvia_Joly',
     'Lista_mensagens_Stefanie_lee'
 ].sort();
 
-// Tabelas básicas de mensagens (dados brutos) - nomes exatos do banco
+// Tabelas básicas de mensagens (dados brutos) - nomes exatos do banco conforme screenshots
 export const basicMessageTables = [
     'Lista_de_Mensagens_Adiney_esteves',
     'Lista_de_Mensagens_Alana_meneses', 
@@ -66,7 +66,7 @@ export const basicMessageTables = [
 // Lista principal de agentes baseada nos prints fornecidos
 export const agentTables = metricsAgentTables;
 
-// Mapeamento ATUALIZADO baseado nos prints - nomes formatados para sufixos de tabelas
+// Mapeamento CORRIGIDO baseado nos screenshots - nomes formatados para sufixos de tabelas
 const nameToTableMapping: Record<string, string> = {
     'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início conforme banco
     'Adiney Esteves': 'Adiney_esteves',
@@ -90,10 +90,10 @@ const nameToTableMapping: Record<string, string> = {
     'Michelle Meleck': 'Michelle_Meleck',
     'Patricia Lima': 'Patricia_lima',
     'Raiany Pimentel': 'Raiany_pimentel',
-    'Roberta Xavier': 'Roberta_xavier', // Note: banco tem 'Roberta_Xavier' vs 'Roberta_xavier'
+    'Roberta Xavier': 'Roberta_Xavier', // Note: banco tem R maiúsculo em Xavier
     'Roberto Pigini': 'Roberto_pigini',
     'Roclides Lima': 'Roclides_lima',
-    'Rodrigo Pastore': 'Rodrigo_pastore', // Note: banco pode ter 'Rodrigo_Pastore'
+    'Rodrigo Pastore': 'Rodrigo_Pastore', // Note: banco tem P maiúsculo em Pastore
     'Silvia Joly': 'Silvia_Joly',
     'Stefanie Lee': 'Stefanie_lee'
 };
@@ -107,7 +107,7 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais para nomes com acentos e formatação - ATUALIZADOS conforme prints
+    // Casos especiais para nomes com acentos e formatação - CORRIGIDOS conforme screenshots
     const specialCases: Record<string, string> = {
         'Carlos Antunes': 'Carlos Antunes',
         ' Carlos Antunes': 'Carlos Antunes', // Handle the space
@@ -132,12 +132,12 @@ export const formatAgentName = (tableName: string) => {
         'Michelle Meleck': 'Michelle Meleck',
         'Patricia lima': 'Patricia Lima',
         'Raiany pimentel': 'Raiany Pimentel',
+        'Roberta Xavier': 'Roberta Xavier', // Handle exact match from database
         'Roberta xavier': 'Roberta Xavier',
-        'Roberta Xavier': 'Roberta Xavier', // Handle both cases
         'Roberto pigini': 'Roberto Pigini',
         'Roclides lima': 'Roclides Lima',
+        'Rodrigo Pastore': 'Rodrigo Pastore', // Handle exact match from database  
         'Rodrigo pastore': 'Rodrigo Pastore',
-        'Rodrigo Pastore': 'Rodrigo Pastore', // Handle both cases
         'Silvia Joly': 'Silvia Joly',
         'Stefanie lee': 'Stefanie Lee'
     };
@@ -278,7 +278,7 @@ export const getAllAvailableTables = (): string[] => {
 
 // Função para debug geral de mapeamento
 export const debugAgentMapping = (): void => {
-    console.log('🗺️ DEBUG MAPEAMENTO GERAL:');
+    console.log('🗺️ DEBUG MAPEAMENTO GERAL (ATUALIZADO):');
     console.log('📊 Total de tabelas de métricas:', metricsAgentTables.length);
     console.log('💬 Total de tabelas básicas:', basicMessageTables.length);
     console.log('🔗 Total de mapeamentos:', Object.keys(nameToTableMapping).length);
@@ -295,7 +295,7 @@ export const debugAgentMapping = (): void => {
 
 // Função para debug específico do André Araújo
 export const debugAndreAraujo = (): void => {
-    console.log('🐛 DEBUG ANDRÉ ARAÚJO - ANÁLISE COMPLETA:');
+    console.log('🐛 DEBUG ANDRÉ ARAÚJO - ANÁLISE ATUALIZADA:');
     
     const formattedName = 'André Araújo';
     console.log('👤 Nome formatado:', formattedName);
@@ -335,6 +335,7 @@ export const debugAndreAraujo = (): void => {
 
 // Executar debug automaticamente quando o módulo for carregado
 if (typeof window !== 'undefined') {
-    console.log('🔧 INIT - Módulo agents.ts carregado com dados atualizados dos prints');
+    console.log('🔧 INIT - Módulo agents.ts carregado com dados CORRIGIDOS dos screenshots');
+    console.log('📸 INIT - Baseado nos screenshots fornecidos pelo usuário');
     debugAndreAraujo();
 }
