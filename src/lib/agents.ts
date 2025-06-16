@@ -243,6 +243,23 @@ export const getAllAvailableTables = (): string[] => {
     return [...metricsAgentTables, ...basicMessageTables];
 };
 
+// Função para debug geral de mapeamento
+export const debugAgentMapping = (): void => {
+    console.log('🗺️ DEBUG MAPEAMENTO GERAL:');
+    console.log('📊 Total de tabelas de métricas:', metricsAgentTables.length);
+    console.log('💬 Total de tabelas básicas:', basicMessageTables.length);
+    console.log('🔗 Total de mapeamentos:', Object.keys(nameToTableMapping).length);
+    
+    Object.entries(nameToTableMapping).forEach(([formatted, mapped]) => {
+        const metricsTable = `Lista_mensagens_${mapped}`;
+        const basicTable = `Lista_de_Mensagens_${mapped}`;
+        
+        console.log(`👤 ${formatted}:`);
+        console.log(`  📊 Métricas: ${metricsTable} (${metricsAgentTables.includes(metricsTable) ? '✅' : '❌'})`);
+        console.log(`  💬 Básica: ${basicTable} (${basicMessageTables.includes(basicTable) ? '✅' : '❌'})`);
+    });
+};
+
 // Função para debug específico do André Araújo
 export const debugAndreAraujo = (): void => {
     console.log('🐛 DEBUG ANDRÉ ARAÚJO - ANÁLISE COMPLETA:');
