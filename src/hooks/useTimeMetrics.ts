@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getMetricsTableName, getBasicTableName } from "@/lib/agents";
+import { getMetricsTableName, getBasicTableName, debugAndreAraujo } from "@/lib/agents";
 
 interface TimeMetricsData {
     tempo_primeira_resposta_minutos: string;
@@ -61,19 +61,32 @@ export const useTimeMetrics = (selectedAgent: string) => {
             
             console.log('🔍 TIME - Buscando métricas de tempo para:', selectedAgent);
             
+            // Debug específico para André Araújo
+            if (selectedAgent === 'André Araújo') {
+                console.log('🐛 TIME - Executando debug para André Araújo');
+                debugAndreAraujo();
+            }
+            
             // Tentar tabela de métricas primeiro
             const metricsTableName = getMetricsTableName(selectedAgent);
             console.log('📊 TIME - Tentando tabela de métricas:', metricsTableName);
             
             if (metricsTableName) {
                 try {
+                    console.log('🔄 TIME - Executando query na tabela de métricas:', metricsTableName);
                     const { data: metricsData, error: metricsError } = await supabase
                         .from(metricsTableName as any)
                         .select('tempo_primeira_resposta_minutos, tempo_medio_resposta_atendente_minutos, tempo_maximo_resposta_atendente_minutos, duracao_total_conversa_minutos')
                         .limit(1);
                     
+                    console.log('📊 TIME - Resultado da query de métricas:');
+                    console.log('- Erro:', metricsError);
+                    console.log('- Dados:', metricsData);
+                    console.log('- Quantidade de registros:', metricsData?.length || 0);
+                    
                     if (!metricsError && metricsData && metricsData.length > 0) {
                         console.log('✅ TIME - Usando dados de métricas');
+                        console.log('📋 TIME - Primeiro registro:', metricsData[0]);
                         const firstRow = metricsData[0] as any;
                         return {
                             tempo_primeira_resposta_minutos: firstRow.tempo_primeira_resposta_minutos || '0',
@@ -81,10 +94,17 @@ export const useTimeMetrics = (selectedAgent: string) => {
                             tempo_maximo_resposta_atendente_minutos: firstRow.tempo_maximo_resposta_atendente_minutos || '0',
                             duracao_total_conversa_minutos: firstRow.duracao_total_conversa_minutos || '0'
                         };
+                    } else if (metricsError) {
+                        console.log('⚠️ TIME - Erro na tabela de métricas:', metricsError.message);
+                        console.log('🔍 TIME - Detalhes do erro:', metricsError);
+                    } else {
+                        console.log('⚠️ TIME - Tabela de métricas está vazia');
                     }
                 } catch (err) {
                     console.error('💥 TIME - Erro ao buscar métricas:', err);
                 }
+            } else {
+                console.log('❌ TIME - Nenhuma tabela de métricas encontrada para:', selectedAgent);
             }
             
             // Fallback para tabela básica
@@ -93,21 +113,34 @@ export const useTimeMetrics = (selectedAgent: string) => {
             
             if (basicTableName) {
                 try {
+                    console.log('🔄 TIME - Executando query na tabela básica:', basicTableName);
                     const { data: basicData, error: basicError } = await supabase
                         .from(basicTableName as any)
                         .select('*')
                         .limit(100);
                     
+                    console.log('💬 TIME - Resultado da query básica:');
+                    console.log('- Erro:', basicError);
+                    console.log('- Quantidade de registros:', basicData?.length || 0);
+                    
                     if (!basicError && basicData && basicData.length > 0) {
                         console.log('✅ TIME - Usando dados básicos');
+                        console.log('📋 TIME - Amostra dos dados básicos:', basicData.slice(0, 2));
                         return calculateTimeMetricsFromBasic(basicData);
+                    } else if (basicError) {
+                        console.log('⚠️ TIME - Erro na tabela básica:', basicError.message);
+                        console.log('🔍 TIME - Detalhes do erro:', basicError);
+                    } else {
+                        console.log('⚠️ TIME - Tabela básica está vazia');
                     }
                 } catch (err) {
                     console.error('💥 TIME - Erro ao buscar dados básicos:', err);
                 }
+            } else {
+                console.log('❌ TIME - Nenhuma tabela básica encontrada para:', selectedAgent);
             }
             
-            console.log('⚠️ TIME - Retornando dados zerados');
+            console.log('⚠️ TIME - Retornando dados zerados para:', selectedAgent);
             return {
                 tempo_primeira_resposta_minutos: '0',
                 tempo_medio_resposta_atendente_minutos: '0',

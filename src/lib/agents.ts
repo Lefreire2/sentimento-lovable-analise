@@ -66,9 +66,9 @@ export const basicMessageTables = [
 // Lista principal de agentes
 export const agentTables = metricsAgentTables;
 
-// Mapeamento DIRETO e DEFINITIVO de nomes formatados para sufixos de tabelas
+// Mapeamento DIRETO e CORRIGIDO - nomes formatados para sufixos de tabelas
 const nameToTableMapping: Record<string, string> = {
-    'André Araújo': 'Andre_araujo', // SEM acento no banco
+    'André Araújo': 'Andre_araujo', // CORRIGIDO: SEM acento no banco, tabela existe
     'Mariana Araújo': 'Mariana_araújo',
     'Aline Bigatão': 'Aline_bigatão',
     'Ana Beatriz': 'Ana_beatriz',
@@ -159,52 +159,77 @@ export const formatAgentName = (tableName: string) => {
 
 export const getMetricsTableName = (formattedName: string): string => {
     console.log('🔍 MÉTRICA - Buscando tabela para:', formattedName);
+    console.log('🗺️ MÉTRICA - Mapeamentos disponíveis:', Object.keys(nameToTableMapping));
     
     // Usa o mapeamento direto primeiro
     const mappedName = nameToTableMapping[formattedName];
     if (mappedName) {
         const tableNameMetrics = `Lista_mensagens_${mappedName}`;
-        console.log('✅ MÉTRICA - Mapeamento direto:', tableNameMetrics);
+        console.log('✅ MÉTRICA - Mapeamento direto encontrado:', mappedName);
+        console.log('📊 MÉTRICA - Tabela resultante:', tableNameMetrics);
         
         // Verifica se a tabela realmente existe na lista
         if (metricsAgentTables.includes(tableNameMetrics)) {
-            console.log('✅ MÉTRICA - Tabela confirmada na lista');
+            console.log('✅ MÉTRICA - Tabela confirmada na lista de métricas');
             return tableNameMetrics;
         } else {
             console.log('❌ MÉTRICA - Tabela NÃO encontrada na lista:', tableNameMetrics);
-            console.log('📋 MÉTRICA - Tabelas disponíveis:', metricsAgentTables);
+            console.log('📋 MÉTRICA - Tabelas de métricas disponíveis:', metricsAgentTables);
         }
     } else {
         console.log('❌ MÉTRICA - Nenhum mapeamento encontrado para:', formattedName);
-        console.log('📋 MÉTRICA - Mapeamentos disponíveis:', Object.keys(nameToTableMapping));
+        console.log('🔍 MÉTRICA - Verificando se o nome já existe diretamente...');
+        
+        // Tentar encontrar tabela que termine com o nome sem mapeamento
+        const directMatch = metricsAgentTables.find(table => 
+            table.toLowerCase().includes(formattedName.toLowerCase().replace(/[áàâãä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/ /g, '_'))
+        );
+        
+        if (directMatch) {
+            console.log('✅ MÉTRICA - Encontrada correspondência direta:', directMatch);
+            return directMatch;
+        }
     }
     
-    console.log('❌ MÉTRICA - Retornando string vazia');
+    console.log('❌ MÉTRICA - Retornando string vazia para:', formattedName);
     return '';
 };
 
 export const getBasicTableName = (formattedName: string): string => {
     console.log('🔍 BÁSICA - Buscando tabela para:', formattedName);
+    console.log('🗺️ BÁSICA - Mapeamentos disponíveis:', Object.keys(nameToTableMapping));
     
     // Usa o mapeamento direto primeiro
     const mappedName = nameToTableMapping[formattedName];
     if (mappedName) {
         const tableNameBasic = `Lista_de_Mensagens_${mappedName}`;
-        console.log('✅ BÁSICA - Mapeamento direto:', tableNameBasic);
+        console.log('✅ BÁSICA - Mapeamento direto encontrado:', mappedName);
+        console.log('💬 BÁSICA - Tabela resultante:', tableNameBasic);
         
         // Verifica se a tabela realmente existe na lista
         if (basicMessageTables.includes(tableNameBasic)) {
-            console.log('✅ BÁSICA - Tabela confirmada na lista');
+            console.log('✅ BÁSICA - Tabela confirmada na lista básica');
             return tableNameBasic;
         } else {
             console.log('❌ BÁSICA - Tabela NÃO encontrada na lista:', tableNameBasic);
-            console.log('📋 BÁSICA - Tabelas disponíveis:', basicMessageTables);
+            console.log('📋 BÁSICA - Tabelas básicas disponíveis:', basicMessageTables);
         }
     } else {
         console.log('❌ BÁSICA - Nenhum mapeamento encontrado para:', formattedName);
+        console.log('🔍 BÁSICA - Verificando se o nome já existe diretamente...');
+        
+        // Tentar encontrar tabela que termine com o nome sem mapeamento
+        const directMatch = basicMessageTables.find(table => 
+            table.toLowerCase().includes(formattedName.toLowerCase().replace(/[áàâãä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/ /g, '_'))
+        );
+        
+        if (directMatch) {
+            console.log('✅ BÁSICA - Encontrada correspondência direta:', directMatch);
+            return directMatch;
+        }
     }
     
-    console.log('❌ BÁSICA - Retornando string vazia');
+    console.log('❌ BÁSICA - Retornando string vazia para:', formattedName);
     return '';
 };
 
@@ -218,19 +243,47 @@ export const getAllAvailableTables = (): string[] => {
     return [...metricsAgentTables, ...basicMessageTables];
 };
 
-// Função para debug - mapear todos os nomes formatados
-export const debugAgentMapping = (): void => {
-    console.log('🔍 DEBUG - MAPEAMENTO COMPLETO:');
-    console.log('📊 Tabelas de métricas:', metricsAgentTables.length);
-    console.log('💬 Tabelas básicas:', basicMessageTables.length);
+// Função para debug específico do André Araújo
+export const debugAndreAraujo = (): void => {
+    console.log('🐛 DEBUG ANDRÉ ARAÚJO - ANÁLISE COMPLETA:');
     
-    console.log('🗺️ Mapeamento direto para André Araújo:');
-    console.log('- Formatado: "André Araújo"');
-    console.log('- Mapeado para:', nameToTableMapping['André Araújo']);
-    console.log('- Tabela métrica resultante:', `Lista_mensagens_${nameToTableMapping['André Araújo']}`);
-    console.log('- Tabela básica resultante:', `Lista_de_Mensagens_${nameToTableMapping['André Araújo']}`);
+    const formattedName = 'André Araújo';
+    console.log('👤 Nome formatado:', formattedName);
     
-    console.log('✅ Verificação de existência:');
-    console.log('- Métrica existe?', metricsAgentTables.includes(`Lista_mensagens_${nameToTableMapping['André Araújo']}`));
-    console.log('- Básica existe?', basicMessageTables.includes(`Lista_de_Mensagens_${nameToTableMapping['André Araújo']}`));
+    const mappedName = nameToTableMapping[formattedName];
+    console.log('🗺️ Nome mapeado:', mappedName);
+    
+    if (mappedName) {
+        const metricsTable = `Lista_mensagens_${mappedName}`;
+        const basicTable = `Lista_de_Mensagens_${mappedName}`;
+        
+        console.log('📊 Tabela de métricas calculada:', metricsTable);
+        console.log('💬 Tabela básica calculada:', basicTable);
+        
+        console.log('✅ Tabela de métricas existe?', metricsAgentTables.includes(metricsTable));
+        console.log('✅ Tabela básica existe?', basicMessageTables.includes(basicTable));
+        
+        if (metricsAgentTables.includes(metricsTable)) {
+            console.log('🎯 MÉTRICA - Tabela encontrada na posição:', metricsAgentTables.indexOf(metricsTable));
+        }
+        
+        if (basicMessageTables.includes(basicTable)) {
+            console.log('🎯 BÁSICA - Tabela encontrada na posição:', basicMessageTables.indexOf(basicTable));
+        }
+    }
+    
+    console.log('📋 TODAS as tabelas de métricas:');
+    metricsAgentTables.forEach((table, index) => {
+        console.log(`  ${index}: ${table}`);
+    });
+    
+    console.log('📋 TODAS as tabelas básicas:');
+    basicMessageTables.forEach((table, index) => {
+        console.log(`  ${index}: ${table}`);
+    });
 };
+
+// Executar debug automaticamente quando o módulo for carregado
+if (typeof window !== 'undefined') {
+    debugAndreAraujo();
+}
