@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMetricsTableName, getBasicTableName } from "@/lib/agents";
@@ -116,7 +115,7 @@ const calculateFunnelFromBasicMessages = (messages: any[]): FunnelData => {
 };
 
 export const useFunnelData = (selectedAgent: string) => {
-    return useQuery<FunnelData>({
+    const query = useQuery<FunnelData>({
         queryKey: ['funnelData', selectedAgent],
         queryFn: async () => {
             if (!selectedAgent) {
@@ -197,4 +196,12 @@ export const useFunnelData = (selectedAgent: string) => {
         staleTime: 2 * 60 * 1000, // 2 minutos
         gcTime: 5 * 60 * 1000, // 5 minutos
     });
+
+    return {
+        data: query.data,
+        isLoading: query.isLoading,
+        isError: query.isError,
+        refetch: query.refetch,
+        isFetching: query.isFetching
+    };
 };

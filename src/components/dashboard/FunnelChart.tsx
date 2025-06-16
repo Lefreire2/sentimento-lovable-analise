@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Filter, TrendingDown, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Filter, TrendingDown, Loader2, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AgentData } from "@/hooks/useAgentData";
 import { useFunnelData } from "@/hooks/useFunnelData";
@@ -13,7 +14,7 @@ interface FunnelChartProps {
 }
 
 export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: FunnelChartProps) => {
-    const { data: funnelData, isLoading, isError } = useFunnelData(selectedAgent);
+    const { data: funnelData, isLoading, isError, refetch, isFetching } = useFunnelData(selectedAgent);
 
     const getPeriodDescription = () => {
         switch (selectedPeriod.type) {
@@ -26,6 +27,11 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
             default:
                 return 'período selecionado';
         }
+    };
+
+    const handleReloadData = () => {
+        console.log('🔄 Recarregando dados do funil para:', selectedAgent);
+        refetch();
     };
 
     if (isLoading) {
@@ -64,6 +70,18 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                             {getPeriodDescription()}
                         </Badge>
                     </div>
+                    <Button 
+                        onClick={handleReloadData} 
+                        variant="outline" 
+                        size="sm"
+                        disabled={isFetching}
+                    >
+                        {isFetching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <RefreshCw className="h-4 w-4" />
+                        )}
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <div className="text-center py-8">
@@ -89,6 +107,19 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
                         <TrendingDown className="h-3 w-3" />
                         Taxa: {funnelData.conversionRate}%
                     </Badge>
+                    <Button 
+                        onClick={handleReloadData} 
+                        variant="outline" 
+                        size="sm"
+                        disabled={isFetching}
+                        title="Recarregar dados do funil"
+                    >
+                        {isFetching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <RefreshCw className="h-4 w-4" />
+                        )}
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent>
