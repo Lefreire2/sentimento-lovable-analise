@@ -6,6 +6,7 @@ import { AgentSelector } from "@/components/dashboard/AgentSelector";
 import { PeriodSelector, PeriodFilter } from "@/components/dashboard/PeriodSelector";
 import { DashboardStates } from "@/components/dashboard/DashboardStates";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { CacheControlButtons } from "@/components/dashboard/CacheControlButtons";
 import { testDatabaseConnection } from "@/lib/database-test";
 
 const Dashboard = () => {
@@ -43,6 +44,13 @@ const Dashboard = () => {
                 <DashboardHeader />
                 <AgentSelector selectedAgent={selectedAgent} onAgentChange={setSelectedAgent} />
                 <PeriodSelector selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
+                
+                {/* Controles de Cache - sempre visível quando há agente selecionado */}
+                {selectedAgent && (
+                    <div className="mb-6">
+                        <CacheControlButtons selectedAgent={selectedAgent} />
+                    </div>
+                )}
                 
                 {shouldShowStates && (
                     <DashboardStates 
