@@ -1,4 +1,3 @@
-
 // Tabelas de métricas agregadas (dados processados) - nomes exatos do banco
 export const metricsAgentTables = [
     'Lista_mensagens_ Carlos_Antunes',
@@ -99,7 +98,7 @@ const nameToTableMapping: Record<string, string> = {
 };
 
 export const formatAgentName = (tableName: string) => {
-    console.log('🎯 Formatando nome da tabela:', tableName);
+    console.log('🎯 FORMAT - Formatando nome da tabela:', tableName);
     
     const name = tableName
         .replace('Lista_mensagens_', '')
@@ -143,7 +142,7 @@ export const formatAgentName = (tableName: string) => {
     
     // Verifica se existe um caso especial
     if (specialCases[name]) {
-        console.log('✅ Nome formatado (caso especial):', specialCases[name]);
+        console.log('✅ FORMAT - Nome formatado (caso especial):', specialCases[name]);
         return specialCases[name];
     }
     
@@ -153,7 +152,7 @@ export const formatAgentName = (tableName: string) => {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     
-    console.log('✅ Nome formatado:', formatted);
+    console.log('✅ FORMAT - Nome formatado:', formatted);
     return formatted;
 };
 
@@ -178,16 +177,32 @@ export const getMetricsTableName = (formattedName: string): string => {
         }
     } else {
         console.log('❌ MÉTRICA - Nenhum mapeamento encontrado para:', formattedName);
-        console.log('🔍 MÉTRICA - Verificando se o nome já existe diretamente...');
         
-        // Tentar encontrar tabela que termine com o nome sem mapeamento
-        const directMatch = metricsAgentTables.find(table => 
-            table.toLowerCase().includes(formattedName.toLowerCase().replace(/[áàâãä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/ /g, '_'))
-        );
+        // Tentar busca fuzzy nas tabelas disponíveis
+        const fuzzyMatch = metricsAgentTables.find(table => {
+            const cleanTable = table.toLowerCase()
+                .replace('lista_mensagens_', '')
+                .replace(/[áàâãä]/g, 'a')
+                .replace(/[éèêë]/g, 'e')
+                .replace(/[íìîï]/g, 'i')
+                .replace(/[óòôõö]/g, 'o')
+                .replace(/[úùûü]/g, 'u')
+                .replace(/_/g, ' ');
+            
+            const cleanName = formattedName.toLowerCase()
+                .replace(/[áàâãä]/g, 'a')
+                .replace(/[éèêë]/g, 'e')
+                .replace(/[íìîï]/g, 'i')
+                .replace(/[óòôõö]/g, 'o')
+                .replace(/[úùûü]/g, 'u')
+                .replace(/ /g, ' ');
+            
+            return cleanTable.includes(cleanName) || cleanName.includes(cleanTable);
+        });
         
-        if (directMatch) {
-            console.log('✅ MÉTRICA - Encontrada correspondência direta:', directMatch);
-            return directMatch;
+        if (fuzzyMatch) {
+            console.log('✅ MÉTRICA - Encontrada correspondência fuzzy:', fuzzyMatch);
+            return fuzzyMatch;
         }
     }
     
@@ -216,16 +231,32 @@ export const getBasicTableName = (formattedName: string): string => {
         }
     } else {
         console.log('❌ BÁSICA - Nenhum mapeamento encontrado para:', formattedName);
-        console.log('🔍 BÁSICA - Verificando se o nome já existe diretamente...');
         
-        // Tentar encontrar tabela que termine com o nome sem mapeamento
-        const directMatch = basicMessageTables.find(table => 
-            table.toLowerCase().includes(formattedName.toLowerCase().replace(/[áàâãä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/ /g, '_'))
-        );
+        // Tentar busca fuzzy nas tabelas disponíveis
+        const fuzzyMatch = basicMessageTables.find(table => {
+            const cleanTable = table.toLowerCase()
+                .replace('lista_de_mensagens_', '')
+                .replace(/[áàâãä]/g, 'a')
+                .replace(/[éèêë]/g, 'e')
+                .replace(/[íìîï]/g, 'i')
+                .replace(/[óòôõö]/g, 'o')
+                .replace(/[úùûü]/g, 'u')
+                .replace(/_/g, ' ');
+            
+            const cleanName = formattedName.toLowerCase()
+                .replace(/[áàâãä]/g, 'a')
+                .replace(/[éèêë]/g, 'e')
+                .replace(/[íìîï]/g, 'i')
+                .replace(/[óòôõö]/g, 'o')
+                .replace(/[úùûü]/g, 'u')
+                .replace(/ /g, ' ');
+            
+            return cleanTable.includes(cleanName) || cleanName.includes(cleanTable);
+        });
         
-        if (directMatch) {
-            console.log('✅ BÁSICA - Encontrada correspondência direta:', directMatch);
-            return directMatch;
+        if (fuzzyMatch) {
+            console.log('✅ BÁSICA - Encontrada correspondência fuzzy:', fuzzyMatch);
+            return fuzzyMatch;
         }
     }
     
@@ -302,5 +333,6 @@ export const debugAndreAraujo = (): void => {
 
 // Executar debug automaticamente quando o módulo for carregado
 if (typeof window !== 'undefined') {
+    console.log('🔧 INIT - Módulo agents.ts carregado');
     debugAndreAraujo();
 }

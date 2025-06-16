@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAgentData } from "@/hooks/useAgentData";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { AgentSelector } from "@/components/dashboard/AgentSelector";
@@ -7,6 +7,7 @@ import { PeriodSelector, PeriodFilter } from "@/components/dashboard/PeriodSelec
 import { DashboardStates } from "@/components/dashboard/DashboardStates";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import { getAllAvailableTables } from "@/lib/agents";
+import { testDatabaseConnection, testSpecificTable } from "@/lib/database-test";
 
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
@@ -16,7 +17,27 @@ const Dashboard = () => {
     
     const { data: agentData, isLoading, isError, error } = useAgentData(selectedAgent);
 
-    console.log('🎛️ Dashboard - Estado atual:');
+    // Teste de conectividade quando o componente é montado
+    useEffect(() => {
+        console.log('🚀 DASHBOARD - Componente montado, iniciando testes');
+        testDatabaseConnection();
+    }, []);
+
+    // Teste específico quando um agente é selecionado
+    useEffect(() => {
+        if (selectedAgent) {
+            console.log('🎯 DASHBOARD - Agente selecionado:', selectedAgent);
+            console.log('🧪 DASHBOARD - Iniciando testes específicos para:', selectedAgent);
+            
+            // Testar as tabelas específicas deste agente
+            if (selectedAgent === 'André Araújo') {
+                testSpecificTable('Lista_mensagens_Andre_araujo');
+                testSpecificTable('Lista_de_Mensagens_Andre_araujo');
+            }
+        }
+    }, [selectedAgent]);
+
+    console.log('🎛️ DASHBOARD - Estado atual:');
     console.log('- selectedAgent:', selectedAgent);
     console.log('- selectedPeriod:', selectedPeriod);
     console.log('- isLoading:', isLoading);
@@ -25,12 +46,12 @@ const Dashboard = () => {
     console.log('- error:', error);
     
     // Log das tabelas disponíveis no banco
-    console.log('📊 Tabelas disponíveis no banco:', getAllAvailableTables());
+    console.log('📊 DASHBOARD - Tabelas disponíveis no banco:', getAllAvailableTables());
 
     const shouldShowStates = isLoading || isError || !selectedAgent || (selectedAgent && !agentData);
     const shouldShowContent = agentData && !isLoading && !isError;
 
-    console.log('🎯 Dashboard - Decisões de renderização:');
+    console.log('🎯 DASHBOARD - Decisões de renderização:');
     console.log('- shouldShowStates:', shouldShowStates);
     console.log('- shouldShowContent:', shouldShowContent);
 
