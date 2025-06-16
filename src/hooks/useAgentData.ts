@@ -124,7 +124,7 @@ export const useAgentData = (selectedAgent: string) => {
                     
                     if (!metricsError && metricsData && metricsData.length > 0) {
                         console.log('✅ AGENT-QUERY - Usando dados de métricas');
-                        const firstRow = metricsData[0];
+                        const firstRow = metricsData[0] as any;
                         return {
                             tempo_primeira_resposta_minutos: firstRow.tempo_primeira_resposta_minutos || '0',
                             tempo_medio_resposta_atendente_minutos: firstRow.tempo_medio_resposta_atendente_minutos || '0',
