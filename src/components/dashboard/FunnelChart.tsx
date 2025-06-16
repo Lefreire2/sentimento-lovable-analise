@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, TrendingDown, Loader2, RefreshCw } from "lucide-react";
@@ -34,18 +33,36 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
         refetch();
     };
 
+    // Cabeçalho comum para todos os estados
+    const CardHeaderComponent = () => (
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5 text-primary" />
+                <CardTitle>Funil de Conversação</CardTitle>
+                <Badge variant="outline" className="ml-2">
+                    {getPeriodDescription()}
+                </Badge>
+            </div>
+            <Button 
+                onClick={handleReloadData} 
+                variant="outline" 
+                size="sm"
+                disabled={isFetching}
+                title="Recarregar dados do funil"
+            >
+                {isFetching ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    <RefreshCw className="h-4 w-4" />
+                )}
+            </Button>
+        </CardHeader>
+    );
+
     if (isLoading) {
         return (
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex items-center space-x-2">
-                        <Filter className="h-5 w-5 text-primary" />
-                        <CardTitle>Funil de Conversação</CardTitle>
-                        <Badge variant="outline" className="ml-2">
-                            {getPeriodDescription()}
-                        </Badge>
-                    </div>
-                </CardHeader>
+                <CardHeaderComponent />
                 <CardContent>
                     <div className="flex flex-col items-center justify-center gap-2 text-center p-8">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -62,27 +79,7 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
     if (isError || !funnelData) {
         return (
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex items-center space-x-2">
-                        <Filter className="h-5 w-5 text-primary" />
-                        <CardTitle>Funil de Conversação</CardTitle>
-                        <Badge variant="outline" className="ml-2">
-                            {getPeriodDescription()}
-                        </Badge>
-                    </div>
-                    <Button 
-                        onClick={handleReloadData} 
-                        variant="outline" 
-                        size="sm"
-                        disabled={isFetching}
-                    >
-                        {isFetching ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <RefreshCw className="h-4 w-4" />
-                        )}
-                    </Button>
-                </CardHeader>
+                <CardHeaderComponent />
                 <CardContent>
                     <div className="text-center py-8">
                         <p className="text-muted-foreground">Erro ao carregar dados do funil</p>
