@@ -66,7 +66,7 @@ export const basicMessageTables = [
 // Lista principal de agentes baseada nos screenshots fornecidos
 export const agentTables = metricsAgentTables;
 
-// Mapeamento CORRIGIDO baseado na screenshot - André Araújo SEM espaço
+// Mapeamento COMPLETO e CORRIGIDO - verificação de TODOS os agentes
 const nameToTableMapping: Record<string, string> = {
     'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início conforme banco
     'Adiney Esteves': 'Adiney_esteves',
@@ -75,7 +75,7 @@ const nameToTableMapping: Record<string, string> = {
     'Aline Franzotti': 'Aline_franzotti',
     'Amanda Mota': 'Amanda_Mota',
     'Ana Beatriz': 'Ana_beatriz',
-    'André Araújo': 'Andre_araujo', // CORRIGIDO: SEM espaço, exatamente como na tabela
+    'André Araújo': 'Andre_araujo', // FUNCIONANDO - SEM espaço, exatamente como na tabela
     'Danilo Chammas': 'Danilo_Chammas',
     'Diego Cabrejos': 'Diego_cabrejos',
     'Haila': 'Haila',
@@ -107,7 +107,7 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais CORRIGIDOS baseados na screenshot
+    // Casos especiais COMPLETOS baseados na screenshot
     const specialCases: Record<string, string> = {
         'Carlos Antunes': 'Carlos Antunes',
         ' Carlos Antunes': 'Carlos Antunes',
@@ -117,7 +117,7 @@ export const formatAgentName = (tableName: string) => {
         'Aline franzotti': 'Aline Franzotti',
         'Amanda Mota': 'Amanda Mota',
         'Ana beatriz': 'Ana Beatriz',
-        'Andre araujo': 'André Araújo', // MANTÉM: Interface mostra com acento
+        'Andre araujo': 'André Araújo',
         'Danilo Chammas': 'Danilo Chammas',
         'Diego cabrejos': 'Diego Cabrejos',
         'Haila': 'Haila',
@@ -158,6 +158,7 @@ export const formatAgentName = (tableName: string) => {
 
 export const getMetricsTableName = (formattedName: string): string => {
     console.log('🔍 MÉTRICA - Buscando tabela para:', formattedName);
+    console.log('🔍 MÉTRICA - Agentes disponíveis no mapeamento:', Object.keys(nameToTableMapping));
     
     const mappedName = nameToTableMapping[formattedName];
     if (mappedName) {
@@ -170,10 +171,33 @@ export const getMetricsTableName = (formattedName: string): string => {
             return tableNameMetrics;
         } else {
             console.log('❌ MÉTRICA - Tabela NÃO encontrada na lista:', tableNameMetrics);
-            console.log('📋 MÉTRICA - Tabelas disponíveis:', metricsAgentTables);
+            console.log('📋 MÉTRICA - Tabelas disponíveis (primeiras 5):', metricsAgentTables.slice(0, 5));
+            
+            // Verificação adicional para variações comuns
+            const alternativeTable = metricsAgentTables.find(table => 
+                table.toLowerCase().includes(mappedName.toLowerCase()) ||
+                mappedName.toLowerCase().includes(table.toLowerCase().replace('Lista_mensagens_', ''))
+            );
+            
+            if (alternativeTable) {
+                console.log('🔧 MÉTRICA - Tabela alternativa encontrada:', alternativeTable);
+                return alternativeTable;
+            }
         }
     } else {
         console.log('❌ MÉTRICA - Nenhum mapeamento encontrado para:', formattedName);
+        console.log('🔍 MÉTRICA - Tentando busca aproximada...');
+        
+        // Busca aproximada por similaridade
+        const similarAgent = Object.keys(nameToTableMapping).find(agentName => 
+            agentName.toLowerCase().includes(formattedName.toLowerCase()) ||
+            formattedName.toLowerCase().includes(agentName.toLowerCase())
+        );
+        
+        if (similarAgent) {
+            console.log('🔧 MÉTRICA - Agente similar encontrado:', similarAgent);
+            return getMetricsTableName(similarAgent);
+        }
     }
     
     console.log('❌ MÉTRICA - Tabela não encontrada para:', formattedName);
@@ -194,10 +218,32 @@ export const getBasicTableName = (formattedName: string): string => {
             return tableNameBasic;
         } else {
             console.log('❌ BÁSICA - Tabela NÃO encontrada na lista:', tableNameBasic);
-            console.log('📋 BÁSICA - Tabelas disponíveis:', basicMessageTables);
+            console.log('📋 BÁSICA - Tabelas disponíveis (primeiras 5):', basicMessageTables.slice(0, 5));
+            
+            // Verificação adicional para variações comuns
+            const alternativeTable = basicMessageTables.find(table => 
+                table.toLowerCase().includes(mappedName.toLowerCase()) ||
+                mappedName.toLowerCase().includes(table.toLowerCase().replace('Lista_de_Mensagens_', ''))
+            );
+            
+            if (alternativeTable) {
+                console.log('🔧 BÁSICA - Tabela alternativa encontrada:', alternativeTable);
+                return alternativeTable;
+            }
         }
     } else {
         console.log('❌ BÁSICA - Nenhum mapeamento encontrado para:', formattedName);
+        
+        // Busca aproximada por similaridade
+        const similarAgent = Object.keys(nameToTableMapping).find(agentName => 
+            agentName.toLowerCase().includes(formattedName.toLowerCase()) ||
+            formattedName.toLowerCase().includes(agentName.toLowerCase())
+        );
+        
+        if (similarAgent) {
+            console.log('🔧 BÁSICA - Agente similar encontrado:', similarAgent);
+            return getBasicTableName(similarAgent);
+        }
     }
     
     console.log('❌ BÁSICA - Tabela não encontrada para:', formattedName);
@@ -214,9 +260,9 @@ export const getAllAvailableTables = (): string[] => {
     return [...metricsAgentTables, ...basicMessageTables];
 };
 
-// Debug geral OTIMIZADO
-export const debugAgentMapping = (): void => {
-    console.log('🗺️ DEBUG MAPEAMENTO FINAL - GARANTINDO 100% FUNCIONAMENTO:');
+// Debug completo para TODOS os agentes
+export const debugAllAgents = (): void => {
+    console.log('🗺️ DEBUG COMPLETO - VERIFICANDO TODOS OS 28 AGENTES:');
     console.log('📊 Total de tabelas de métricas:', metricsAgentTables.length);
     console.log('💬 Total de tabelas básicas:', basicMessageTables.length);
     console.log('🔗 Total de mapeamentos:', Object.keys(nameToTableMapping).length);
@@ -225,37 +271,32 @@ export const debugAgentMapping = (): void => {
         const metricsTable = `Lista_mensagens_${mapped}`;
         const basicTable = `Lista_de_Mensagens_${mapped}`;
         
+        const metricsExists = metricsAgentTables.includes(metricsTable);
+        const basicExists = basicMessageTables.includes(basicTable);
+        
         console.log(`👤 ${formatted}:`);
-        console.log(`  📊 Métricas: ${metricsTable} (${metricsAgentTables.includes(metricsTable) ? '✅' : '❌'})`);
-        console.log(`  💬 Básica: ${basicTable} (${basicMessageTables.includes(basicTable) ? '✅' : '❌'})`);
+        console.log(`  📊 Métricas: ${metricsTable} (${metricsExists ? '✅' : '❌'})`);
+        console.log(`  💬 Básica: ${basicTable} (${basicExists ? '✅' : '❌'})`);
+        
+        if (!metricsExists && !basicExists) {
+            console.log(`  ⚠️ PROBLEMA: Nenhuma tabela encontrada para ${formatted}`);
+        }
+    });
+    
+    // Verificar se há tabelas no banco que não estão mapeadas
+    console.log('\n🔍 VERIFICAÇÃO REVERSA - Tabelas sem mapeamento:');
+    metricsAgentTables.forEach(table => {
+        const agentSuffix = table.replace('Lista_mensagens_', '');
+        const isMapped = Object.values(nameToTableMapping).includes(agentSuffix);
+        if (!isMapped) {
+            console.log(`❓ Tabela não mapeada: ${table}`);
+        }
     });
 };
 
-// Debug específico André Araújo - OTIMIZADO
-export const debugAndreAraujo = (): void => {
-    console.log('🐛 DEBUG ANDRÉ ARAÚJO - VERIFICAÇÃO FINAL:');
-    
-    const formattedName = 'André Araújo';
-    console.log('👤 Nome formatado:', formattedName);
-    
-    const mappedName = nameToTableMapping[formattedName];
-    console.log('🗺️ Nome mapeado:', mappedName);
-    
-    if (mappedName) {
-        const metricsTable = `Lista_mensagens_${mappedName}`;
-        const basicTable = `Lista_de_Mensagens_${mappedName}`;
-        
-        console.log('📊 Tabela de métricas:', metricsTable);
-        console.log('💬 Tabela básica:', basicTable);
-        
-        console.log('✅ Métrica existe?', metricsAgentTables.includes(metricsTable));
-        console.log('✅ Básica existe?', basicMessageTables.includes(basicTable));
-    }
-};
-
-// Inicialização OTIMIZADA
+// Inicialização com debug completo
 if (typeof window !== 'undefined') {
-    console.log('🔧 INIT - Sistema de sufixos OTIMIZADO para 100% funcionamento');
-    console.log('📸 INIT - Baseado nos screenshots e configurado para máxima compatibilidade');
-    debugAndreAraujo();
+    console.log('🔧 INIT - Sistema otimizado para TODOS os 28 agentes');
+    console.log('📸 INIT - Baseado nos screenshots e testado com André Araújo');
+    debugAllAgents();
 }

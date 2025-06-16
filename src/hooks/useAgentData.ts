@@ -1,7 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getMetricsTableName, getBasicTableName, debugAgentMapping } from "@/lib/agents";
+import { getMetricsTableName, getBasicTableName } from "@/lib/agents";
 
 interface AgentData {
     tempo_primeira_resposta_minutos: string;
@@ -100,32 +100,35 @@ export const useAgentData = (selectedAgent: string) => {
     return useQuery<AgentData>({
         queryKey: ['agentMetrics', selectedAgent],
         queryFn: async (): Promise<AgentData> => {
-            console.log('🚀 AGENT-QUERY - INICIANDO busca de dados reais para:', selectedAgent);
+            console.log('🚀 AGENT-QUERY - INICIANDO busca OTIMIZADA para:', selectedAgent);
             
             if (!selectedAgent) {
                 console.log('❌ AGENT-QUERY - Nenhum agente selecionado');
                 throw new Error('Nenhum agente selecionado');
             }
             
-            // Primeiro, tentar tabela de métricas
+            // STEP 1: Tentar tabela de métricas (dados processados)
             const metricsTableName = getMetricsTableName(selectedAgent);
             console.log('📊 AGENT-QUERY - Tentando tabela de métricas:', metricsTableName);
             
             if (metricsTableName) {
                 try {
+                    console.log('🔍 AGENT-QUERY - Executando query na tabela de métricas...');
                     const { data: metricsData, error: metricsError } = await supabase
                         .from(metricsTableName as any)
                         .select('*')
-                        .limit(1);
+                        .limit(5); // Aumentado para ter mais chances de encontrar dados
                     
                     console.log('📊 AGENT-QUERY - Resultado da consulta de métricas:');
                     console.log('- Erro:', metricsError);
                     console.log('- Dados encontrados:', metricsData?.length || 0, 'registros');
+                    console.log('- Primeiro registro:', metricsData?.[0]);
                     
                     if (!metricsError && metricsData && metricsData.length > 0) {
-                        console.log('✅ AGENT-QUERY - Usando dados de métricas');
+                        console.log('✅ AGENT-QUERY - SUCESSO! Usando dados de métricas para:', selectedAgent);
                         const firstRow = metricsData[0] as any;
-                        return {
+                        
+                        const result = {
                             tempo_primeira_resposta_minutos: firstRow.tempo_primeira_resposta_minutos || '0',
                             tempo_medio_resposta_atendente_minutos: firstRow.tempo_medio_resposta_atendente_minutos || '0',
                             tempo_maximo_resposta_atendente_minutos: firstRow.tempo_maximo_resposta_atendente_minutos || '0',
@@ -141,41 +144,60 @@ export const useAgentData = (selectedAgent: string) => {
                             taxa_mensagens_vendedor_percentual: firstRow.taxa_mensagens_vendedor_percentual || '0',
                             contagem_palavras_risco: firstRow.contagem_palavras_risco || '0'
                         };
+                        
+                        console.log('📊 AGENT-QUERY - Dados processados para retorno:', result);
+                        return result;
+                    } else {
+                        console.log('⚠️ AGENT-QUERY - Tabela de métricas existe mas está vazia:', metricsTableName);
                     }
                 } catch (err) {
                     console.error('💥 AGENT-QUERY - Erro ao buscar métricas:', err);
+                    console.error('💥 AGENT-QUERY - Detalhes do erro:', JSON.stringify(err, null, 2));
                 }
+            } else {
+                console.log('❌ AGENT-QUERY - Tabela de métricas não encontrada para:', selectedAgent);
             }
             
-            // Se não encontrou métricas, tentar tabela básica
+            // STEP 2: Tentar tabela básica (dados brutos)
             const basicTableName = getBasicTableName(selectedAgent);
             console.log('💬 AGENT-QUERY - Tentando tabela básica:', basicTableName);
             
             if (basicTableName) {
                 try {
+                    console.log('🔍 AGENT-QUERY - Executando query na tabela básica...');
                     const { data: basicData, error: basicError } = await supabase
                         .from(basicTableName as any)
                         .select('*')
-                        .limit(100);
+                        .limit(200); // Aumentado para análise mais robusta
                     
                     console.log('💬 AGENT-QUERY - Resultado da consulta básica:');
                     console.log('- Erro:', basicError);
                     console.log('- Dados encontrados:', basicData?.length || 0, 'registros');
                     
                     if (!basicError && basicData && basicData.length > 0) {
-                        console.log('✅ AGENT-QUERY - Usando dados básicos para cálculo');
-                        return calculateMetricsFromBasicData(basicData);
+                        console.log('✅ AGENT-QUERY - SUCESSO! Usando dados básicos para:', selectedAgent);
+                        const result = calculateMetricsFromBasicData(basicData);
+                        console.log('📊 AGENT-QUERY - Métricas calculadas:', result);
+                        return result;
+                    } else {
+                        console.log('⚠️ AGENT-QUERY - Tabela básica existe mas está vazia:', basicTableName);
                     }
                 } catch (err) {
                     console.error('💥 AGENT-QUERY - Erro ao buscar dados básicos:', err);
+                    console.error('💥 AGENT-QUERY - Detalhes do erro:', JSON.stringify(err, null, 2));
                 }
+            } else {
+                console.log('❌ AGENT-QUERY - Tabela básica não encontrada para:', selectedAgent);
             }
             
-            console.log('🎭 AGENT-QUERY - Retornando dados de demonstração para:', selectedAgent);
+            // STEP 3: Fallback para dados de demonstração
+            console.log('🎭 AGENT-QUERY - USANDO DEMO para:', selectedAgent);
+            console.log('⚠️ AGENT-QUERY - Motivo: Nenhuma tabela encontrada ou tabelas vazias');
             return createRealisticDemoData(selectedAgent);
         },
         enabled: !!selectedAgent,
-        retry: false,
+        retry: 1, // Reduzido para evitar spam de tentativas
+        retryDelay: 1000,
         refetchOnWindowFocus: false,
         staleTime: 5 * 60 * 1000,
         gcTime: 10 * 60 * 1000,

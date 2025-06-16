@@ -217,9 +217,9 @@ export const useFunnelData = (selectedAgent: string) => {
                 return createDemoFunnelData('default');
             }
             
-            console.log('🔍 FUNIL - Iniciando busca de dados reais para agente:', selectedAgent);
+            console.log('🔍 FUNIL - Iniciando busca OTIMIZADA para agente:', selectedAgent);
             
-            // Primeiro, tentar tabela de métricas (dados mais detalhados)
+            // STEP 1: Tentar tabela de métricas (dados mais detalhados)
             const metricsTableName = getMetricsTableName(selectedAgent);
             console.log('📊 FUNIL - Tentando tabela de métricas:', metricsTableName);
             
@@ -235,15 +235,17 @@ export const useFunnelData = (selectedAgent: string) => {
                     console.log('- Dados encontrados:', metricsData?.length || 0, 'registros');
                     
                     if (!metricsError && metricsData && metricsData.length > 0) {
-                        console.log('✅ FUNIL - Usando dados de métricas para cálculo do funil');
+                        console.log('✅ FUNIL - SUCESSO! Usando dados de métricas para:', selectedAgent);
                         return calculateFunnelFromMetrics(metricsData);
+                    } else {
+                        console.log('⚠️ FUNIL - Tabela de métricas vazia para:', selectedAgent);
                     }
                 } catch (err) {
                     console.error('💥 FUNIL - Erro ao buscar métricas:', err);
                 }
             }
             
-            // Se não encontrou métricas, tentar tabela básica
+            // STEP 2: Tentar tabela básica
             const basicTableName = getBasicTableName(selectedAgent);
             console.log('💬 FUNIL - Tentando tabela básica:', basicTableName);
             
@@ -259,19 +261,22 @@ export const useFunnelData = (selectedAgent: string) => {
                     console.log('- Dados encontrados:', basicData?.length || 0, 'registros');
                     
                     if (!basicError && basicData && basicData.length > 0) {
-                        console.log('✅ FUNIL - Usando dados básicos para cálculo do funil');
+                        console.log('✅ FUNIL - SUCESSO! Usando dados básicos para:', selectedAgent);
                         return calculateFunnelFromBasicMessages(basicData);
+                    } else {
+                        console.log('⚠️ FUNIL - Tabela básica vazia para:', selectedAgent);
                     }
                 } catch (err) {
                     console.error('💥 FUNIL - Erro ao buscar dados básicos:', err);
                 }
             }
             
-            console.log('🎭 FUNIL - Retornando dados de demonstração para:', selectedAgent);
+            console.log('🎭 FUNIL - USANDO DEMO para:', selectedAgent);
             return createDemoFunnelData(selectedAgent);
         },
         enabled: !!selectedAgent,
-        retry: false,
+        retry: 1,
+        retryDelay: 1000,
         refetchOnWindowFocus: false,
         staleTime: 5 * 60 * 1000,
         gcTime: 5 * 60 * 1000,
