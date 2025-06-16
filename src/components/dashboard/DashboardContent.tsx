@@ -38,10 +38,10 @@ export const DashboardContent = ({ agentData, selectedAgent, selectedPeriod }: D
                 agentData={agentData} 
                 selectedAgent={selectedAgent} 
             />
-            <SentimentMetrics agentData={agentData} />
-            <TimeMetrics agentData={agentData} />
-            <PerformanceMetrics agentData={agentData} />
-            <ResponseTimeChart agentData={agentData} />
+            <SentimentMetrics selectedAgent={selectedAgent} />
+            <TimeMetrics selectedAgent={selectedAgent} />
+            <PerformanceMetrics selectedAgent={selectedAgent} />
+            <ResponseTimeChart selectedAgent={selectedAgent} />
         </div>
     );
 };
