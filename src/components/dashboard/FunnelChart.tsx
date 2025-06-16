@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Filter, TrendingDown, Loader2, RefreshCw, Database, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AgentData } from "@/hooks/useAgentData";
-import { useFunnelData } from "@/hooks/useFunnelData";
+import { useFunnelData } from "@/hooks/useFunnelDataRefactored";
 import { PeriodFilter } from "./PeriodSelector";
 
 interface FunnelChartProps {
