@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getMetricsTableName, getBasicTableName } from "@/lib/agents";
 
@@ -115,6 +116,8 @@ const calculateFunnelFromBasicMessages = (messages: any[]): FunnelData => {
 };
 
 export const useFunnelData = (selectedAgent: string) => {
+    const queryClient = useQueryClient();
+    
     const query = useQuery<FunnelData>({
         queryKey: ['funnelData', selectedAgent],
         queryFn: async () => {
@@ -193,15 +196,27 @@ export const useFunnelData = (selectedAgent: string) => {
         enabled: !!selectedAgent,
         retry: 1,
         refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 1000, // 2 minutos
+        staleTime: 0, // Sempre considerar os dados como obsoletos para permitir refresh
         gcTime: 5 * 60 * 1000, // 5 minutos
     });
+
+    const invalidateAndRefetch = async () => {
+        console.log('🔄 FUNIL - Invalidando cache e recarregando dados para:', selectedAgent);
+        
+        // Invalidar o cache da query específica
+        await queryClient.invalidateQueries({ 
+            queryKey: ['funnelData', selectedAgent] 
+        });
+        
+        // Forçar um refetch
+        return query.refetch();
+    };
 
     return {
         data: query.data,
         isLoading: query.isLoading,
         isError: query.isError,
-        refetch: query.refetch,
+        refetch: invalidateAndRefetch,
         isFetching: query.isFetching
     };
 };

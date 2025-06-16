@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, TrendingDown, Loader2, RefreshCw } from "lucide-react";
@@ -28,9 +29,14 @@ export const FunnelChart = ({ agentData, selectedAgent, selectedPeriod }: Funnel
         }
     };
 
-    const handleReloadData = () => {
-        console.log('🔄 Recarregando dados do funil para:', selectedAgent);
-        refetch();
+    const handleReloadData = async () => {
+        console.log('🔄 FUNIL - Botão reload clicado para agente:', selectedAgent);
+        try {
+            await refetch();
+            console.log('✅ FUNIL - Dados recarregados com sucesso');
+        } catch (error) {
+            console.error('❌ FUNIL - Erro ao recarregar dados:', error);
+        }
     };
 
     // Cabeçalho comum para todos os estados
