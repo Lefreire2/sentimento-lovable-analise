@@ -5,43 +5,16 @@ export const useCacheManager = () => {
     const queryClient = useQueryClient();
 
     const clearAllCache = async () => {
-        console.log('🔄 CACHE-MANAGER - Limpando TODOS os caches');
+        console.log('🔄 CACHE-MANAGER - LIMPEZA TOTAL INICIADA');
         
-        // Limpar cache específico de agentes
-        await queryClient.invalidateQueries({ 
-            predicate: (query) => {
-                const queryKey = query.queryKey;
-                return queryKey.some(key => 
-                    typeof key === 'string' && 
-                    (key.includes('agentMetrics') || 
-                     key.includes('funnelData') || 
-                     key.includes('sentimentMetrics') || 
-                     key.includes('performanceMetrics') || 
-                     key.includes('timeMetrics'))
-                );
-            }
-        });
+        // Limpar TODOS os caches relacionados a dados
+        await queryClient.clear();
         
-        // Remover dados do cache completamente
-        queryClient.removeQueries({ 
-            predicate: (query) => {
-                const queryKey = query.queryKey;
-                return queryKey.some(key => 
-                    typeof key === 'string' && 
-                    (key.includes('agentMetrics') || 
-                     key.includes('funnelData') || 
-                     key.includes('sentimentMetrics') || 
-                     key.includes('performanceMetrics') || 
-                     key.includes('timeMetrics'))
-                );
-            }
-        });
-        
-        console.log('✅ CACHE-MANAGER - Cache completamente limpo');
+        console.log('✅ CACHE-MANAGER - Cache completamente LIMPO');
     };
 
     const clearAgentCache = async (agentName: string) => {
-        console.log('🔄 CACHE-MANAGER - Limpando cache para agente:', agentName);
+        console.log('🔄 CACHE-MANAGER - Limpando cache ESPECÍFICO para agente:', agentName);
         
         const queries = [
             ['agentMetrics', agentName],
@@ -56,19 +29,19 @@ export const useCacheManager = () => {
             queryClient.removeQueries({ queryKey });
         }
         
-        console.log('✅ CACHE-MANAGER - Cache do agente limpo:', agentName);
+        console.log('✅ CACHE-MANAGER - Cache do agente LIMPO:', agentName);
     };
 
     const forceRefreshAllData = async () => {
-        console.log('🔄 CACHE-MANAGER - Forçando refresh de TODOS os dados');
+        console.log('🔄 CACHE-MANAGER - REFRESH TOTAL FORÇADO');
         
-        // Primeiro limpar tudo
+        // Limpar tudo primeiro
         await clearAllCache();
         
-        // Aguardar um pouco para garantir que o cache foi limpo
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Aguardar para garantir limpeza
+        await new Promise(resolve => setTimeout(resolve, 200));
         
-        console.log('✅ CACHE-MANAGER - Refresh completo finalizado');
+        console.log('✅ CACHE-MANAGER - Refresh completo FINALIZADO');
     };
 
     return {
