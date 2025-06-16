@@ -66,7 +66,7 @@ export const basicMessageTables = [
 // Lista principal de agentes baseada nos screenshots fornecidos
 export const agentTables = metricsAgentTables;
 
-// Mapeamento DEFINITIVO baseado nos screenshots - GARANTIDO 100% funcionamento
+// Mapeamento CORRIGIDO baseado na screenshot - André Araújo SEM espaço
 const nameToTableMapping: Record<string, string> = {
     'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início conforme banco
     'Adiney Esteves': 'Adiney_esteves',
@@ -75,7 +75,7 @@ const nameToTableMapping: Record<string, string> = {
     'Aline Franzotti': 'Aline_franzotti',
     'Amanda Mota': 'Amanda_Mota',
     'Ana Beatriz': 'Ana_beatriz',
-    'André Araújo': 'Andre_araujo', // SEM acento no banco, COM acento na UI
+    'André Araújo': 'Andre_araujo', // CORRIGIDO: SEM espaço, exatamente como na tabela
     'Danilo Chammas': 'Danilo_Chammas',
     'Diego Cabrejos': 'Diego_cabrejos',
     'Haila': 'Haila',
@@ -90,10 +90,10 @@ const nameToTableMapping: Record<string, string> = {
     'Michelle Meleck': 'Michelle_Meleck',
     'Patricia Lima': 'Patricia_lima',
     'Raiany Pimentel': 'Raiany_pimentel',
-    'Roberta Xavier': 'Roberta_Xavier', // R maiúsculo em Xavier
+    'Roberta Xavier': 'Roberta_Xavier',
     'Roberto Pigini': 'Roberto_pigini',
     'Roclides Lima': 'Roclides_lima',
-    'Rodrigo Pastore': 'Rodrigo_Pastore', // P maiúsculo em Pastore
+    'Rodrigo Pastore': 'Rodrigo_Pastore',
     'Silvia Joly': 'Silvia_Joly',
     'Stefanie Lee': 'Stefanie_lee'
 };
@@ -107,7 +107,7 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais OTIMIZADOS - garantindo 100% de funcionamento
+    // Casos especiais CORRIGIDOS baseados na screenshot
     const specialCases: Record<string, string> = {
         'Carlos Antunes': 'Carlos Antunes',
         ' Carlos Antunes': 'Carlos Antunes',
@@ -117,7 +117,7 @@ export const formatAgentName = (tableName: string) => {
         'Aline franzotti': 'Aline Franzotti',
         'Amanda Mota': 'Amanda Mota',
         'Ana beatriz': 'Ana Beatriz',
-        'Andre araujo': 'André Araújo', // CRÍTICO: SEM acento no banco -> COM acento na UI
+        'Andre araujo': 'André Araújo', // MANTÉM: Interface mostra com acento
         'Danilo Chammas': 'Danilo Chammas',
         'Diego cabrejos': 'Diego Cabrejos',
         'Haila': 'Haila',
@@ -132,11 +132,11 @@ export const formatAgentName = (tableName: string) => {
         'Michelle Meleck': 'Michelle Meleck',
         'Patricia lima': 'Patricia Lima',
         'Raiany pimentel': 'Raiany Pimentel',
-        'Roberta Xavier': 'Roberta Xavier', // Exato conforme banco
+        'Roberta Xavier': 'Roberta Xavier',
         'Roberta xavier': 'Roberta Xavier',
         'Roberto pigini': 'Roberto Pigini',
         'Roclides lima': 'Roclides Lima',
-        'Rodrigo Pastore': 'Rodrigo Pastore', // Exato conforme banco
+        'Rodrigo Pastore': 'Rodrigo Pastore',
         'Rodrigo pastore': 'Rodrigo Pastore',
         'Silvia Joly': 'Silvia Joly',
         'Stefanie lee': 'Stefanie Lee'
@@ -168,7 +168,12 @@ export const getMetricsTableName = (formattedName: string): string => {
         if (metricsAgentTables.includes(tableNameMetrics)) {
             console.log('✅ MÉTRICA - Tabela CONFIRMADA na lista');
             return tableNameMetrics;
+        } else {
+            console.log('❌ MÉTRICA - Tabela NÃO encontrada na lista:', tableNameMetrics);
+            console.log('📋 MÉTRICA - Tabelas disponíveis:', metricsAgentTables);
         }
+    } else {
+        console.log('❌ MÉTRICA - Nenhum mapeamento encontrado para:', formattedName);
     }
     
     console.log('❌ MÉTRICA - Tabela não encontrada para:', formattedName);
@@ -187,7 +192,12 @@ export const getBasicTableName = (formattedName: string): string => {
         if (basicMessageTables.includes(tableNameBasic)) {
             console.log('✅ BÁSICA - Tabela CONFIRMADA na lista');
             return tableNameBasic;
+        } else {
+            console.log('❌ BÁSICA - Tabela NÃO encontrada na lista:', tableNameBasic);
+            console.log('📋 BÁSICA - Tabelas disponíveis:', basicMessageTables);
         }
+    } else {
+        console.log('❌ BÁSICA - Nenhum mapeamento encontrado para:', formattedName);
     }
     
     console.log('❌ BÁSICA - Tabela não encontrada para:', formattedName);

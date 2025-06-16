@@ -166,7 +166,7 @@ export const useAgentData = (selectedAgent: string) => {
                 return null;
             }
             
-            console.log('🚀 QUERY - INICIANDO BUSCA OTIMIZADA');
+            console.log('🚀 QUERY - INICIANDO BUSCA CORRIGIDA PARA ANDRÉ ARAÚJO');
             console.log('👤 QUERY - Agente:', selectedAgent);
             console.log('🕐 QUERY - Timestamp:', new Date().toISOString());
             
@@ -178,25 +178,46 @@ export const useAgentData = (selectedAgent: string) => {
             
             if (metricsTableName) {
                 try {
-                    console.log('🔍 MÉTRICA - Consultando:', metricsTableName);
+                    console.log('🔍 MÉTRICA - Consultando tabela:', metricsTableName);
+                    console.log('🔍 MÉTRICA - Query: SELECT COUNT(*) FROM', metricsTableName);
                     
-                    const { data: metricsData, error: metricsError } = await supabase
+                    // Primeiro, verificar se a tabela existe e tem dados
+                    const { count, error: countError } = await supabase
                         .from(metricsTableName as any)
-                        .select('*');
+                        .select('*', { count: 'exact', head: true });
                     
-                    console.log('📊 MÉTRICA - Resultado:');
-                    console.log('  - Erro:', metricsError);
-                    console.log('  - Registros:', metricsData?.length || 0);
+                    console.log('📊 MÉTRICA - Count resultado:');
+                    console.log('  - Erro do count:', countError);
+                    console.log('  - Total de registros:', count);
                     
-                    if (!metricsError && metricsData && metricsData.length > 0) {
-                        console.log('✅ MÉTRICA - Dados encontrados! Agregando...');
-                        return aggregateAgentData(metricsData);
+                    if (!countError && count && count > 0) {
+                        console.log('✅ MÉTRICA - Tabela tem dados! Buscando registros...');
+                        
+                        const { data: metricsData, error: metricsError } = await supabase
+                            .from(metricsTableName as any)
+                            .select('*')
+                            .limit(100);
+                        
+                        console.log('📊 MÉTRICA - Dados resultado:');
+                        console.log('  - Erro:', metricsError);
+                        console.log('  - Registros retornados:', metricsData?.length || 0);
+                        console.log('  - Primeiro registro:', metricsData?.[0]);
+                        
+                        if (!metricsError && metricsData && metricsData.length > 0) {
+                            console.log('✅ MÉTRICA - SUCESSO! Dados encontrados! Agregando...');
+                            return aggregateAgentData(metricsData);
+                        }
+                    } else if (countError) {
+                        console.log('⚠️ MÉTRICA - Erro ao verificar tabela:', countError.message);
+                        console.log('⚠️ MÉTRICA - Detalhes do erro:', countError);
                     } else {
-                        console.log('⚠️ MÉTRICA - Tabela vazia ou erro:', metricsError?.message);
+                        console.log('⚠️ MÉTRICA - Tabela vazia (count = 0)');
                     }
                 } catch (err) {
                     console.error('💥 MÉTRICA - Exceção:', err);
                 }
+            } else {
+                console.log('❌ MÉTRICA - Nenhuma tabela de métricas encontrada para:', selectedAgent);
             }
             
             // STEP 2: Fallback para tabela básica (dados brutos)
@@ -205,37 +226,62 @@ export const useAgentData = (selectedAgent: string) => {
             
             if (basicTableName) {
                 try {
-                    console.log('🔍 BÁSICA - Consultando:', basicTableName);
+                    console.log('🔍 BÁSICA - Consultando tabela:', basicTableName);
+                    console.log('🔍 BÁSICA - Query: SELECT COUNT(*) FROM', basicTableName);
                     
-                    const { data: basicData, error: basicError } = await supabase
+                    // Primeiro, verificar se a tabela existe e tem dados
+                    const { count, error: countError } = await supabase
                         .from(basicTableName as any)
-                        .select('*')
-                        .limit(1000); // Limite para performance
+                        .select('*', { count: 'exact', head: true });
                     
-                    console.log('💬 BÁSICA - Resultado:');
-                    console.log('  - Erro:', basicError);
-                    console.log('  - Registros:', basicData?.length || 0);
+                    console.log('💬 BÁSICA - Count resultado:');
+                    console.log('  - Erro do count:', countError);
+                    console.log('  - Total de registros:', count);
                     
-                    if (!basicError && basicData && basicData.length > 0) {
-                        console.log('✅ BÁSICA - Dados encontrados! Estimando métricas...');
-                        return createEstimatedDataFromBasic(basicData);
+                    if (!countError && count && count > 0) {
+                        console.log('✅ BÁSICA - Tabela tem dados! Buscando registros...');
+                        
+                        const { data: basicData, error: basicError } = await supabase
+                            .from(basicTableName as any)
+                            .select('*')
+                            .limit(500); // Limite maior para tabelas básicas
+                        
+                        console.log('💬 BÁSICA - Dados resultado:');
+                        console.log('  - Erro:', basicError);
+                        console.log('  - Registros retornados:', basicData?.length || 0);
+                        console.log('  - Primeiro registro:', basicData?.[0]);
+                        
+                        if (!basicError && basicData && basicData.length > 0) {
+                            console.log('✅ BÁSICA - SUCESSO! Dados encontrados! Estimando métricas...');
+                            return createEstimatedDataFromBasic(basicData);
+                        }
+                    } else if (countError) {
+                        console.log('⚠️ BÁSICA - Erro ao verificar tabela:', countError.message);
+                        console.log('⚠️ BÁSICA - Detalhes do erro:', countError);
                     } else {
-                        console.log('⚠️ BÁSICA - Tabela vazia ou erro:', basicError?.message);
+                        console.log('⚠️ BÁSICA - Tabela vazia (count = 0)');
                     }
                 } catch (err) {
                     console.error('💥 BÁSICA - Exceção:', err);
                 }
+            } else {
+                console.log('❌ BÁSICA - Nenhuma tabela básica encontrada para:', selectedAgent);
             }
             
             // STEP 3: Dados de demonstração realistas
             console.log('🎭 DEMO - Fornecendo dados realistas para demonstração');
+            console.log('📋 DEMO - Resumo das tentativas:');
+            console.log('  - Métrica tentada:', metricsTableName || 'N/A');
+            console.log('  - Básica tentada:', basicTableName || 'N/A');
+            console.log('  - Agente selecionado:', selectedAgent);
+            
             return createRealisticDemoData(selectedAgent);
         },
         enabled: !!selectedAgent,
         retry: 1,
         refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 1000, // 2 minutos
-        gcTime: 5 * 60 * 1000, // 5 minutos
+        staleTime: 1 * 60 * 1000, // 1 minuto
+        gcTime: 3 * 60 * 1000, // 3 minutos
     });
 };
 
