@@ -1,7 +1,8 @@
+
 // Tabelas de métricas agregadas (dados processados) - nomes exatos do banco
 export const metricsAgentTables = [
     'Lista_mensagens_ Carlos_Antunes',
-    'Lista_mensagens_Adiney_esteves',
+    'Lista_mensagens_Adiney_esteves', 
     'Lista_mensagens_Alana_meneses',
     'Lista_mensagens_Aline_bigatão',
     'Lista_mensagens_Aline_franzotti',
@@ -33,7 +34,7 @@ export const metricsAgentTables = [
 // Tabelas básicas de mensagens (dados brutos) - nomes exatos do banco
 export const basicMessageTables = [
     'Lista_de_Mensagens_Adiney_esteves',
-    'Lista_de_Mensagens_Alana_meneses',
+    'Lista_de_Mensagens_Alana_meneses', 
     'Lista_de_Mensagens_Aline_bigatão',
     'Lista_de_Mensagens_Aline_franzotti',
     'Lista_de_Mensagens_Amanda_Mota',
@@ -62,18 +63,22 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Stefanie_lee'
 ].sort();
 
-// Lista principal de agentes
+// Lista principal de agentes baseada nos prints fornecidos
 export const agentTables = metricsAgentTables;
 
-// Mapeamento DIRETO e CORRIGIDO - nomes formatados para sufixos de tabelas
+// Mapeamento ATUALIZADO baseado nos prints - nomes formatados para sufixos de tabelas
 const nameToTableMapping: Record<string, string> = {
-    'André Araújo': 'Andre_araujo', // CORRIGIDO: SEM acento no banco, tabela existe
-    'Mariana Araújo': 'Mariana_araújo',
+    'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início conforme banco
+    'Adiney Esteves': 'Adiney_esteves',
+    'Alana Meneses': 'Alana_meneses',
     'Aline Bigatão': 'Aline_bigatão',
+    'Aline Franzotti': 'Aline_franzotti',
+    'Amanda Mota': 'Amanda_Mota',
     'Ana Beatriz': 'Ana_beatriz',
-    'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início
-    'Diego Cabrejos': 'Diego_cabrejos',
+    'André Araújo': 'Andre_araujo', // SEM acento no banco, COM acento na UI
     'Danilo Chammas': 'Danilo_Chammas',
+    'Diego Cabrejos': 'Diego_cabrejos',
+    'Haila': 'Haila',
     'Henrique Maffei': 'Henrique_maffei',
     'Julia Jorge': 'Julia_jorge',
     'Karla Fazollo': 'Karla_fazollo',
@@ -81,20 +86,16 @@ const nameToTableMapping: Record<string, string> = {
     'Luiza Murad': 'Luiza_murad',
     'Marcelo Soeiro': 'Marcelo_soeiro',
     'Marco Antonio': 'Marco_antonio',
+    'Mariana Araújo': 'Mariana_araújo',
     'Michelle Meleck': 'Michelle_Meleck',
     'Patricia Lima': 'Patricia_lima',
     'Raiany Pimentel': 'Raiany_pimentel',
-    'Roberta Xavier': 'Roberta_xavier',
+    'Roberta Xavier': 'Roberta_xavier', // Note: banco tem 'Roberta_Xavier' vs 'Roberta_xavier'
     'Roberto Pigini': 'Roberto_pigini',
     'Roclides Lima': 'Roclides_lima',
-    'Rodrigo Pastore': 'Rodrigo_pastore',
+    'Rodrigo Pastore': 'Rodrigo_pastore', // Note: banco pode ter 'Rodrigo_Pastore'
     'Silvia Joly': 'Silvia_Joly',
-    'Stefanie Lee': 'Stefanie_lee',
-    'Adiney Esteves': 'Adiney_esteves',
-    'Alana Meneses': 'Alana_meneses',
-    'Aline Franzotti': 'Aline_franzotti',
-    'Amanda Mota': 'Amanda_Mota',
-    'Haila': 'Haila'
+    'Stefanie Lee': 'Stefanie_lee'
 };
 
 export const formatAgentName = (tableName: string) => {
@@ -106,16 +107,20 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais para nomes com acentos e formatação
+    // Casos especiais para nomes com acentos e formatação - ATUALIZADOS conforme prints
     const specialCases: Record<string, string> = {
-        'Andre araujo': 'André Araújo', // SEM acento no banco -> COM acento na UI
-        'Mariana araújo': 'Mariana Araújo',
-        'Aline bigatão': 'Aline Bigatão',
-        'Ana beatriz': 'Ana Beatriz',
         'Carlos Antunes': 'Carlos Antunes',
         ' Carlos Antunes': 'Carlos Antunes', // Handle the space
-        'Diego cabrejos': 'Diego Cabrejos',
+        'Adiney esteves': 'Adiney Esteves',
+        'Alana meneses': 'Alana Meneses',
+        'Aline bigatão': 'Aline Bigatão',
+        'Aline franzotti': 'Aline Franzotti',
+        'Amanda Mota': 'Amanda Mota',
+        'Ana beatriz': 'Ana Beatriz',
+        'Andre araujo': 'André Araújo', // SEM acento no banco -> COM acento na UI
         'Danilo Chammas': 'Danilo Chammas',
+        'Diego cabrejos': 'Diego Cabrejos',
+        'Haila': 'Haila',
         'Henrique maffei': 'Henrique Maffei',
         'Julia jorge': 'Julia Jorge',
         'Karla fazollo': 'Karla Fazollo',
@@ -123,21 +128,18 @@ export const formatAgentName = (tableName: string) => {
         'Luiza murad': 'Luiza Murad',
         'Marcelo soeiro': 'Marcelo Soeiro',
         'Marco antonio': 'Marco Antonio',
+        'Mariana araújo': 'Mariana Araújo',
         'Michelle Meleck': 'Michelle Meleck',
         'Patricia lima': 'Patricia Lima',
         'Raiany pimentel': 'Raiany Pimentel',
         'Roberta xavier': 'Roberta Xavier',
+        'Roberta Xavier': 'Roberta Xavier', // Handle both cases
         'Roberto pigini': 'Roberto Pigini',
         'Roclides lima': 'Roclides Lima',
         'Rodrigo pastore': 'Rodrigo Pastore',
         'Rodrigo Pastore': 'Rodrigo Pastore', // Handle both cases
         'Silvia Joly': 'Silvia Joly',
-        'Stefanie lee': 'Stefanie Lee',
-        'Adiney esteves': 'Adiney Esteves',
-        'Alana meneses': 'Alana Meneses',
-        'Aline franzotti': 'Aline Franzotti',
-        'Amanda Mota': 'Amanda Mota',
-        'Haila': 'Haila'
+        'Stefanie lee': 'Stefanie Lee'
     };
     
     // Verifica se existe um caso especial
@@ -320,19 +322,19 @@ export const debugAndreAraujo = (): void => {
         }
     }
     
-    console.log('📋 TODAS as tabelas de métricas:');
-    metricsAgentTables.forEach((table, index) => {
+    console.log('📋 TODAS as tabelas de métricas relevantes:');
+    metricsAgentTables.filter(table => table.includes('Andre')).forEach((table, index) => {
         console.log(`  ${index}: ${table}`);
     });
     
-    console.log('📋 TODAS as tabelas básicas:');
-    basicMessageTables.forEach((table, index) => {
+    console.log('📋 TODAS as tabelas básicas relevantes:');
+    basicMessageTables.filter(table => table.includes('Andre')).forEach((table, index) => {
         console.log(`  ${index}: ${table}`);
     });
 };
 
 // Executar debug automaticamente quando o módulo for carregado
 if (typeof window !== 'undefined') {
-    console.log('🔧 INIT - Módulo agents.ts carregado');
+    console.log('🔧 INIT - Módulo agents.ts carregado com dados atualizados dos prints');
     debugAndreAraujo();
 }
