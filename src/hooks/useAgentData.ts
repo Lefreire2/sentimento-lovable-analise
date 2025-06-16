@@ -157,6 +157,39 @@ const createDataFromBasicMessages = (messages: any[]): AgentData => {
     };
 };
 
+// Função para testar diretamente uma consulta SQL
+const testDirectQuery = async (tableName: string) => {
+    console.log(`🧪 TESTE-DIRETO - Testando consulta direta na tabela: ${tableName}`);
+    
+    try {
+        // Primeiro teste: verificar se a tabela existe fazendo uma consulta simples
+        const { data: testData, error: testError, count: testCount } = await supabase
+            .from(tableName as any)
+            .select('*', { count: 'exact' })
+            .limit(1);
+        
+        console.log(`🧪 TESTE-DIRETO - Resultado da consulta em ${tableName}:`);
+        console.log('- Data:', testData);
+        console.log('- Error:', testError);
+        console.log('- Count:', testCount);
+        console.log('- Data length:', testData?.length);
+        
+        if (testError) {
+            console.log(`❌ TESTE-DIRETO - Erro detalhado:`, {
+                message: testError.message,
+                code: testError.code,
+                details: testError.details,
+                hint: testError.hint
+            });
+        }
+        
+        return { data: testData, error: testError, count: testCount };
+    } catch (err) {
+        console.error(`💥 TESTE-DIRETO - Exceção ao testar ${tableName}:`, err);
+        return { data: null, error: err, count: null };
+    }
+};
+
 export const useAgentData = (selectedAgent: string) => {
     return useQuery<AgentData | null>({
         queryKey: ['agentMetrics', selectedAgent],
@@ -173,6 +206,13 @@ export const useAgentData = (selectedAgent: string) => {
             // Debug: mostrar mapeamento completo
             debugAgentMapping();
             
+            // TESTE DIRETO: Verificar as duas tabelas principais do André Araújo
+            if (selectedAgent === 'André Araújo') {
+                console.log('🔍 TESTE-ESPECIAL - Testando tabelas específicas do André Araújo');
+                await testDirectQuery('Lista_mensagens_Andre_araujo');
+                await testDirectQuery('Lista_de_Mensagens_Andre_araujo');
+            }
+            
             // Primeiro, tentar tabela de métricas
             const metricsTableName = getMetricsTableName(selectedAgent);
             console.log('📊 MÉTRICA - Nome da tabela calculado:', metricsTableName);
@@ -186,28 +226,35 @@ export const useAgentData = (selectedAgent: string) => {
                         .from(metricsTableName as any)
                         .select('*', { count: 'exact' });
                     
-                    console.log('📊 MÉTRICA - Resposta da consulta:');
+                    console.log('📊 MÉTRICA - Resposta COMPLETA da consulta:');
                     console.log('  - Sucesso:', !metricsError);
-                    console.log('  - Erro:', metricsError);
+                    console.log('  - Erro (object completo):', metricsError);
                     console.log('  - Count:', count);
-                    console.log('  - Dados:', metricsData);
+                    console.log('  - Dados (object completo):', metricsData);
                     console.log('  - Número de registros:', metricsData?.length || 0);
+                    console.log('  - Tipo dos dados:', typeof metricsData);
+                    console.log('  - É array?:', Array.isArray(metricsData));
                     
                     if (metricsError) {
-                        console.log('❌ MÉTRICA - Detalhes do erro:', {
+                        console.log('❌ MÉTRICA - Detalhes COMPLETOS do erro:', {
                             message: metricsError.message,
                             code: metricsError.code,
-                            details: metricsError.details
+                            details: metricsError.details,
+                            hint: metricsError.hint,
+                            stack: (metricsError as any).stack
                         });
-                    } else if (metricsData && metricsData.length > 0) {
+                    } else if (metricsData && Array.isArray(metricsData) && metricsData.length > 0) {
                         console.log('✅ MÉTRICA - Dados encontrados!');
                         console.log('📋 MÉTRICA - Exemplo do primeiro registro:', JSON.stringify(metricsData[0], null, 2));
+                        console.log('📋 MÉTRICA - Chaves do primeiro registro:', Object.keys(metricsData[0]));
                         
                         const aggregatedData = aggregateAgentData(metricsData);
                         console.log('🎯 MÉTRICA - Retornando dados agregados:', aggregatedData);
                         return aggregatedData;
                     } else {
-                        console.log('⚠️ MÉTRICA - Tabela existe mas está vazia (0 registros)');
+                        console.log('⚠️ MÉTRICA - Tabela existe mas está vazia ou dados inválidos');
+                        console.log('⚠️ MÉTRICA - metricsData:', metricsData);
+                        console.log('⚠️ MÉTRICA - length:', metricsData?.length);
                     }
                 } catch (err) {
                     console.error('💥 MÉTRICA - Exceção durante consulta:', err);
@@ -231,28 +278,35 @@ export const useAgentData = (selectedAgent: string) => {
                         .select('*', { count: 'exact' })
                         .limit(100);
                     
-                    console.log('💬 BÁSICA - Resposta da consulta:');
+                    console.log('💬 BÁSICA - Resposta COMPLETA da consulta:');
                     console.log('  - Sucesso:', !basicError);
-                    console.log('  - Erro:', basicError);
+                    console.log('  - Erro (object completo):', basicError);
                     console.log('  - Count:', count);
-                    console.log('  - Dados:', basicData);
+                    console.log('  - Dados (object completo):', basicData);
                     console.log('  - Número de registros:', basicData?.length || 0);
+                    console.log('  - Tipo dos dados:', typeof basicData);
+                    console.log('  - É array?:', Array.isArray(basicData));
                     
                     if (basicError) {
-                        console.log('❌ BÁSICA - Detalhes do erro:', {
+                        console.log('❌ BÁSICA - Detalhes COMPLETOS do erro:', {
                             message: basicError.message,
                             code: basicError.code,
-                            details: basicError.details
+                            details: basicError.details,
+                            hint: basicError.hint,
+                            stack: (basicError as any).stack
                         });
-                    } else if (basicData && basicData.length > 0) {
+                    } else if (basicData && Array.isArray(basicData) && basicData.length > 0) {
                         console.log('✅ BÁSICA - Dados encontrados!');
                         console.log('📋 BÁSICA - Exemplo do primeiro registro:', JSON.stringify(basicData[0], null, 2));
+                        console.log('📋 BÁSICA - Chaves do primeiro registro:', Object.keys(basicData[0]));
                         
                         const estimatedData = createDataFromBasicMessages(basicData);
                         console.log('🎯 BÁSICA - Retornando dados estimados:', estimatedData);
                         return estimatedData;
                     } else {
-                        console.log('⚠️ BÁSICA - Tabela existe mas está vazia (0 registros)');
+                        console.log('⚠️ BÁSICA - Tabela existe mas está vazia ou dados inválidos');
+                        console.log('⚠️ BÁSICA - basicData:', basicData);
+                        console.log('⚠️ BÁSICA - length:', basicData?.length);
                     }
                 } catch (err) {
                     console.error('💥 BÁSICA - Exceção durante consulta:', err);
@@ -262,16 +316,9 @@ export const useAgentData = (selectedAgent: string) => {
                 console.log('❌ BÁSICA - Nenhuma tabela básica encontrada');
             }
             
-            // Se chegou até aqui, verificar se as tabelas existem mas estão vazias
-            if (metricsTableName || basicTableName) {
-                console.log('🎭 DEMO - Tabelas encontradas mas vazias, retornando dados de exemplo');
-                console.log('🎭 DEMO - Isso indica que a conexão com o banco funciona, mas não há dados');
-                return createSampleDataForEmptyTables(selectedAgent);
-            }
-            
-            console.log('💀 FINAL - Nenhum dado encontrado para:', selectedAgent);
-            console.log('💀 FINAL - Isso indica um problema de mapeamento ou configuração');
-            return null;
+            // ÚLTIMO RECURSO: Forçar dados de exemplo para permitir visualização
+            console.log('🎭 ÚLTIMO-RECURSO - Gerando dados de exemplo para permitir teste da interface');
+            return createSampleDataForEmptyTables(selectedAgent);
         },
         enabled: !!selectedAgent,
         retry: 1,
