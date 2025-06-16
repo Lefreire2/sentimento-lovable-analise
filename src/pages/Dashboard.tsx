@@ -6,8 +6,7 @@ import { AgentSelector } from "@/components/dashboard/AgentSelector";
 import { PeriodSelector, PeriodFilter } from "@/components/dashboard/PeriodSelector";
 import { DashboardStates } from "@/components/dashboard/DashboardStates";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
-import { getAllAvailableTables } from "@/lib/agents";
-import { testDatabaseConnection, testSpecificTable } from "@/lib/database-test";
+import { testDatabaseConnection } from "@/lib/database-test";
 
 const Dashboard = () => {
     const [selectedAgent, setSelectedAgent] = useState<string>('');
@@ -23,33 +22,16 @@ const Dashboard = () => {
         testDatabaseConnection();
     }, []);
 
-    // Teste específico quando um agente é selecionado
-    useEffect(() => {
-        if (selectedAgent) {
-            console.log('🎯 DASHBOARD - Agente selecionado:', selectedAgent);
-            console.log('🧪 DASHBOARD - Iniciando testes específicos para:', selectedAgent);
-            
-            // Testar as tabelas específicas deste agente
-            if (selectedAgent === 'André Araújo') {
-                testSpecificTable('Lista_mensagens_Andre_araujo');
-                testSpecificTable('Lista_de_Mensagens_Andre_araujo');
-            }
-        }
-    }, [selectedAgent]);
-
     console.log('🎛️ DASHBOARD - Estado atual:');
     console.log('- selectedAgent:', selectedAgent);
-    console.log('- selectedPeriod:', selectedPeriod);
     console.log('- isLoading:', isLoading);
     console.log('- isError:', isError);
     console.log('- agentData:', agentData);
     console.log('- error:', error);
-    
-    // Log das tabelas disponíveis no banco
-    console.log('📊 DASHBOARD - Tabelas disponíveis no banco:', getAllAvailableTables());
 
-    const shouldShowStates = isLoading || isError || !selectedAgent || (selectedAgent && !agentData);
-    const shouldShowContent = agentData && !isLoading && !isError;
+    // Lógica simplificada de renderização
+    const shouldShowContent = selectedAgent && agentData && !isLoading;
+    const shouldShowStates = !shouldShowContent;
 
     console.log('🎯 DASHBOARD - Decisões de renderização:');
     console.log('- shouldShowStates:', shouldShowStates);
