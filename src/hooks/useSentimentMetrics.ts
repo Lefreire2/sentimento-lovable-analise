@@ -63,7 +63,7 @@ export const useSentimentMetrics = (selectedAgent: string) => {
                     
                     if (!metricsError && metricsData && metricsData.length > 0) {
                         console.log('✅ SENTIMENT - Usando dados de métricas');
-                        const firstRow = metricsData[0];
+                        const firstRow = metricsData[0] as any;
                         return {
                             sentimento_geral_conversa: firstRow.sentimento_geral_conversa || 'Neutro',
                             sentimento_usuario: firstRow.sentimento_usuario || 'Neutro',

@@ -66,7 +66,7 @@ export const usePerformanceMetrics = (selectedAgent: string) => {
                     
                     if (!metricsError && metricsData && metricsData.length > 0) {
                         console.log('✅ PERFORMANCE - Usando dados de métricas');
-                        const firstRow = metricsData[0];
+                        const firstRow = metricsData[0] as any;
                         return {
                             conversao_indicada_mvp: firstRow.conversao_indicada_mvp || 'Não',
                             pontuacao_aderencia_percentual: firstRow.pontuacao_aderencia_percentual || '0',
