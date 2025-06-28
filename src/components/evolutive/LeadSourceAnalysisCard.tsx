@@ -51,7 +51,7 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   };
 
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
-  const totalObjections = Object.values(analysis.source_distribution || {}).reduce((sum: number, count) => sum + (count as number), 0);
+  const totalObjections = Object.values(analysis.source_distribution || {}).reduce((sum: number, count) => sum + Number(count), 0);
 
   return (
     <div className="space-y-6">
@@ -76,14 +76,14 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
             <div className="text-center">
               <Badge variant="default" className="text-sm">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {analysis.best_performing_source}
+                {String(analysis.best_performing_source)}
               </Badge>
               <div className="text-sm text-muted-foreground mt-1">Melhor Fonte</div>
             </div>
             <div className="text-center">
               <Badge variant="destructive" className="text-sm">
                 <TrendingDown className="h-3 w-3 mr-1" />
-                {analysis.worst_performing_source}
+                {String(analysis.worst_performing_source)}
               </Badge>
               <div className="text-sm text-muted-foreground mt-1">Pior Fonte</div>
             </div>
@@ -102,8 +102,9 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
         <CardContent>
           <div className="space-y-4">
             {Object.entries(analysis.source_distribution || {}).map(([source, count]) => {
+              const numCount = Number(count);
               const percentage = totalObjections > 0 
-                ? (((count as number) / totalObjections) * 100).toFixed(1) 
+                ? ((numCount / totalObjections) * 100).toFixed(1) 
                 : '0';
               
               return (
@@ -114,7 +115,7 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
                       <span className="font-medium">{source}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{String(count)} ({percentage}%)</span>
+                      <span className="text-sm text-muted-foreground">{numCount} ({percentage}%)</span>
                     </div>
                   </div>
                   <Progress value={Number(percentage)} className="h-2" />
