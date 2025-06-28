@@ -102,8 +102,8 @@ export const ObjectionAnalysisCard = ({ data }: ObjectionAnalysisProps) => {
           <div className="space-y-4">
             {Object.entries(analysis.category_distribution || {}).map(([category, count]) => {
               const percentage = analysis.total_objections > 0 
-                ? ((count as number / analysis.total_objections) * 100).toFixed(1) 
-                : 0;
+                ? (((count as number) / analysis.total_objections) * 100).toFixed(1) 
+                : '0';
               
               return (
                 <div key={category} className="space-y-2">
@@ -113,7 +113,7 @@ export const ObjectionAnalysisCard = ({ data }: ObjectionAnalysisProps) => {
                       <span className="font-medium">{category}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{count} ({percentage}%)</span>
+                      <span className="text-sm text-muted-foreground">{String(count)} ({percentage}%)</span>
                     </div>
                   </div>
                   <Progress value={Number(percentage)} className="h-2" />
@@ -136,8 +136,8 @@ export const ObjectionAnalysisCard = ({ data }: ObjectionAnalysisProps) => {
           <div className="space-y-4">
             {Object.entries(analysis.funnel_stage_distribution || {}).map(([stage, count]) => {
               const percentage = analysis.total_objections > 0 
-                ? ((count as number / analysis.total_objections) * 100).toFixed(1) 
-                : 0;
+                ? (((count as number) / analysis.total_objections) * 100).toFixed(1) 
+                : '0';
               
               const iscritical = stage === analysis.critical_stage;
               
@@ -151,7 +151,7 @@ export const ObjectionAnalysisCard = ({ data }: ObjectionAnalysisProps) => {
                       {iscritical && <Badge variant="destructive" className="text-xs">Crítico</Badge>}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{count} ({percentage}%)</span>
+                      <span className="text-sm text-muted-foreground">{String(count)} ({percentage}%)</span>
                     </div>
                   </div>
                   <Progress value={Number(percentage)} className="h-2" />
@@ -171,13 +171,13 @@ export const ObjectionAnalysisCard = ({ data }: ObjectionAnalysisProps) => {
           <div className="grid grid-cols-3 gap-4">
             {Object.entries(analysis.intensity_analysis || {}).map(([intensity, count]) => {
               const percentage = analysis.total_objections > 0 
-                ? ((count as number / analysis.total_objections) * 100).toFixed(1) 
-                : 0;
+                ? (((count as number) / analysis.total_objections) * 100).toFixed(1) 
+                : '0';
               
               return (
                 <div key={intensity} className="text-center">
                   <div className={`w-4 h-4 rounded-full mx-auto mb-2 ${getIntensityColor(intensity)}`}></div>
-                  <div className="font-semibold">{count}</div>
+                  <div className="font-semibold">{String(count)}</div>
                   <div className="text-sm text-muted-foreground">{intensity}</div>
                   <div className="text-xs text-muted-foreground">({percentage}%)</div>
                 </div>
