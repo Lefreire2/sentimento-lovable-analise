@@ -51,6 +51,21 @@ export interface AppointmentOptimization {
   script_personalizado: string;
   probabilidade_sucesso: number;
   fatores_otimizacao: string[];
+  
+  // Novos campos contextuais
+  contexto_conversa?: string;
+  necessidades_identificadas?: string[];
+  objecoes_previstas?: string[];
+  gatilhos_conversao?: string[];
+  perfil_comportamental?: string;
+  nivel_interesse?: string;
+  urgencia_detectada?: string;
+  agendamento_detectado?: string;
+  ultima_etapa_alcancada?: string;
+  termo_chave_conversao?: string;
+  motivo_nao_conversao?: string;
+  resumo_atendimento?: string;
+  
   created_at: string;
 }
 

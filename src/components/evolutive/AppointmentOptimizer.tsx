@@ -8,6 +8,7 @@ import { AppointmentLoadingState } from './appointment/AppointmentLoadingState';
 import { AppointmentProbability } from './appointment/AppointmentProbability';
 import { AppointmentScheduleInfo } from './appointment/AppointmentScheduleInfo';
 import { AppointmentAnalysisInfo } from './appointment/AppointmentAnalysisInfo';
+import { AppointmentContextInfo } from './appointment/AppointmentContextInfo';
 import { AppointmentScriptSection } from './appointment/AppointmentScriptSection';
 import { AppointmentActions } from './appointment/AppointmentActions';
 import { AppointmentEmptyState } from './appointment/AppointmentEmptyState';
@@ -32,8 +33,8 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
       {
         onSuccess: (data) => {
           toast({
-            title: "Otimização Concluída",
-            description: `Estratégia personalizada gerada com ${data.probabilidade_sucesso}% de probabilidade de sucesso`,
+            title: "Otimização Consultiva Concluída",
+            description: `Estratégia personalizada gerada com análise contextual detalhada`,
           });
         },
         onError: (error) => {
@@ -64,7 +65,23 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
               probabilidade_sucesso={optimization.probabilidade_sucesso}
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Informações Contextuais */}
+            {optimization.contexto_conversa && (
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">Análise Contextual</h3>
+                <AppointmentContextInfo
+                  contexto_conversa={optimization.contexto_conversa}
+                  necessidades_identificadas={optimization.necessidades_identificadas || []}
+                  objecoes_previstas={optimization.objecoes_previstas || []}
+                  gatilhos_conversao={optimization.gatilhos_conversao || []}
+                  perfil_comportamental={optimization.perfil_comportamental}
+                  nivel_interesse={optimization.nivel_interesse}
+                  urgencia_detectada={optimization.urgencia_detectada}
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border-t pt-6">
               <AppointmentScheduleInfo
                 melhor_horario_sugerido={optimization.melhor_horario_sugerido}
                 melhor_dia_semana={optimization.melhor_dia_semana}
@@ -81,16 +98,19 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
               />
             </div>
 
-            <AppointmentScriptSection
-              script_personalizado={optimization.script_personalizado}
-              customMessage={customMessage}
-              onCustomMessageChange={setCustomMessage}
-            />
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">Script Consultivo Personalizado</h3>
+              <AppointmentScriptSection
+                script_personalizado={optimization.script_personalizado}
+                customMessage={customMessage}
+                onCustomMessageChange={setCustomMessage}
+              />
+            </div>
 
             <AppointmentActions />
 
             <div className="text-xs text-muted-foreground text-center pt-2">
-              Otimização gerada em: {new Date(optimization.created_at).toLocaleString('pt-BR')}
+              Otimização consultiva gerada em: {new Date(optimization.created_at).toLocaleString('pt-BR')}
             </div>
           </>
         )}
