@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import DashboardOptimized from "./pages/DashboardOptimized";
+import EvolutiveSystem from "./pages/EvolutiveSystem";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -31,6 +32,7 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard-optimized" element={<DashboardOptimized />} />
+              <Route path="/evolutive-system" element={<EvolutiveSystem />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
