@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { useToast } from '@/hooks/use-toast';
 
 interface AppointmentOptimizerProps {
-  leadId: string;
+  leadId?: string;
   conversationContext?: any;
 }
 
@@ -32,7 +31,7 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
   const handleOptimizeAppointment = () => {
     optimizeAppointment(
       {
-        leadId,
+        leadId: leadId || 'demo-lead',
         conversationData: conversationContext
       },
       {
@@ -74,6 +73,7 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
         <CardTitle className="flex items-center gap-2">
           <Target className="h-5 w-5" />
           Otimização de Agendamento
+          {!leadId && <Badge variant="secondary" className="ml-2">Demo</Badge>}
         </CardTitle>
         <Button 
           onClick={handleOptimizeAppointment}
@@ -210,7 +210,7 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
           <div className="text-center py-8">
             <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
-              Gere uma estratégia personalizada de agendamento
+              {!leadId ? 'Modo demonstração - Gere uma estratégia de agendamento' : 'Gere uma estratégia personalizada de agendamento'}
             </p>
             <p className="text-xs text-muted-foreground mb-4">
               Baseada no contexto da conversa e padrões de sucesso
@@ -223,4 +223,19 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
       </CardContent>
     </Card>
   );
+};
+
+const getChannelIcon = (channel: string) => {
+  switch (channel.toLowerCase()) {
+    case 'whatsapp': return <MessageSquare className="h-4 w-4" />;
+    case 'telefone': return <Phone className="h-4 w-4" />;
+    case 'email': return <Mail className="h-4 w-4" />;
+    default: return <Send className="h-4 w-4" />;
+  }
+};
+
+const getProbabilityColor = (probability: number) => {
+  if (probability >= 80) return 'text-green-600';
+  if (probability >= 60) return 'text-yellow-600';
+  return 'text-red-600';
 };

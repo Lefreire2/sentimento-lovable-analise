@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,13 +16,13 @@ import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { IntentionAnalysis } from '@/types/evolutiveSystem';
 
 interface IntentionAnalysisPanelProps {
-  leadId: string;
+  leadId?: string;
   conversationData?: any;
 }
 
 export const IntentionAnalysisPanel = ({ leadId, conversationData }: IntentionAnalysisPanelProps) => {
   const { useIntentionAnalysis } = useEvolutiveSystem();
-  const { data: analysis, isLoading, refetch } = useIntentionAnalysis(leadId);
+  const { data: analysis, isLoading, refetch } = useIntentionAnalysis(leadId || 'demo-lead');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleAnalyzeIntention = async () => {
@@ -80,6 +79,7 @@ export const IntentionAnalysisPanel = ({ leadId, conversationData }: IntentionAn
         <CardTitle className="flex items-center gap-2">
           <Brain className="h-5 w-5" />
           Análise de Intenção
+          {!leadId && <Badge variant="secondary" className="ml-2">Demo</Badge>}
         </CardTitle>
         <Button 
           onClick={handleAnalyzeIntention}
@@ -189,7 +189,7 @@ export const IntentionAnalysisPanel = ({ leadId, conversationData }: IntentionAn
           <div className="text-center py-8">
             <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-sm text-muted-foreground mb-4">
-              Nenhuma análise de intenção disponível para este lead
+              {!leadId ? 'Modo demonstração - Análise de intenção do sistema' : 'Nenhuma análise de intenção disponível para este lead'}
             </p>
             <Button onClick={handleAnalyzeIntention} disabled={isAnalyzing}>
               {isAnalyzing ? 'Analisando...' : 'Iniciar Análise'}
@@ -199,4 +199,22 @@ export const IntentionAnalysisPanel = ({ leadId, conversationData }: IntentionAn
       </CardContent>
     </Card>
   );
+};
+
+const getIntentionColor = (nivel: string) => {
+  switch (nivel) {
+    case 'Alta': return 'bg-green-500';
+    case 'Média': return 'bg-yellow-500';
+    case 'Baixa': return 'bg-red-500';
+    default: return 'bg-gray-500';
+  }
+};
+
+const getIntentionIcon = (nivel: string) => {
+  switch (nivel) {
+    case 'Alta': return <CheckCircle className="h-4 w-4" />;
+    case 'Média': return <AlertCircle className="h-4 w-4" />;
+    case 'Baixa': return <Target className="h-4 w-4" />;
+    default: return <Brain className="h-4 w-4" />;
+  }
 };
