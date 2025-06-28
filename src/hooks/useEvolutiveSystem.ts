@@ -19,11 +19,18 @@ export const useEvolutiveSystem = () => {
     return useQuery<IntentionAnalysis>({
       queryKey: ['intention-analysis', leadId],
       queryFn: async () => {
+        console.log('🧠 Iniciando análise de intenção para lead:', leadId);
+        
         const { data, error } = await supabase.functions.invoke('analyze-intention', {
           body: { leadId }
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro na análise de intenção:', error);
+          throw error;
+        }
+        
+        console.log('✅ Análise de intenção concluída:', data);
         return data;
       },
       enabled: !!leadId,
@@ -35,11 +42,18 @@ export const useEvolutiveSystem = () => {
   const useAppointmentOptimization = () => {
     return useMutation({
       mutationFn: async (data: { leadId: string; conversationData: ConversationContext }) => {
+        console.log('🎯 Iniciando otimização de agendamento:', data);
+        
         const { data: result, error } = await supabase.functions.invoke('optimize-appointment', {
           body: data
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro na otimização de agendamento:', error);
+          throw error;
+        }
+        
+        console.log('✅ Otimização de agendamento concluída:', result);
         return result;
       },
       onSuccess: () => {
@@ -53,11 +67,18 @@ export const useEvolutiveSystem = () => {
     return useQuery<SystemMetrics>({
       queryKey: ['system-metrics', period],
       queryFn: async () => {
+        console.log('📊 Calculando métricas do sistema para período:', period);
+        
         const { data, error } = await supabase.functions.invoke('calculate-system-metrics', {
           body: { period }
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro no cálculo de métricas:', error);
+          throw error;
+        }
+        
+        console.log('✅ Métricas do sistema calculadas:', data);
         return data;
       },
       refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minutos
@@ -69,9 +90,16 @@ export const useEvolutiveSystem = () => {
     return useQuery<ClosedLoopData>({
       queryKey: ['closed-loop-data'],
       queryFn: async () => {
+        console.log('🔄 Obtendo dados do closed-loop...');
+        
         const { data, error } = await supabase.functions.invoke('get-closed-loop-data');
         
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro ao obter dados do closed-loop:', error);
+          throw error;
+        }
+        
+        console.log('✅ Dados do closed-loop obtidos:', data);
         return data;
       },
       refetchInterval: 10 * 60 * 1000, // Atualiza a cada 10 minutos
@@ -81,11 +109,18 @@ export const useEvolutiveSystem = () => {
   // Função para processar feedback de marketing
   const processMarketingFeedback = useMutation({
     mutationFn: async (feedbackData: any) => {
+      console.log('📈 Processando feedback de marketing:', feedbackData);
+      
       const { data, error } = await supabase.functions.invoke('process-marketing-feedback', {
         body: feedbackData
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro no processamento de feedback:', error);
+        throw error;
+      }
+      
+      console.log('✅ Feedback de marketing processado:', data);
       return data;
     },
     onSuccess: () => {
@@ -98,21 +133,31 @@ export const useEvolutiveSystem = () => {
   useEffect(() => {
     const initializeSystem = async () => {
       try {
+        console.log('🚀 Inicializando Sistema Evolutivo...');
         setSystemStatus('initializing');
         
         // Verificar se as funções necessárias estão disponíveis
-        const { data: healthCheck } = await supabase.functions.invoke('system-health-check');
+        console.log('🔍 Verificando saúde do sistema...');
+        const { data: healthCheck, error } = await supabase.functions.invoke('system-health-check');
+        
+        if (error) {
+          console.error('❌ Erro na verificação de saúde:', error);
+          setSystemStatus('error');
+          return;
+        }
+        
+        console.log('✅ Verificação de saúde concluída:', healthCheck);
         
         if (healthCheck?.status === 'healthy') {
           setSystemStatus('active');
           console.log('🚀 Sistema Evolutivo inicializado com sucesso');
         } else {
           setSystemStatus('error');
-          console.error('❌ Falha na inicialização do sistema');
+          console.error('❌ Sistema não está saudável:', healthCheck);
         }
       } catch (error) {
         setSystemStatus('error');
-        console.error('💥 Erro na inicialização:', error);
+        console.error('💥 Erro na inicialização do sistema:', error);
       }
     };
 
