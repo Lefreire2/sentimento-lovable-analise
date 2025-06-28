@@ -9,6 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      lead_source_metrics: {
+        Row: {
+          agent_name: string
+          analysis_period: string
+          avg_objection_intensity: number | null
+          conversion_rate: number | null
+          cost_per_appointment: number | null
+          created_at: string | null
+          id: string
+          lead_source: string
+          most_common_objection: string | null
+          objection_rate: number | null
+          roi_score: number | null
+          script_effectiveness_rate: number | null
+          total_leads: number | null
+          total_objections: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_name: string
+          analysis_period: string
+          avg_objection_intensity?: number | null
+          conversion_rate?: number | null
+          cost_per_appointment?: number | null
+          created_at?: string | null
+          id?: string
+          lead_source: string
+          most_common_objection?: string | null
+          objection_rate?: number | null
+          roi_score?: number | null
+          script_effectiveness_rate?: number | null
+          total_leads?: number | null
+          total_objections?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_name?: string
+          analysis_period?: string
+          avg_objection_intensity?: number | null
+          conversion_rate?: number | null
+          cost_per_appointment?: number | null
+          created_at?: string | null
+          id?: string
+          lead_source?: string
+          most_common_objection?: string | null
+          objection_rate?: number | null
+          roi_score?: number | null
+          script_effectiveness_rate?: number | null
+          total_leads?: number | null
+          total_objections?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      lead_sources: {
+        Row: {
+          created_at: string | null
+          expected_objection_profile: Json | null
+          id: string
+          qualification_level: string | null
+          source_category: string
+          source_description: string | null
+          source_name: string
+          updated_at: string | null
+          utm_parameters: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          expected_objection_profile?: Json | null
+          id?: string
+          qualification_level?: string | null
+          source_category: string
+          source_description?: string | null
+          source_name: string
+          updated_at?: string | null
+          utm_parameters?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          expected_objection_profile?: Json | null
+          id?: string
+          qualification_level?: string | null
+          source_category?: string
+          source_description?: string | null
+          source_name?: string
+          updated_at?: string | null
+          utm_parameters?: Json | null
+        }
+        Relationships: []
+      }
       "Lista_de_Mensagens_ Carlos_Antunes": {
         Row: {
           id: number
@@ -3552,9 +3642,12 @@ export type Database = {
           conversation_id: string | null
           conversion_impact: boolean | null
           created_at: string
+          cross_channel_insights: Json | null
           funnel_stage: string
           id: string
           intensity_level: string
+          lead_source: string | null
+          lead_source_analysis: Json | null
           objection_category: string
           objection_text: string | null
           occurrence_timestamp: string | null
@@ -3566,9 +3659,12 @@ export type Database = {
           conversation_id?: string | null
           conversion_impact?: boolean | null
           created_at?: string
+          cross_channel_insights?: Json | null
           funnel_stage: string
           id?: string
           intensity_level: string
+          lead_source?: string | null
+          lead_source_analysis?: Json | null
           objection_category: string
           objection_text?: string | null
           occurrence_timestamp?: string | null
@@ -3580,9 +3676,12 @@ export type Database = {
           conversation_id?: string | null
           conversion_impact?: boolean | null
           created_at?: string
+          cross_channel_insights?: Json | null
           funnel_stage?: string
           id?: string
           intensity_level?: string
+          lead_source?: string | null
+          lead_source_analysis?: Json | null
           objection_category?: string
           objection_text?: string | null
           occurrence_timestamp?: string | null

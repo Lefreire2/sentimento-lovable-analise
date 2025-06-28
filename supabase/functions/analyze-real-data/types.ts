@@ -13,6 +13,9 @@ export interface ObjectionData {
   script_effectiveness: boolean | null;
   conversion_impact: boolean | null;
   occurrence_timestamp: string;
+  lead_source?: string;
+  lead_source_analysis?: any;
+  cross_channel_insights?: any;
 }
 
 export interface AnalysisResult {
@@ -27,4 +30,5 @@ export interface AnalysisResult {
   system_metrics?: any;
   objection_analysis?: any;
   complete_analysis?: any;
+  lead_source_analysis?: any;
 }

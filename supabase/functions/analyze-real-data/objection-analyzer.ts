@@ -1,5 +1,12 @@
 
 import { ObjectionData } from './types.ts';
+import { 
+  analyzeLeadSourceDistribution, 
+  analyzeSourceVsObjectionCategory, 
+  analyzeSourceConversionRates, 
+  generateLeadSourceRecommendations,
+  generateSimulatedLeadSourceData
+} from './lead-source-analyzer.ts';
 
 export function analyzeCategoryDistribution(data: ObjectionData[]): Record<string, number> {
   const distribution: Record<string, number> = {};
@@ -139,6 +146,10 @@ export async function generateSimulatedObjections(supabase: any, agentName: stri
       ]
     }
   };
+
+  // Adicionar análise de fontes de lead simulada
+  const leadSourceData = await generateSimulatedLeadSourceData(agentName);
+  simulatedData.objection_analysis = { ...simulatedData.objection_analysis, ...leadSourceData.lead_source_analysis };
 
   return simulatedData;
 }
