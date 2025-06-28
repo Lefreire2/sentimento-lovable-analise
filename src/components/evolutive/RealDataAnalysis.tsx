@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Database, 
@@ -16,6 +15,10 @@ import {
 } from 'lucide-react';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { IntentionAnalysisCard } from './IntentionAnalysisCard';
+import { FunnelAnalysisCard } from './FunnelAnalysisCard';
+import { PerformanceAnalysisCard } from './PerformanceAnalysisCard';
+import { SentimentAnalysisCard } from './SentimentAnalysisCard';
+import { SystemMetricsCard } from './SystemMetricsCard';
 
 interface RealDataAnalysisProps {
   agentName: string;
@@ -102,9 +105,27 @@ export const RealDataAnalysis = ({ agentName }: RealDataAnalysisProps) => {
               <h3 className="text-lg font-semibold">Análise de Intenção - {agentName}</h3>
               <IntentionAnalysisCard data={analysisData} />
             </div>
-          ) : (
-            <SingleAnalysisDisplay data={analysisData} type={analysisType} />
-          )}
+          ) : analysisType === 'funnel' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Funil de Conversão - {agentName}</h3>
+              <FunnelAnalysisCard data={analysisData} />
+            </div>
+          ) : analysisType === 'performance' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Análise de Performance - {agentName}</h3>
+              <PerformanceAnalysisCard data={analysisData} />
+            </div>
+          ) : analysisType === 'sentiment' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Análise de Sentimentos - {agentName}</h3>
+              <SentimentAnalysisCard data={analysisData} />
+            </div>
+          ) : analysisType === 'system_metrics' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Métricas do Sistema - {agentName}</h3>
+              <SystemMetricsCard data={analysisData} />
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -130,127 +151,29 @@ const CompleteAnalysisDisplay = ({ data }: { data: any }) => {
         <IntentionAnalysisCard data={data.intention} />
       </div>
 
-      {/* Outras análises em formato de cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Funil de Conversão */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Funil de Conversão
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span>Leads:</span>
-              <Badge variant="outline">{data.funnel.funnel_data.leads}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Qualificados:</span>
-              <Badge variant="secondary">{data.funnel.funnel_data.qualified}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Agendamentos:</span>
-              <Badge variant="default">{data.funnel.funnel_data.appointments}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Conversões:</span>
-              <Badge className="bg-green-500">{data.funnel.funnel_data.conversions}</Badge>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Funil de Conversão */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Funil de Conversão</h3>
+        <FunnelAnalysisCard data={data.funnel} />
+      </div>
 
-        {/* Performance */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Performance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span>Tempo Médio Resposta:</span>
-              <Badge variant="outline">{data.performance.performance_metrics.avg_response_time} min</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Taxa Conversão:</span>
-              <Badge variant="default">{data.performance.performance_metrics.conversion_rate}%</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Score Aderência:</span>
-              <Badge variant="secondary">{data.performance.performance_metrics.adherence_score}%</Badge>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Performance */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Análise de Performance</h3>
+        <PerformanceAnalysisCard data={data.performance} />
+      </div>
 
-        {/* Sentimentos */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Análise de Sentimentos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span>Sentimento Geral:</span>
-              <Badge variant="outline">{data.sentiment.sentiment_analysis.overall}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Usuário:</span>
-              <Badge variant="secondary">{data.sentiment.sentiment_analysis.user}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Atendente:</span>
-              <Badge variant="default">{data.sentiment.sentiment_analysis.agent}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Palavras de Risco:</span>
-              <Badge variant="destructive">{data.sentiment.sentiment_analysis.risk_words}</Badge>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Sentimentos */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Análise de Sentimentos</h3>
+        <SentimentAnalysisCard data={data.sentiment} />
+      </div>
 
-        {/* Métricas do Sistema */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Métricas do Sistema
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between">
-              <span>Total de Leads:</span>
-              <Badge variant="outline">{data.system_metrics.system_metrics.leads_totais}</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Taxa Qualificação:</span>
-              <Badge variant="default">{data.system_metrics.system_metrics.taxa_qualificacao}%</Badge>
-            </div>
-            <div className="flex justify-between">
-              <span>Taxa Agendamento:</span>
-              <Badge variant="secondary">{data.system_metrics.system_metrics.taxa_conversao_agendamento}%</Badge>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Métricas do Sistema */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Métricas do Sistema</h3>
+        <SystemMetricsCard data={data.system_metrics} />
       </div>
     </div>
-  );
-};
-
-const SingleAnalysisDisplay = ({ data, type }: { data: any; type: string }) => {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Resultado da Análise - {type}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <pre className="bg-muted p-4 rounded text-sm overflow-auto">
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      </CardContent>
-    </Card>
   );
 };
