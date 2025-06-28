@@ -30,11 +30,13 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   const analysis = data.lead_source_analysis;
   
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
+  
+  // Safely calculate total objections with proper type handling
   const totalObjections = Object.values(analysis.source_distribution || {})
-    .reduce((sum, count) => {
+    .reduce((sum: number, count: unknown): number => {
       const numericCount = typeof count === 'number' ? count : Number(count) || 0;
       return sum + numericCount;
-    }, 0 as number);
+    }, 0);
 
   // Safely convert values to strings for display
   const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
