@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -38,6 +37,10 @@ serve(async (req) => {
       'Danilo Chammas': {
         basic: 'Lista_de_Mensagens_Danilo_Chammas',
         metrics: 'Lista_mensagens_Danilo_Chammas'
+      },
+      'Haila': {
+        basic: 'Lista_de_Mensagens_Haila',
+        metrics: 'Lista_mensagens_Haila'
       }
     };
 

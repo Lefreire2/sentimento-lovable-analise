@@ -1,47 +1,40 @@
 
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RealDataAnalysis } from '@/components/evolutive/RealDataAnalysis';
+import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysisPanel';
+import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
+import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
+import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { 
   Brain, 
   Target, 
-  BarChart3, 
-  RefreshCw,
-  Zap,
-  TrendingUp,
-  Users,
-  Settings,
-  Database
+  TrendingUp, 
+  Database,
+  Activity,
+  Calendar,
+  BarChart3
 } from 'lucide-react';
 
-import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
-import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysisPanel';
-import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
-import { RealDataAnalysis } from '@/components/evolutive/RealDataAnalysis';
-import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
-
 const EvolutiveSystem = () => {
-  const { systemStatus, useClosedLoopData } = useEvolutiveSystem();
-  const { data: closedLoopData, refetch } = useClosedLoopData();
-  const [selectedPeriod, setSelectedPeriod] = useState('last30days');
-  const [selectedLeadId, setSelectedLeadId] = useState('');
+  const { systemStatus } = useEvolutiveSystem();
   const [selectedAgent, setSelectedAgent] = useState('André Araújo');
 
+  // Lista de agentes disponíveis para análise
   const availableAgents = [
     'André Araújo',
     'Carlos Antunes', 
     'Jorge Mendes',
-    'Danilo Chammas'
+    'Danilo Chammas',
+    'Haila'
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-500';
-      case 'optimizing': return 'bg-blue-500';
-      case 'initializing': return 'bg-yellow-500';
+      case 'optimizing': return 'bg-yellow-500';
       case 'error': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
@@ -49,259 +42,99 @@ const EvolutiveSystem = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active': return 'Sistema Ativo';
+      case 'active': return 'Ativo';
       case 'optimizing': return 'Otimizando';
-      case 'initializing': return 'Inicializando';
       case 'error': return 'Erro';
+      case 'initializing': return 'Inicializando';
       default: return 'Desconhecido';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Sistema Evolutivo</h1>
-            <p className="text-muted-foreground">
-              Análise de Dados Reais e Otimização de Agendamentos
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Badge className={`${getStatusColor(systemStatus)} text-white`}>
-              {getStatusText(systemStatus)}
-            </Badge>
-            
-            <Button onClick={() => refetch()} size="sm" variant="outline">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Atualizar
-            </Button>
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Sistema Evolutivo de IA
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Análise inteligente e otimização contínua de conversões
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${getStatusColor(systemStatus)}`}></div>
+              <Badge variant="outline">
+                {getStatusText(systemStatus)}
+              </Badge>
+            </div>
           </div>
         </div>
 
-        {/* Status Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded">
-                <Brain className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Análises IA</p>
-                <p className="text-xl font-bold">Ativo</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded">
-                <Target className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Otimização</p>
-                <p className="text-xl font-bold">Funcionando</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded">
-                <TrendingUp className="h-6 w-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Closed-Loop</p>
-                <p className="text-xl font-bold">Ativo</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded">
-                <Database className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Dados Reais</p>
-                <p className="text-xl font-bold">Conectado</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Agent Selector */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Seleção de Agente
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {availableAgents.map((agent) => (
+                <button
+                  key={agent}
+                  onClick={() => setSelectedAgent(agent)}
+                  className={`p-3 rounded-lg border transition-all ${
+                    selectedAgent === agent
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : 'bg-white hover:bg-gray-50 border-gray-200'
+                  }`}
+                >
+                  {agent}
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Main Content */}
         <Tabs defaultValue="real-data" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="real-data" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Dados Reais
+            </TabsTrigger>
+            <TabsTrigger value="intention" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Análise de Intenção
+            </TabsTrigger>
+            <TabsTrigger value="optimization" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Otimização
             </TabsTrigger>
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Métricas
             </TabsTrigger>
-            <TabsTrigger value="intention" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Análise Intenção
-            </TabsTrigger>
-            <TabsTrigger value="optimization" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Otimização
-            </TabsTrigger>
-            <TabsTrigger value="closed-loop" className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Closed-Loop
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="real-data" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Seleção de Agente</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione um agente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableAgents.map((agent) => (
-                      <SelectItem key={agent} value={agent}>
-                        {agent}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
-            
             <RealDataAnalysis agentName={selectedAgent} />
           </TabsContent>
 
-          <TabsContent value="metrics" className="space-y-6">
-            <SystemMetricsDashboard period={selectedPeriod} />
-          </TabsContent>
-
           <TabsContent value="intention" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Selecionar Lead</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="ID do Lead ou Conversa"
-                      value={selectedLeadId}
-                      onChange={(e) => setSelectedLeadId(e.target.value)}
-                      className="w-full p-2 border rounded"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Insira o ID de um lead para análise de intenção personalizada
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {selectedLeadId && (
-                <IntentionAnalysisPanel leadId={selectedLeadId} />
-              )}
-            </div>
+            <IntentionAnalysisPanel />
           </TabsContent>
 
           <TabsContent value="optimization" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Otimizar Agendamento</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="ID do Lead"
-                      value={selectedLeadId}
-                      onChange={(e) => setSelectedLeadId(e.target.value)}
-                      className="w-full p-2 border rounded"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Gere estratégias personalizadas de agendamento
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {selectedLeadId && (
-                <AppointmentOptimizer leadId={selectedLeadId} />
-              )}
-            </div>
+            <AppointmentOptimizer />
           </TabsContent>
 
-          <TabsContent value="closed-loop" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <RefreshCw className="h-5 w-5" />
-                  Sistema Closed-Loop
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Users className="h-4 w-4 text-blue-600" />
-                          <span className="font-medium">Marketing Input</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Campanhas gerando leads qualificados
-                        </p>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Brain className="h-4 w-4 text-green-600" />
-                          <span className="font-medium">Análise & Conversão</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          IA otimizando agendamentos
-                        </p>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <TrendingUp className="h-4 w-4 text-purple-600" />
-                          <span className="font-medium">Feedback Loop</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Insights retornando ao marketing
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <div className="text-center py-8">
-                    <RefreshCw className="h-16 w-16 mx-auto text-muted-foreground mb-4 animate-spin" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      Sistema de Feedback Contínuo Ativo
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Dados de conversão alimentando otimizações de marketing em tempo real
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="metrics" className="space-y-6">
+            <SystemMetricsDashboard />
           </TabsContent>
         </Tabs>
       </div>
