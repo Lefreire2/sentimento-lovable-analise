@@ -8,6 +8,7 @@ import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysis
 import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
 import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
+import { formatAgentName, agentTables } from '@/lib/agents';
 import { 
   Brain, 
   Target, 
@@ -15,21 +16,19 @@ import {
   Database,
   Activity,
   Calendar,
-  BarChart3
+  BarChart3,
+  Users
 } from 'lucide-react';
 
 const EvolutiveSystem = () => {
   const { systemStatus } = useEvolutiveSystem();
   const [selectedAgent, setSelectedAgent] = useState('André Araújo');
 
-  // Lista de agentes disponíveis para análise
-  const availableAgents = [
-    'André Araújo',
-    'Carlos Antunes', 
-    'Jorge Mendes',
-    'Danilo Chammas',
-    'Haila'
-  ];
+  // Obter todos os agentes disponíveis do banco de dados
+  const availableAgents = agentTables.map(table => formatAgentName(table)).sort();
+
+  console.log('📋 Total de agentes disponíveis:', availableAgents.length);
+  console.log('🎯 Agentes carregados:', availableAgents);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -77,25 +76,41 @@ const EvolutiveSystem = () => {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Seleção de Agente
+              <Users className="h-5 w-5" />
+              Seleção de Agente ({availableAgents.length} disponíveis)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 max-h-96 overflow-y-auto">
               {availableAgents.map((agent) => (
                 <button
                   key={agent}
                   onClick={() => setSelectedAgent(agent)}
-                  className={`p-3 rounded-lg border transition-all ${
+                  className={`p-3 rounded-lg border text-sm transition-all ${
                     selectedAgent === agent
                       ? 'bg-blue-500 text-white border-blue-500'
                       : 'bg-white hover:bg-gray-50 border-gray-200'
                   }`}
+                  title={agent}
                 >
-                  {agent}
+                  <div className="truncate">
+                    {agent}
+                  </div>
                 </button>
               ))}
+            </div>
+            
+            {/* Agente Selecionado */}
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-900">
+                  Agente Selecionado:
+                </span>
+                <span className="text-sm text-blue-700 font-semibold">
+                  {selectedAgent}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
