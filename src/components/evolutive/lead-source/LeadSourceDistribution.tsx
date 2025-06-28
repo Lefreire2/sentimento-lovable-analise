@@ -24,7 +24,8 @@ export const LeadSourceDistribution = ({
       <CardContent>
         <div className="space-y-4">
           {Object.entries(sourceDistribution).map(([source, count]) => {
-            const numCount = Number(count || 0);
+            // Safely convert count to number
+            const numCount = typeof count === 'number' ? count : Number(count) || 0;
             const percentage = totalObjections > 0 
               ? ((numCount / totalObjections) * 100).toFixed(1) 
               : '0';
