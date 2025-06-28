@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Brain, 
   Target, 
@@ -12,12 +13,14 @@ import {
   Zap,
   TrendingUp,
   Users,
-  Settings
+  Settings,
+  Database
 } from 'lucide-react';
 
 import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
 import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysisPanel';
 import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
+import { RealDataAnalysis } from '@/components/evolutive/RealDataAnalysis';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 
 const EvolutiveSystem = () => {
@@ -25,6 +28,14 @@ const EvolutiveSystem = () => {
   const { data: closedLoopData, refetch } = useClosedLoopData();
   const [selectedPeriod, setSelectedPeriod] = useState('last30days');
   const [selectedLeadId, setSelectedLeadId] = useState('');
+  const [selectedAgent, setSelectedAgent] = useState('André Araújo');
+
+  const availableAgents = [
+    'André Araújo',
+    'Carlos Antunes', 
+    'Jorge Mendes',
+    'Danilo Chammas'
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,7 +66,7 @@ const EvolutiveSystem = () => {
           <div>
             <h1 className="text-3xl font-bold">Sistema Evolutivo</h1>
             <p className="text-muted-foreground">
-              Análise de Intenção e Otimização de Agendamentos
+              Análise de Dados Reais e Otimização de Agendamentos
             </p>
           </div>
           
@@ -112,19 +123,23 @@ const EvolutiveSystem = () => {
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
               <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded">
-                <Zap className="h-6 w-6 text-orange-600" />
+                <Database className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Predição</p>
-                <p className="text-xl font-bold">ML Ativo</p>
+                <p className="text-sm text-muted-foreground">Dados Reais</p>
+                <p className="text-xl font-bold">Conectado</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="metrics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="real-data" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="real-data" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Dados Reais
+            </TabsTrigger>
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Métricas
@@ -142,6 +157,30 @@ const EvolutiveSystem = () => {
               Closed-Loop
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="real-data" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Seleção de Agente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione um agente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableAgents.map((agent) => (
+                      <SelectItem key={agent} value={agent}>
+                        {agent}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+            
+            <RealDataAnalysis agentName={selectedAgent} />
+          </TabsContent>
 
           <TabsContent value="metrics" className="space-y-6">
             <SystemMetricsDashboard period={selectedPeriod} />

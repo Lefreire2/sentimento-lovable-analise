@@ -14,6 +14,30 @@ export const useEvolutiveSystem = () => {
   const queryClient = useQueryClient();
   const [systemStatus, setSystemStatus] = useState<'initializing' | 'active' | 'optimizing' | 'error'>('initializing');
 
+  // Hook para análise de dados reais
+  const useRealDataAnalysis = (agentName: string, analysisType: string) => {
+    return useQuery<any>({
+      queryKey: ['real-data-analysis', agentName, analysisType],
+      queryFn: async () => {
+        console.log('🔍 Iniciando análise de dados reais para:', agentName, analysisType);
+        
+        const { data, error } = await supabase.functions.invoke('analyze-real-data', {
+          body: { agentName, analysisType }
+        });
+        
+        if (error) {
+          console.error('❌ Erro na análise de dados reais:', error);
+          throw error;
+        }
+        
+        console.log('✅ Análise de dados reais concluída:', data);
+        return data;
+      },
+      enabled: !!agentName,
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    });
+  };
+
   // Hook para análise de intenção em tempo real
   const useIntentionAnalysis = (leadId: string) => {
     return useQuery<IntentionAnalysis>({
@@ -166,6 +190,7 @@ export const useEvolutiveSystem = () => {
 
   return {
     systemStatus,
+    useRealDataAnalysis,
     useIntentionAnalysis,
     useAppointmentOptimization,
     useSystemMetrics,
