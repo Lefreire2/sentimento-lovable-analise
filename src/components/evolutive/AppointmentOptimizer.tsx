@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -61,12 +62,6 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
     }
   };
 
-  const getProbabilityColor = (probability: number) => {
-    if (probability >= 80) return 'text-green-600';
-    if (probability >= 60) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -79,6 +74,7 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
           onClick={handleOptimizeAppointment}
           disabled={isPending}
           size="sm"
+          className="bg-gray-800 hover:bg-gray-900"
         >
           {isPending ? (
             <><Sparkles className="h-4 w-4 animate-spin mr-2" /> Otimizando</>
@@ -101,56 +97,57 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
         {optimization && (
           <>
             {/* Probabilidade de Sucesso */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-medium">Probabilidade de Sucesso</label>
-              <div className="flex items-center gap-2">
-                <Progress value={optimization.probabilidade_sucesso} className="flex-1" />
-                <span className={`text-sm font-bold ${getProbabilityColor(optimization.probabilidade_sucesso)}`}>
+              <div className="flex items-center gap-3">
+                <Progress 
+                  value={optimization.probabilidade_sucesso} 
+                  className="flex-1 h-3" 
+                />
+                <span className="text-2xl font-bold text-green-600 min-w-[60px] text-right">
                   {optimization.probabilidade_sucesso}%
                 </span>
               </div>
             </div>
 
-            {/* Recomendações de Timing */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Melhor Horário e Dia */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  Melhor Horário
-                </label>
-                <Badge variant="outline" className="w-fit">
+                  <label className="text-sm font-medium">Melhor Horário</label>
+                </div>
+                <div className="text-lg font-semibold">
                   {optimization.melhor_horario_sugerido}
-                </Badge>
+                </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Melhor Dia
-                </label>
-                <Badge variant="outline" className="w-fit">
+                  <label className="text-sm font-medium">Melhor Dia</label>
+                </div>
+                <div className="text-lg font-semibold">
                   {optimization.melhor_dia_semana}
-                </Badge>
+                </div>
               </div>
             </div>
 
-            {/* Canal Preferido */}
+            {/* Canal Recomendado */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Canal Recomendado</label>
               <div className="flex items-center gap-2">
                 {getChannelIcon(optimization.canal_preferido)}
-                <Badge variant="secondary">
-                  {optimization.canal_preferido}
-                </Badge>
+                <span className="font-medium">{optimization.canal_preferido}</span>
               </div>
             </div>
 
             {/* Abordagem Recomendada */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Abordagem Recomendada</label>
-              <p className="text-sm bg-blue-50 dark:bg-blue-950/20 p-3 rounded border-l-2 border-blue-500">
-                {optimization.abordagem_recomendada}
-              </p>
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border-l-4 border-blue-500">
+                <p className="text-sm">{optimization.abordagem_recomendada}</p>
+              </div>
             </div>
 
             {/* Script Personalizado */}
@@ -159,21 +156,9 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
               <Textarea
                 value={optimization.script_personalizado}
                 readOnly
-                className="min-h-[120px] bg-muted"
+                className="min-h-[120px] bg-gray-50 dark:bg-gray-900"
                 placeholder="Script gerado automaticamente..."
               />
-            </div>
-
-            {/* Fatores de Otimização */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Fatores de Otimização</label>
-              <div className="flex flex-wrap gap-2">
-                {optimization.fatores_otimizacao.map((fator, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {fator}
-                  </Badge>
-                ))}
-              </div>
             </div>
 
             {/* Campo para personalizar mensagem */}
@@ -200,22 +185,23 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
             </div>
 
             {/* Timestamp */}
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground text-center pt-2">
               Otimização gerada em: {new Date(optimization.created_at).toLocaleString('pt-BR')}
             </div>
           </>
         )}
 
         {!optimization && !isPending && (
-          <div className="text-center py-8">
-            <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-sm text-muted-foreground mb-4">
-              {!leadId ? 'Modo demonstração - Gere uma estratégia de agendamento' : 'Gere uma estratégia personalizada de agendamento'}
+          <div className="text-center py-12">
+            <Target className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <p className="text-lg font-medium mb-2">
+              {!leadId ? 'Modo demonstração' : 'Pronto para otimizar'}
             </p>
-            <p className="text-xs text-muted-foreground mb-4">
-              Baseada no contexto da conversa e padrões de sucesso
+            <p className="text-sm text-muted-foreground mb-6">
+              Gere uma estratégia personalizada baseada no contexto da conversa e padrões de sucesso
             </p>
-            <Button onClick={handleOptimizeAppointment}>
+            <Button onClick={handleOptimizeAppointment} size="lg">
+              <Sparkles className="h-4 w-4 mr-2" />
               Gerar Otimização
             </Button>
           </div>
@@ -223,19 +209,4 @@ export const AppointmentOptimizer = ({ leadId, conversationContext }: Appointmen
       </CardContent>
     </Card>
   );
-};
-
-const getChannelIcon = (channel: string) => {
-  switch (channel.toLowerCase()) {
-    case 'whatsapp': return <MessageSquare className="h-4 w-4" />;
-    case 'telefone': return <Phone className="h-4 w-4" />;
-    case 'email': return <Mail className="h-4 w-4" />;
-    default: return <Send className="h-4 w-4" />;
-  }
-};
-
-const getProbabilityColor = (probability: number) => {
-  if (probability >= 80) return 'text-green-600';
-  if (probability >= 60) return 'text-yellow-600';
-  return 'text-red-600';
 };
