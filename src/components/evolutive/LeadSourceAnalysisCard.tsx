@@ -31,8 +31,8 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
   
-  // Safely calculate total objections with proper type handling
-  const totalObjections = Object.values(analysis.source_distribution || {})
+  // Safely calculate total objections with proper type handling and explicit number typing
+  const totalObjections: number = Object.values(analysis.source_distribution || {})
     .reduce((sum: number, count: unknown): number => {
       const numericCount = typeof count === 'number' ? count : Number(count) || 0;
       return sum + numericCount;
