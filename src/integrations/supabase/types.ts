@@ -3546,6 +3546,51 @@ export type Database = {
         }
         Relationships: []
       }
+      objection_analysis: {
+        Row: {
+          agent_name: string
+          conversation_id: string | null
+          conversion_impact: boolean | null
+          created_at: string
+          funnel_stage: string
+          id: string
+          intensity_level: string
+          objection_category: string
+          objection_text: string | null
+          occurrence_timestamp: string | null
+          remote_jid: string | null
+          script_effectiveness: boolean | null
+        }
+        Insert: {
+          agent_name: string
+          conversation_id?: string | null
+          conversion_impact?: boolean | null
+          created_at?: string
+          funnel_stage: string
+          id?: string
+          intensity_level: string
+          objection_category: string
+          objection_text?: string | null
+          occurrence_timestamp?: string | null
+          remote_jid?: string | null
+          script_effectiveness?: boolean | null
+        }
+        Update: {
+          agent_name?: string
+          conversation_id?: string | null
+          conversion_impact?: boolean | null
+          created_at?: string
+          funnel_stage?: string
+          id?: string
+          intensity_level?: string
+          objection_category?: string
+          objection_text?: string | null
+          occurrence_timestamp?: string | null
+          remote_jid?: string | null
+          script_effectiveness?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

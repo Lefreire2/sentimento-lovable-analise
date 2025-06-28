@@ -11,7 +11,8 @@ import {
   MessageSquare,
   Clock,
   Target,
-  Brain
+  Brain,
+  AlertTriangle
 } from 'lucide-react';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { IntentionAnalysisCard } from './IntentionAnalysisCard';
@@ -19,6 +20,7 @@ import { FunnelAnalysisCard } from './FunnelAnalysisCard';
 import { PerformanceAnalysisCard } from './PerformanceAnalysisCard';
 import { SentimentAnalysisCard } from './SentimentAnalysisCard';
 import { SystemMetricsCard } from './SystemMetricsCard';
+import { ObjectionAnalysisCard } from './ObjectionAnalysisCard';
 
 interface RealDataAnalysisProps {
   agentName: string;
@@ -36,6 +38,7 @@ export const RealDataAnalysis = ({ agentName }: RealDataAnalysisProps) => {
     { key: 'funnel', label: 'Funil de Conversão', icon: BarChart3 },
     { key: 'performance', label: 'Performance', icon: TrendingUp },
     { key: 'sentiment', label: 'Sentimentos', icon: MessageSquare },
+    { key: 'objections', label: 'Análise de Objeções', icon: AlertTriangle },
     { key: 'system_metrics', label: 'Métricas Sistema', icon: Target }
   ];
 
@@ -75,7 +78,7 @@ export const RealDataAnalysis = ({ agentName }: RealDataAnalysisProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {analysisTypes.map((type) => {
               const Icon = type.icon;
               return (
@@ -119,6 +122,11 @@ export const RealDataAnalysis = ({ agentName }: RealDataAnalysisProps) => {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Análise de Sentimentos - {agentName}</h3>
               <SentimentAnalysisCard data={analysisData} />
+            </div>
+          ) : analysisType === 'objections' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Análise de Objeções - {agentName}</h3>
+              <ObjectionAnalysisCard data={analysisData} />
             </div>
           ) : analysisType === 'system_metrics' && analysisData ? (
             <div className="space-y-4">
@@ -167,6 +175,12 @@ const CompleteAnalysisDisplay = ({ data }: { data: any }) => {
       <div>
         <h3 className="text-lg font-semibold mb-4">Análise de Sentimentos</h3>
         <SentimentAnalysisCard data={data.sentiment} />
+      </div>
+
+      {/* Análise de Objeções */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Análise de Objeções</h3>
+        <ObjectionAnalysisCard data={data.objections} />
       </div>
 
       {/* Métricas do Sistema */}
