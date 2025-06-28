@@ -31,12 +31,12 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
   
-  // Safely calculate total objections with proper type handling and explicit number typing
-  const totalObjections: number = Object.values(analysis.source_distribution || {})
-    .reduce((sum: number, count: unknown): number => {
-      const numericCount = typeof count === 'number' ? count : Number(count) || 0;
-      return sum + numericCount;
-    }, 0);
+  // Calculate total objections with explicit type assertion
+  const sourceDistributionValues = Object.values(analysis.source_distribution || {});
+  const totalObjections = sourceDistributionValues.reduce((sum, count) => {
+    const numericCount = typeof count === 'number' ? count : Number(count) || 0;
+    return sum + numericCount;
+  }, 0) as number;
 
   // Safely convert values to strings for display
   const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
