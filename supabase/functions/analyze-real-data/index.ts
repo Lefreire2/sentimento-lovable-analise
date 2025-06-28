@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -96,6 +97,44 @@ serve(async (req) => {
   }
 })
 
+// Função para analisar leads únicos baseado em remoteJid
+async function analyzeUniqueLeads(supabase: any, basicTableName: string) {
+  console.log('📊 Analisando leads únicos por remoteJid para:', basicTableName);
+  
+  // Buscar todos os remoteJid únicos (não nulos e não vazios)
+  const { data: uniqueJids, error } = await supabase
+    .from(basicTableName)
+    .select('remoteJid')
+    .not('remoteJid', 'is', null)
+    .neq('remoteJid', '')
+    .neq('remoteJid', 'undefined');
+
+  if (error) {
+    console.error('Erro ao buscar remoteJids:', error);
+    return 0;
+  }
+
+  // Filtrar e contar remoteJids únicos válidos
+  const validJids = new Set();
+  
+  uniqueJids?.forEach(row => {
+    const jid = row.remoteJid;
+    if (jid && jid.trim() !== '' && jid !== 'undefined' && jid !== 'null') {
+      // Limpar e normalizar o JID
+      const cleanJid = jid.trim().toLowerCase();
+      // Verificar se parece com um JID válido (deve conter @ ou ser um número)
+      if (cleanJid.includes('@') || /^\d+$/.test(cleanJid)) {
+        validJids.add(cleanJid);
+      }
+    }
+  });
+
+  console.log('📊 Total de leads únicos identificados:', validJids.size);
+  console.log('📊 Primeiros 5 JIDs únicos:', Array.from(validJids).slice(0, 5));
+  
+  return validJids.size;
+}
+
 async function analyzeIntention(supabase: any, tables: any) {
   console.log('🧠 Analisando intenção com dados reais...');
   
@@ -110,18 +149,8 @@ async function analyzeIntention(supabase: any, tables: any) {
     throw metricsError;
   }
 
-  // Buscar dados da tabela básica
-  const { data: basicData, error: basicError } = await supabase
-    .from(tables.basic)
-    .select('*')
-    .limit(500);
-
-  if (basicError) {
-    console.error('Erro ao buscar dados básicos:', basicError);
-    throw basicError;
-  }
-
-  const totalConversations = basicData?.length || 0;
+  // Analisar leads únicos pela tabela básica
+  const totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
   const totalMetrics = metricsData?.length || 0;
 
   // Análise de conversões
@@ -145,7 +174,7 @@ async function analyzeIntention(supabase: any, tables: any) {
     analysis_type: 'intention',
     timestamp: new Date().toISOString(),
     data: {
-      total_conversations: totalConversations,
+      total_conversations: totalUniqueLeads,
       total_processed_metrics: totalMetrics,
       conversions: {
         count: conversions.length,
@@ -174,11 +203,9 @@ async function analyzeFunnel(supabase: any, tables: any) {
     .from(tables.metrics)
     .select('*');
 
-  const { data: basicData } = await supabase
-    .from(tables.basic)
-    .select('*');
-
-  const totalLeads = basicData?.length || 0;
+  // Analisar leads únicos pela tabela básica
+  const totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
+  
   const qualifiedLeads = metricsData?.filter(row => 
     row.pontuacao_aderencia_percentual && parseFloat(row.pontuacao_aderencia_percentual) > 50
   ).length || 0;
@@ -193,12 +220,12 @@ async function analyzeFunnel(supabase: any, tables: any) {
 
   return {
     funnel_data: {
-      leads: totalLeads,
+      leads: totalUniqueLeads,
       qualified: qualifiedLeads,
       appointments: appointments,
       conversions: conversions,
       rates: {
-        qualification: totalLeads > 0 ? ((qualifiedLeads / totalLeads) * 100).toFixed(2) : '0',
+        qualification: totalUniqueLeads > 0 ? ((qualifiedLeads / totalUniqueLeads) * 100).toFixed(2) : '0',
         appointment: qualifiedLeads > 0 ? ((appointments / qualifiedLeads) * 100).toFixed(2) : '0',
         conversion: appointments > 0 ? ((conversions / appointments) * 100).toFixed(2) : '0'
       }
@@ -278,20 +305,17 @@ async function analyzeSystemMetrics(supabase: any, tables: any) {
     .from(tables.metrics)
     .select('*');
 
-  const { data: basicData } = await supabase
-    .from(tables.basic)
-    .select('*');
-
-  const totalLeads = basicData?.length || 0;
+  // Analisar leads únicos pela tabela básica
+  const totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
   const qualifiedLeads = metricsData?.length || 0;
   const conversions = metricsData?.filter(row => row.conversao_indicada_mvp === 'Sim').length || 0;
   const appointments = metricsData?.filter(row => row.agendamento_detectado === 'Sim').length || 0;
 
   return {
     system_metrics: {
-      leads_totais: totalLeads,
+      leads_totais: totalUniqueLeads,
       leads_qualificados: qualifiedLeads,
-      taxa_qualificacao: totalLeads > 0 ? ((qualifiedLeads / totalLeads) * 100).toFixed(2) : '0',
+      taxa_qualificacao: totalUniqueLeads > 0 ? ((qualifiedLeads / totalUniqueLeads) * 100).toFixed(2) : '0',
       agendamentos_realizados: appointments,
       taxa_conversao_agendamento: qualifiedLeads > 0 ? ((appointments / qualifiedLeads) * 100).toFixed(2) : '0',
       conversoes: conversions,
