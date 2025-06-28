@@ -4,7 +4,7 @@ import { Target } from 'lucide-react';
 import { LeadSourceOverview } from './lead-source/LeadSourceOverview';
 import { LeadSourceDistribution } from './lead-source/LeadSourceDistribution';
 import { LeadSourcePerformance } from './lead-source/LeadSourcePerformance';
-import { LeadSourceRecommendations } from './lead-source/LeardSourceRecommendations';
+import { LeadSourceRecommendations } from './lead-source/LeadSourceRecommendations';
 
 interface LeadSourceAnalysisProps {
   data: any;
@@ -33,10 +33,10 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   
   // Calculate total objections with proper type handling
   const sourceDistributionValues = Object.values(analysis.source_distribution || {});
-  const totalObjections: number = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
+  const totalObjections = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
     const numericCount = typeof count === 'number' ? count : Number(count) || 0;
     return sum + numericCount;
-  }, 0);
+  }, 0) as number;
 
   // Safely convert values to strings for display
   const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
