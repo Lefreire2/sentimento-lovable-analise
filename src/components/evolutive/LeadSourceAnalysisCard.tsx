@@ -51,8 +51,8 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   };
 
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
-  const totalObjections = Object.values(analysis.source_distribution || {})
-    .reduce((sum: number, count) => sum + Number(count || 0), 0);
+  const totalObjections: number = Object.values(analysis.source_distribution || {})
+    .reduce((sum: number, count: unknown) => sum + Number(count || 0), 0);
 
   // Safely convert values to strings for display
   const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
