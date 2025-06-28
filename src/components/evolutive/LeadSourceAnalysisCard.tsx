@@ -51,7 +51,12 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   };
 
   const totalSources = Object.keys(analysis.source_distribution || {}).length;
-  const totalObjections = Object.values(analysis.source_distribution || {}).reduce((sum: number, count) => sum + Number(count), 0);
+  const totalObjections = Object.values(analysis.source_distribution || {})
+    .reduce((sum: number, count) => sum + Number(count || 0), 0);
+
+  // Safely convert values to strings for display
+  const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
+  const worstPerformingSource = String(analysis.worst_performing_source || 'N/A');
 
   return (
     <div className="space-y-6">
@@ -76,14 +81,14 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
             <div className="text-center">
               <Badge variant="default" className="text-sm">
                 <TrendingUp className="h-3 w-3 mr-1" />
-                {String(analysis.best_performing_source)}
+                {bestPerformingSource}
               </Badge>
               <div className="text-sm text-muted-foreground mt-1">Melhor Fonte</div>
             </div>
             <div className="text-center">
               <Badge variant="destructive" className="text-sm">
                 <TrendingDown className="h-3 w-3 mr-1" />
-                {String(analysis.worst_performing_source)}
+                {worstPerformingSource}
               </Badge>
               <div className="text-sm text-muted-foreground mt-1">Pior Fonte</div>
             </div>
@@ -102,7 +107,7 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
         <CardContent>
           <div className="space-y-4">
             {Object.entries(analysis.source_distribution || {}).map(([source, count]) => {
-              const numCount = Number(count);
+              const numCount = Number(count || 0);
               const percentage = totalObjections > 0 
                 ? ((numCount / totalObjections) * 100).toFixed(1) 
                 : '0';
