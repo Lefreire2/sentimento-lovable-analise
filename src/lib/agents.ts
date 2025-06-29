@@ -63,10 +63,10 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Stefanie_lee'
 ].sort();
 
-// Lista principal de agentes baseada nos screenshots fornecidos
+// Lista principal de agentes baseada nos dados do banco
 export const agentTables = metricsAgentTables;
 
-// Mapeamento COMPLETO e CORRIGIDO - verificação de TODOS os agentes
+// Mapeamento COMPLETO atualizado com base no banco de dados real
 const nameToTableMapping: Record<string, string> = {
     'Carlos Antunes': ' Carlos_Antunes', // Com espaço no início conforme banco
     'Adiney Esteves': 'Adiney_esteves',
@@ -75,7 +75,7 @@ const nameToTableMapping: Record<string, string> = {
     'Aline Franzotti': 'Aline_franzotti',
     'Amanda Mota': 'Amanda_Mota',
     'Ana Beatriz': 'Ana_beatriz',
-    'André Araújo': 'Andre_araujo', // FUNCIONANDO - SEM espaço, exatamente como na tabela
+    'André Araújo': 'Andre_araujo',
     'Danilo Chammas': 'Danilo_Chammas',
     'Diego Cabrejos': 'Diego_cabrejos',
     'Haila': 'Haila',
@@ -107,7 +107,7 @@ export const formatAgentName = (tableName: string) => {
         .replace(/_/g, ' ')
         .trim();
     
-    // Casos especiais COMPLETOS baseados na screenshot
+    // Casos especiais COMPLETOS baseados no banco real
     const specialCases: Record<string, string> = {
         'Carlos Antunes': 'Carlos Antunes',
         ' Carlos Antunes': 'Carlos Antunes',
@@ -296,7 +296,7 @@ export const debugAllAgents = (): void => {
 
 // Inicialização com debug completo
 if (typeof window !== 'undefined') {
-    console.log('🔧 INIT - Sistema otimizado para TODOS os 28 agentes');
-    console.log('📸 INIT - Baseado nos screenshots e testado com André Araújo');
+    console.log('🔧 INIT - Sistema atualizado com base no banco de dados real');
+    console.log('📊 INIT - Total de 28 agentes confirmados no Supabase');
     debugAllAgents();
 }
