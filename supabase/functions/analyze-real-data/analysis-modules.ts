@@ -1,3 +1,4 @@
+
 import { AgentTableMapping, AnalysisResult } from './types.ts';
 import { analyzeUniqueLeads } from './leads-analyzer.ts';
 import { analyzeAppointmentsAccurately } from './appointment-analyzer.ts';
@@ -21,27 +22,71 @@ import {
   generateSimulatedObjections
 } from './objection-analyzer.ts';
 
-export async function analyzeIntention(supabase: any, tables: AgentTableMapping): Promise<AnalysisResult> {
+export async function analyzeIntention(
+  supabase: any, 
+  tables: AgentTableMapping, 
+  analysisSettings?: {
+    startDate?: string;
+    endDate?: string;
+    period?: string;
+  }
+): Promise<AnalysisResult> {
   console.log('🧠 Analisando intenção com dados reais OTIMIZADOS...');
+  console.log('📅 Configurações de período:', analysisSettings);
   
   // STEP 1: Análise PRECISA de agendamentos (métrica principal)
   const agentName = tables.basic.replace('Lista_de_Mensagens_', '').replace('Lista_mensagens_', '').replace('_', ' ');
-  const appointmentAnalysis = await analyzeAppointmentsAccurately(supabase, agentName, tables);
+  const appointmentAnalysis = await analyzeAppointmentsAccurately(supabase, agentName, tables, analysisSettings);
   
   console.log('📅 INTENÇÃO - Análise de agendamentos PRECISA concluída:', appointmentAnalysis);
   
-  // STEP 2: Analisar leads únicos pela tabela básica
-  const totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
-  console.log('📊 INTENÇÃO - Total de leads únicos encontrados:', totalUniqueLeads);
+  // STEP 2: Analisar leads únicos pela tabela básica (com filtro de período)
+  let totalUniqueLeads = 0;
+  if (analysisSettings?.startDate || analysisSettings?.endDate) {
+    // Analisar com filtro de período
+    let query = supabase.from(tables.basic).select('remoteJid, Timestamp');
+    
+    if (analysisSettings.startDate) {
+      query = query.gte('Timestamp', analysisSettings.startDate);
+    }
+    if (analysisSettings.endDate) {
+      query = query.lte('Timestamp', analysisSettings.endDate);
+    }
+    
+    const { data: basicData, error } = await query;
+    if (!error && basicData) {
+      const uniqueJids = new Set();
+      basicData.forEach(row => {
+        const jid = row.remoteJid;
+        if (jid && typeof jid === 'string' && jid.trim() !== '') {
+          uniqueJids.add(jid.trim().toLowerCase());
+        }
+      });
+      totalUniqueLeads = uniqueJids.size;
+    }
+  } else {
+    // Usar método existente para período completo
+    totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
+  }
   
-  // STEP 3: Buscar dados da tabela de métricas para outras análises
+  console.log('📊 INTENÇÃO - Total de leads únicos encontrados (período):', totalUniqueLeads);
+  
+  // STEP 3: Buscar dados da tabela de métricas para outras análises (com filtro de período)
   let metricsData = [];
   let uniqueMetricsLeads = 0;
   
   if (tables.metrics && tables.metrics.trim() !== '') {
-    const { data: rawMetricsData, error: metricsError } = await supabase
-      .from(tables.metrics)
-      .select('*');
+    let query = supabase.from(tables.metrics).select('*');
+    
+    // Aplicar filtros de período
+    if (analysisSettings?.startDate) {
+      query = query.gte('data_inicio_conversa', analysisSettings.startDate);
+    }
+    if (analysisSettings?.endDate) {
+      query = query.lte('data_fim_conversa', analysisSettings.endDate);
+    }
+    
+    const { data: rawMetricsData, error: metricsError } = await query;
     
     if (!metricsError && rawMetricsData) {
       metricsData = rawMetricsData;
@@ -123,7 +168,8 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
         rate: appointmentAnalysis.appointment_rate,
         accuracy_level: appointmentAnalysis.accuracy_level,
         data_source: appointmentAnalysis.data_source,
-        verification_details: appointmentAnalysis.verification_details
+        verification_details: appointmentAnalysis.verification_details,
+        analysis_period: appointmentAnalysis.analysis_period
       },
       engagement_metrics: {
         avg_response_time: calculateAverageResponseTime(metricsData),

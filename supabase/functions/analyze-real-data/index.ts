@@ -22,8 +22,9 @@ serve(async (req) => {
   }
 
   try {
-    const { agentName, analysisType } = await req.json();
+    const { agentName, analysisType, analysisSettings } = await req.json();
     console.log('🔍 Iniciando análise real para agente:', agentName, 'tipo:', analysisType);
+    console.log('📅 Configurações de período:', analysisSettings);
 
     // Inicializar cliente Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -42,7 +43,7 @@ serve(async (req) => {
 
     switch (analysisType) {
       case 'intention':
-        analysisResult = await analyzeIntention(supabase, tables);
+        analysisResult = await analyzeIntention(supabase, tables, analysisSettings);
         break;
       case 'funnel':
         analysisResult = await analyzeFunnel(supabase, tables);
@@ -60,7 +61,7 @@ serve(async (req) => {
         analysisResult = await analyzeObjections(supabase, agentName);
         break;
       default:
-        analysisResult = await analyzeAll(supabase, tables, agentName);
+        analysisResult = await analyzeAll(supabase, tables, agentName, analysisSettings);
     }
 
     console.log('✅ Análise real concluída:', analysisResult);
@@ -88,11 +89,11 @@ serve(async (req) => {
   }
 })
 
-async function analyzeAll(supabase: any, tables: any, agentName: string) {
+async function analyzeAll(supabase: any, tables: any, agentName: string, analysisSettings?: any) {
   console.log('🔄 Fazendo análise completa com dados reais...');
   
   const [intention, funnel, performance, sentiment, systemMetrics, objections] = await Promise.all([
-    analyzeIntention(supabase, tables),
+    analyzeIntention(supabase, tables, analysisSettings),
     analyzeFunnel(supabase, tables),
     analyzePerformance(supabase, tables),
     analyzeSentiment(supabase, tables),

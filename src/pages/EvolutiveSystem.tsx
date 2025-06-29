@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +8,7 @@ import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysis
 import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
 import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
 import { SystemRefreshButton } from '@/components/evolutive/SystemRefreshButton';
+import { PeriodSelector, PeriodFilter } from '@/components/dashboard/PeriodSelector';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { formatAgentName, agentTables } from '@/lib/agents';
 import { 
@@ -24,6 +26,9 @@ const EvolutiveSystem = () => {
   const { systemStatus } = useEvolutiveSystem();
   const [selectedAgent, setSelectedAgent] = useState('André Araújo');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>({
+    type: 'last30days'
+  });
 
   // Obter todos os agentes disponíveis do banco de dados
   const availableAgents = agentTables.map(table => formatAgentName(table)).sort();
@@ -34,6 +39,11 @@ const EvolutiveSystem = () => {
   const handleRefreshComplete = () => {
     console.log('🔄 SISTEMA - Forçando re-render dos componentes');
     setRefreshKey(prev => prev + 1);
+  };
+
+  const handlePeriodChange = (period: PeriodFilter) => {
+    setSelectedPeriod(period);
+    setRefreshKey(prev => prev + 1); // Forçar atualização dos dados
   };
 
   const getStatusColor = (status: string) => {
@@ -53,6 +63,43 @@ const EvolutiveSystem = () => {
       case 'initializing': return 'Inicializando';
       default: return 'Desconhecido';
     }
+  };
+
+  // Converter período para configurações de análise
+  const getAnalysisSettings = () => {
+    const now = new Date();
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+    let periodDescription = '';
+
+    switch (selectedPeriod.type) {
+      case 'last7days':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        endDate = now.toISOString();
+        periodDescription = 'Últimos 7 dias';
+        break;
+      case 'last30days':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        endDate = now.toISOString();
+        periodDescription = 'Últimos 30 dias';
+        break;
+      case 'last90days':
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString();
+        endDate = now.toISOString();
+        periodDescription = 'Últimos 90 dias';
+        break;
+      case 'custom':
+        startDate = selectedPeriod.startDate?.toISOString();
+        endDate = selectedPeriod.endDate?.toISOString();
+        periodDescription = 'Período personalizado';
+        break;
+    }
+
+    return {
+      startDate,
+      endDate,
+      period: periodDescription
+    };
   };
 
   return (
@@ -83,6 +130,12 @@ const EvolutiveSystem = () => {
             </div>
           </div>
         </div>
+
+        {/* Period Selector */}
+        <PeriodSelector 
+          selectedPeriod={selectedPeriod}
+          onPeriodChange={handlePeriodChange}
+        />
 
         {/* Agent Selector */}
         <Card className="mb-6">
@@ -149,11 +202,18 @@ const EvolutiveSystem = () => {
           </TabsList>
 
           <TabsContent value="real-data" className="space-y-6">
-            <RealDataAnalysis key={`real-data-${refreshKey}`} agentName={selectedAgent} />
+            <RealDataAnalysis 
+              key={`real-data-${refreshKey}`} 
+              agentName={selectedAgent}
+              analysisSettings={getAnalysisSettings()}
+            />
           </TabsContent>
 
           <TabsContent value="intention" className="space-y-6">
-            <IntentionAnalysisPanel key={`intention-${refreshKey}`} />
+            <IntentionAnalysisPanel 
+              key={`intention-${refreshKey}`}
+              analysisSettings={getAnalysisSettings()}
+            />
           </TabsContent>
 
           <TabsContent value="optimization" className="space-y-6">

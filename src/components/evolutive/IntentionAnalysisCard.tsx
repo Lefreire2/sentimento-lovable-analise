@@ -11,7 +11,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
-  Shield
+  Shield,
+  Clock
 } from 'lucide-react';
 
 interface IntentionAnalysisCardProps {
@@ -46,6 +47,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
   } = data.data;
 
   const isDataConsistent = data_consistency?.is_consistent;
+  const analysisP period = appointments?.analysis_period;
 
   // Determinar nível de precisão dos agendamentos
   const getAccuracyColor = (level: string) => {
@@ -72,8 +74,56 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    try {
+      return new Date(dateString).toLocaleDateString('pt-BR');
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {/* Analysis Period Info */}
+      {analysisP period && (
+        <Card className="border-l-4 border-l-blue-500 bg-blue-50">
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-blue-600" />
+              <span className="font-bold text-lg text-blue-900">
+                PERÍODO DE ANÁLISE
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium">Descrição:</p>
+                <p className="text-blue-700">{analysisP period.period_description}</p>
+              </div>
+              {(analysisP period.start_date || analysisP period.end_date) && (
+                <div>
+                  <p className="font-medium">Período:</p>
+                  <p className="text-blue-700">
+                    {analysisP period.start_date && formatDate(analysisP period.start_date)}
+                    {analysisP period.start_date && analysisP period.end_date && ' até '}
+                    {analysisP period.end_date && formatDate(analysisP period.end_date)}
+                  </p>
+                </div>
+              )}
+              {analysisP period.real_validation && (
+                <div className="col-span-1 md:col-span-2">
+                  <p className="font-medium text-green-700">Validação Real:</p>
+                  <p className="text-green-600">
+                    ✅ {analysisP period.real_validation.validated_count} agendamentos confirmados 
+                    via {analysisP period.real_validation.validation_source}
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Data Consistency Alert */}
       {data_consistency && (
         <Card className={`border-l-4 ${isDataConsistent ? 'border-l-green-500' : 'border-l-blue-500'}`}>
@@ -113,7 +163,13 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
               </span>
             </div>
             <div className="mt-2 text-sm">
-              <p className="font-medium">Fonte dos dados: {appointments.data_source === 'metrics_table' ? 'Tabela de Métricas' : 'Estimativa'}</p>
+              <p className="font-medium">
+                Fonte dos dados: {
+                  appointments.data_source === 'metrics_table' ? 'Tabela de Métricas' : 
+                  appointments.data_source === 'real_validation' ? 'Validação Real' :
+                  'Estimativa'
+                }
+              </p>
               {appointments.verification_details && (
                 <div className="mt-1 text-xs">
                   <p>Registros de métricas: {appointments.verification_details.total_metrics_records}</p>
@@ -164,6 +220,11 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
                   <Badge variant="default" className="bg-purple-600">{appointments?.rate || 0}%</Badge>
                   {appointments?.accuracy_level === 'high' && (
                     <Shield className="h-3 w-3 text-green-600" />
+                  )}
+                  {analysisP period?.real_validation && (
+                    <Badge variant="outline" className="text-xs border-green-500 text-green-700">
+                      VALIDADO
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -224,6 +285,11 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
             <p>
               <strong>Metodologia:</strong> {data_consistency?.base_used > 1 ? 'Análise baseada em dados reais consistentes' : 'Análise com estimativas otimizadas'}
             </p>
+            {analysisP period?.real_validation && (
+              <p className="text-green-700 font-bold">
+                <strong>VALIDAÇÃO REAL:</strong> {analysisP period.real_validation.validated_count} agendamentos confirmados via {analysisP period.real_validation.validation_source}
+              </p>
+            )}
             <p className="text-purple-700 font-bold text-base">
               <strong>AGENDAMENTOS (MÉTRICA PRINCIPAL):</strong> {appointments?.rate}% - {getAccuracyText(appointments?.accuracy_level || 'low')}
             </p>

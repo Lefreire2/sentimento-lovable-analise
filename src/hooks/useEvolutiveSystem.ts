@@ -10,19 +10,26 @@ import {
   ClosedLoopData 
 } from '@/types/evolutiveSystem';
 
+export interface AnalysisSettings {
+  startDate?: string;
+  endDate?: string;
+  period?: string;
+}
+
 export const useEvolutiveSystem = () => {
   const queryClient = useQueryClient();
   const [systemStatus, setSystemStatus] = useState<'initializing' | 'active' | 'optimizing' | 'error'>('initializing');
 
-  // Hook para análise de dados reais
-  const useRealDataAnalysis = (agentName: string, analysisType: string) => {
+  // Hook para análise de dados reais com configurações de período
+  const useRealDataAnalysis = (agentName: string, analysisType: string, analysisSettings?: AnalysisSettings) => {
     return useQuery<any>({
-      queryKey: ['real-data-analysis', agentName, analysisType],
+      queryKey: ['real-data-analysis', agentName, analysisType, analysisSettings],
       queryFn: async () => {
         console.log('🔍 Iniciando análise de dados reais para:', agentName, analysisType);
+        console.log('📅 Configurações de período:', analysisSettings);
         
         const { data, error } = await supabase.functions.invoke('analyze-real-data', {
-          body: { agentName, analysisType }
+          body: { agentName, analysisType, analysisSettings }
         });
         
         if (error) {
