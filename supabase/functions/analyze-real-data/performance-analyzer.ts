@@ -3,148 +3,114 @@ export const analyzePerformanceData = async (supabase: any, tables: any) => {
   console.log('🚀 Analisando dados de performance...');
   
   try {
-    const { messagesTable, summaryTable } = tables;
+    const { messagesTable, metricsTable } = tables;
     
-    // Buscar dados de mensagens
-    const { data: messages, error: messagesError } = await supabase
-      .from(messagesTable)
+    // Buscar dados de métricas para análise de performance
+    const { data: metricsData, error: metricsError } = await supabase
+      .from(metricsTable)
       .select('*');
     
-    if (messagesError) {
-      console.error('❌ Erro ao buscar mensagens:', messagesError);
-      throw messagesError;
+    if (metricsError) {
+      console.error('❌ Erro ao buscar dados de métricas:', metricsError);
     }
     
-    // Buscar dados de resumo se disponível
-    let summaryData = [];
-    if (summaryTable) {
-      const { data: summary, error: summaryError } = await supabase
-        .from(summaryTable)
-        .select('*');
-      
-      if (!summaryError) {
-        summaryData = summary || [];
-      }
-    }
+    const metrics = metricsData || [];
     
-    if (!messages || messages.length === 0) {
+    if (metrics.length === 0) {
       return {
-        total_messages: 0,
-        response_time_avg: 0,
-        response_time_max: 0,
-        message_frequency: 0,
-        engagement_rate: 0,
-        peak_hours: [],
-        performance_score: 0,
-        recommendations: []
+        response_times: {
+          avg_first_response_minutes: 0,
+          avg_response_time_minutes: 0,
+          max_response_time_minutes: 0
+        },
+        conversation_metrics: {
+          avg_conversation_duration_minutes: 0,
+          total_conversations: 0,
+          conversion_rate: 0
+        },
+        script_adherence: {
+          high_adherence: 0,
+          medium_adherence: 0,
+          low_adherence: 0,
+          avg_adherence_score: 0
+        },
+        agent_efficiency: {
+          questions_per_conversation: 0,
+          message_ratio: 0,
+          resolution_rate: 0
+        }
       };
     }
     
-    // Agrupar mensagens por conversa
-    const conversationGroups = messages.reduce((acc: any, msg: any) => {
-      const jid = msg.remoteJid || 'unknown';
-      if (!acc[jid]) {
-        acc[jid] = [];
-      }
-      acc[jid].push(msg);
-      return acc;
-    }, {});
+    let totalFirstResponse = 0;
+    let totalAvgResponse = 0;
+    let totalMaxResponse = 0;
+    let totalDuration = 0;
+    let conversions = 0;
+    let highAdherence = 0;
+    let mediumAdherence = 0;
+    let lowAdherence = 0;
+    let totalQuestions = 0;
+    let totalMessageRatio = 0;
+    let resolutions = 0;
     
-    const conversations = Object.values(conversationGroups);
-    
-    let totalMessages = messages.length;
-    let totalConversations = conversations.length;
-    let responseTimes: number[] = [];
-    let hourDistribution: { [key: string]: number } = {};
-    
-    // Analisar cada conversa
-    conversations.forEach((conversation: any[]) => {
-      // Ordenar mensagens por timestamp
-      const sortedMessages = conversation.sort((a, b) => {
-        const timeA = new Date(a.Timestamp || 0).getTime();
-        const timeB = new Date(b.Timestamp || 0).getTime();
-        return timeA - timeB;
-      });
+    metrics.forEach((metric: any) => {
+      // Tempos de resposta
+      totalFirstResponse += parseInt(metric.tempo_primeira_resposta_minutos) || 0;
+      totalAvgResponse += parseInt(metric.tempo_medio_resposta_atendente_minutos) || 0;
+      totalMaxResponse += parseInt(metric.tempo_maximo_resposta_atendente_minutos) || 0;
       
-      // Calcular tempos de resposta
-      for (let i = 1; i < sortedMessages.length; i++) {
-        const prevTime = new Date(sortedMessages[i-1].Timestamp || 0).getTime();
-        const currTime = new Date(sortedMessages[i].Timestamp || 0).getTime();
-        
-        if (prevTime && currTime && currTime > prevTime) {
-          const responseTime = (currTime - prevTime) / (1000 * 60); // em minutos
-          if (responseTime < 1440) { // menos de 24 horas
-            responseTimes.push(responseTime);
-          }
-        }
+      // Duração da conversa
+      totalDuration += parseInt(metric.duracao_total_conversa_minutos) || 0;
+      
+      // Conversões
+      if (metric.conversao_indicada_mvp === 'Sim') {
+        conversions++;
       }
       
-      // Analisar distribuição por hora
-      sortedMessages.forEach((msg: any) => {
-        if (msg.Timestamp) {
-          const hour = new Date(msg.Timestamp).getHours();
-          const hourKey = `${hour}:00`;
-          hourDistribution[hourKey] = (hourDistribution[hourKey] || 0) + 1;
-        }
-      });
+      // Aderência ao script
+      const adherence = metric.aderência_script_nivel?.toLowerCase();
+      if (adherence?.includes('alto')) {
+        highAdherence++;
+      } else if (adherence?.includes('medio') || adherence?.includes('médio')) {
+        mediumAdherence++;
+      } else {
+        lowAdherence++;
+      }
+      
+      // Eficiência do agente
+      totalQuestions += parseInt(metric.numero_perguntas_vendedor) || 0;
+      totalMessageRatio += parseFloat(metric.taxa_mensagens_vendedor_percentual) || 0;
+      
+      if (metric.indicador_resolucao_primeira_resposta === 'Sim') {
+        resolutions++;
+      }
     });
     
-    // Calcular métricas
-    const avgResponseTime = responseTimes.length > 0 
-      ? responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length 
-      : 0;
-    
-    const maxResponseTime = responseTimes.length > 0 
-      ? Math.max(...responseTimes) 
-      : 0;
-    
-    const messageFrequency = totalConversations > 0 
-      ? totalMessages / totalConversations 
-      : 0;
-    
-    // Calcular engajamento (baseado em mensagens por conversa)
-    const engagementRate = messageFrequency > 5 ? 90 : 
-                          messageFrequency > 3 ? 70 : 
-                          messageFrequency > 1 ? 50 : 30;
-    
-    // Encontrar horários de pico
-    const peakHours = Object.entries(hourDistribution)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([hour, count]) => ({ hour, count }));
-    
-    // Calcular score de performance
-    const responseScore = avgResponseTime < 30 ? 100 : 
-                         avgResponseTime < 60 ? 80 : 
-                         avgResponseTime < 120 ? 60 : 40;
-    
-    const volumeScore = totalMessages > 100 ? 100 : 
-                       totalMessages > 50 ? 80 : 
-                       totalMessages > 20 ? 60 : 40;
-    
-    const performanceScore = Math.round((responseScore + volumeScore + engagementRate) / 3);
-    
-    // Gerar recomendações
-    const recommendations = [];
-    if (avgResponseTime > 60) {
-      recommendations.push('Melhorar tempo de resposta - atualmente acima de 1 hora');
-    }
-    if (messageFrequency < 3) {
-      recommendations.push('Aumentar engajamento - poucas mensagens por conversa');
-    }
-    if (totalMessages < 50) {
-      recommendations.push('Aumentar volume de conversas para melhor análise');
-    }
+    const totalConversations = metrics.length;
     
     return {
-      total_messages: totalMessages,
-      response_time_avg: Math.round(avgResponseTime * 100) / 100,
-      response_time_max: Math.round(maxResponseTime * 100) / 100,
-      message_frequency: Math.round(messageFrequency * 100) / 100,
-      engagement_rate: Math.round(engagementRate),
-      peak_hours: peakHours,
-      performance_score: performanceScore,
-      recommendations: recommendations
+      response_times: {
+        avg_first_response_minutes: Math.round(totalFirstResponse / totalConversations) || 0,
+        avg_response_time_minutes: Math.round(totalAvgResponse / totalConversations) || 0,
+        max_response_time_minutes: Math.round(totalMaxResponse / totalConversations) || 0
+      },
+      conversation_metrics: {
+        avg_conversation_duration_minutes: Math.round(totalDuration / totalConversations) || 0,
+        total_conversations: totalConversations,
+        conversion_rate: Math.round((conversions / totalConversations) * 100) || 0
+      },
+      script_adherence: {
+        high_adherence: highAdherence,
+        medium_adherence: mediumAdherence,
+        low_adherence: lowAdherence,
+        avg_adherence_score: Math.round(((highAdherence * 3 + mediumAdherence * 2 + lowAdherence) / (totalConversations * 3)) * 100) || 0
+      },
+      agent_efficiency: {
+        questions_per_conversation: Math.round(totalQuestions / totalConversations) || 0,
+        message_ratio: Math.round(totalMessageRatio / totalConversations) || 0,
+        resolution_rate: Math.round((resolutions / totalConversations) * 100) || 0
+      }
     };
     
   } catch (error) {
