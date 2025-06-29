@@ -1,10 +1,10 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target } from 'lucide-react';
 import { LeadSourceOverview } from './lead-source/LeadSourceOverview';
 import { LeadSourceDistribution } from './lead-source/LeadSourceDistribution';
 import { LeadSourcePerformance } from './lead-source/LeadSourcePerformance';
 import { LeadSourceRecommendations } from './lead-source/LeadSourceRecommendations';
+import { MessagePatternsCard } from './lead-source/MessagePatternsCard';
 
 interface LeadSourceAnalysisProps {
   data: any;
@@ -60,6 +60,11 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
       <LeadSourcePerformance
         sourceConversionRates={analysis.source_conversion_rates || {}}
       />
+
+      {/* Análise de Padrões de Mensagem */}
+      {analysis.message_analysis && (
+        <MessagePatternsCard messageAnalysis={analysis.message_analysis} />
+      )}
 
       <LeadSourceRecommendations
         recommendations={analysis.recommendations || []}

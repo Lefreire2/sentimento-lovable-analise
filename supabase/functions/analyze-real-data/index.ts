@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getAgentTableMapping } from './agent-mapping.ts'
@@ -10,6 +9,7 @@ import {
   analyzeSystemMetrics, 
   analyzeObjections 
 } from './analysis-modules.ts'
+import { analyzeLeadSourcesWithMessages } from './analysis-modules.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,6 +60,9 @@ serve(async (req) => {
       case 'objections':
         analysisResult = await analyzeObjections(supabase, agentName);
         break;
+      case 'lead_sources':
+        analysisResult = await analyzeLeadSourcesWithMessages(supabase, agentName);
+        break;
       default:
         analysisResult = await analyzeAll(supabase, tables, agentName, analysisSettings);
     }
@@ -92,13 +95,14 @@ serve(async (req) => {
 async function analyzeAll(supabase: any, tables: any, agentName: string, analysisSettings?: any) {
   console.log('🔄 Fazendo análise completa com dados reais...');
   
-  const [intention, funnel, performance, sentiment, systemMetrics, objections] = await Promise.all([
+  const [intention, funnel, performance, sentiment, systemMetrics, objections, leadSources] = await Promise.all([
     analyzeIntention(supabase, tables, analysisSettings),
     analyzeFunnel(supabase, tables),
     analyzePerformance(supabase, tables),
     analyzeSentiment(supabase, tables),
     analyzeSystemMetrics(supabase, tables),
-    analyzeObjections(supabase, agentName)
+    analyzeObjections(supabase, agentName),
+    analyzeLeadSourcesWithMessages(supabase, agentName)
   ]);
 
   return {
@@ -108,7 +112,8 @@ async function analyzeAll(supabase: any, tables: any, agentName: string, analysi
       performance,
       sentiment,
       system_metrics: systemMetrics,
-      objections
+      objections,
+      lead_sources: leadSources.lead_source_analysis
     }
   };
 }

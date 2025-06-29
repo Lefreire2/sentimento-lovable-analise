@@ -20,6 +20,7 @@ import { PerformanceAnalysisCard } from './PerformanceAnalysisCard';
 import { SentimentAnalysisCard } from './SentimentAnalysisCard';
 import { SystemMetricsCard } from './SystemMetricsCard';
 import { ObjectionAnalysisCard } from './ObjectionAnalysisCard';
+import { LeadSourceAnalysisCard } from './LeadSourceAnalysisCard';
 
 interface RealDataAnalysisProps {
   agentName: string;
@@ -39,6 +40,7 @@ export const RealDataAnalysis = ({ agentName, analysisSettings }: RealDataAnalys
     { key: 'performance', label: 'Performance', icon: TrendingUp },
     { key: 'sentiment', label: 'Sentimentos', icon: MessageSquare },
     { key: 'objections', label: 'Análise de Objeções', icon: AlertTriangle },
+    { key: 'lead_sources', label: 'Fontes de Leads', icon: Users },
     { key: 'system_metrics', label: 'Métricas Sistema', icon: Target }
   ];
 
@@ -128,6 +130,11 @@ export const RealDataAnalysis = ({ agentName, analysisSettings }: RealDataAnalys
               <h3 className="text-lg font-semibold">Análise de Objeções - {agentName}</h3>
               <ObjectionAnalysisCard data={analysisData} />
             </div>
+          ) : analysisType === 'lead_sources' && analysisData ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Análise de Fontes de Leads - {agentName}</h3>
+              <LeadSourceAnalysisCard data={analysisData} />
+            </div>
           ) : analysisType === 'system_metrics' && analysisData ? (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Métricas do Sistema - {agentName}</h3>
@@ -182,6 +189,14 @@ const CompleteAnalysisDisplay = ({ data }: { data: any }) => {
         <h3 className="text-lg font-semibold mb-4">Análise de Objeções</h3>
         <ObjectionAnalysisCard data={data.objections} />
       </div>
+
+      {/* Fontes de Leads */}
+      {data.lead_sources && (
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Análise de Fontes de Leads</h3>
+          <LeadSourceAnalysisCard data={{ lead_source_analysis: data.lead_sources }} />
+        </div>
+      )}
 
       {/* Métricas do Sistema */}
       <div>
