@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +13,8 @@ import {
   Shield,
   Clock
 } from 'lucide-react';
+import { DataValidationAlert } from './DataValidationAlert';
+import { validateAnalysisData, correctConversionCalculations } from '@/utils/dataValidator';
 
 interface IntentionAnalysisCardProps {
   data: any;
@@ -36,6 +37,10 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     );
   }
 
+  // Validar dados antes de exibir
+  const validation = validateAnalysisData(data.data);
+  const correctedData = validation.isValid ? data.data : correctConversionCalculations(data.data);
+
   const {
     total_conversations,
     total_processed_metrics,
@@ -44,12 +49,11 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     sentiment_analysis,
     appointments,
     engagement_metrics
-  } = data.data;
+  } = correctedData;
 
   const isDataConsistent = data_consistency?.is_consistent;
   const analysisPeriod = appointments?.analysis_period;
 
-  // Determinar nível de precisão dos agendamentos
   const getAccuracyColor = (level: string) => {
     switch (level) {
       case 'high': return 'text-green-600 bg-green-50 border-green-200';
@@ -85,6 +89,9 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
 
   return (
     <div className="space-y-4">
+      {/* Data Validation Alert */}
+      <DataValidationAlert validation={validation} />
+
       {/* Analysis Period Info */}
       {analysisPeriod && (
         <Card className="border-l-4 border-l-blue-500 bg-blue-50">
@@ -181,7 +188,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
         </Card>
       )}
 
-      {/* Main Metrics */}
+      {/* Main Metrics - UPDATED WITH CORRECTED DATA */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
@@ -196,13 +203,18 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className={validation.errors.some(e => e.includes('conversão')) ? 'ring-2 ring-red-500' : ''}>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">{conversions?.count || 0}</p>
                 <p className="text-xs text-muted-foreground">Conversões</p>
-                <Badge variant="secondary">{conversions?.rate || 0}%</Badge>
+                <div className="flex items-center gap-1">
+                  <Badge variant="secondary">{conversions?.rate || 0}%</Badge>
+                  {validation.errors.some(e => e.includes('conversão')) && (
+                    <AlertTriangle className="h-3 w-3 text-red-500" />
+                  )}
+                </div>
               </div>
               <Target className="h-8 w-8 text-green-500" />
             </div>
@@ -309,4 +321,37 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
       </Card>
     </div>
   );
+};
+
+const getAccuracyColor = (level: string) => {
+  switch (level) {
+    case 'high': return 'text-green-600 bg-green-50 border-green-200';
+    case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+    default: return 'text-red-600 bg-red-50 border-red-200';
+  }
+};
+
+const getAccuracyIcon = (level: string) => {
+  switch (level) {
+    case 'high': return <Shield className="h-4 w-4 text-green-600" />;
+    case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+    default: return <AlertTriangle className="h-4 w-4 text-red-600" />;
+  }
+};
+
+const getAccuracyText = (level: string) => {
+  switch (level) {
+    case 'high': return 'Dados Reais Verificados';
+    case 'medium': return 'Estimativa Confiável';
+    default: return 'Dados Estimados';
+  }
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  } catch {
+    return dateString;
+  }
 };
