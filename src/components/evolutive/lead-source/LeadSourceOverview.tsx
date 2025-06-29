@@ -4,7 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { 
   TrendingUp, 
   TrendingDown, 
-  Target
+  Target,
+  Users,
+  MessageSquare
 } from 'lucide-react';
 
 interface LeadSourceOverviewProps {
@@ -23,36 +25,53 @@ export const LeadSourceOverview = ({
   worstPerformingSource 
 }: LeadSourceOverviewProps) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5" />
+    <Card className="border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <Target className="h-6 w-6 text-blue-600" />
           Análise de Fontes de Lead - {agentName}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{totalSources}</div>
-            <div className="text-sm text-muted-foreground">Fontes Ativas</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Fontes Ativas */}
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm border">
+            <div className="flex items-center justify-center mb-2">
+              <Users className="h-5 w-5 text-blue-500 mr-2" />
+            </div>
+            <div className="text-3xl font-bold text-blue-600 mb-1">{totalSources}</div>
+            <div className="text-sm font-medium text-gray-600">Fontes Ativas</div>
           </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{totalObjections}</div>
-            <div className="text-sm text-muted-foreground">Total de Objeções</div>
+
+          {/* Total de Objeções */}
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm border">
+            <div className="flex items-center justify-center mb-2">
+              <MessageSquare className="h-5 w-5 text-purple-500 mr-2" />
+            </div>
+            <div className="text-3xl font-bold text-purple-600 mb-1">{totalObjections.toLocaleString()}</div>
+            <div className="text-sm font-medium text-gray-600">Total de Objeções</div>
           </div>
-          <div className="text-center">
-            <Badge variant="default" className="text-sm">
-              <TrendingUp className="h-3 w-3 mr-1" />
+
+          {/* Melhor Fonte */}
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm border">
+            <div className="flex items-center justify-center mb-2">
+              <TrendingUp className="h-5 w-5 text-green-500" />
+            </div>
+            <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 px-3 py-1">
               {bestPerformingSource}
             </Badge>
-            <div className="text-sm text-muted-foreground mt-1">Melhor Fonte</div>
+            <div className="text-sm font-medium text-gray-600 mt-2">Melhor Fonte</div>
           </div>
-          <div className="text-center">
-            <Badge variant="destructive" className="text-sm">
-              <TrendingDown className="h-3 w-3 mr-1" />
+
+          {/* Pior Fonte */}
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm border">
+            <div className="flex items-center justify-center mb-2">
+              <TrendingDown className="h-5 w-5 text-red-500" />
+            </div>
+            <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-200 px-3 py-1">
               {worstPerformingSource}
             </Badge>
-            <div className="text-sm text-muted-foreground mt-1">Pior Fonte</div>
+            <div className="text-sm font-medium text-gray-600 mt-2">Pior Fonte</div>
           </div>
         </div>
       </CardContent>
