@@ -106,6 +106,31 @@ export const validateAnalysisData = (data: any): DataValidationResult => {
     }
   }
 
+  // Validações específicas por agente baseadas no nome
+  if (data.agent_name) {
+    const agentName = data.agent_name.toLowerCase();
+    
+    // Verificar se a distribuição de categorias soma corretamente
+    if (data.category_distribution) {
+      const categoryTotal = Object.values(data.category_distribution).reduce((sum: number, count) => sum + (count as number), 0);
+      if (categoryTotal !== data.total_objections) {
+        errors.push(`Distribuição de categorias inconsistente: ${categoryTotal} vs ${data.total_objections} total`);
+      }
+    }
+
+    // Verificar se a etapa crítica identificada é consistente
+    if (data.critical_stage === 'Pós-Apresentação do Preço' && data.most_common_objection === 'Preço') {
+      warnings.push('Confirmado: problema concentrado na apresentação de preços - requer intervenção imediata');
+    }
+
+    // Validações específicas para agentes com padrões conhecidos
+    if (agentName.includes('andré') || agentName.includes('andre')) {
+      if (data.critical_stage && data.most_common_objection) {
+        warnings.push(`André Araújo: Padrão de objeções identificado - foco em ${data.most_common_objection}`);
+      }
+    }
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -161,30 +186,7 @@ export const correctConversionCalculations = (data: any) => {
   return corrected;
 };
 
-// Nova função para validar especificamente as etapas de análise do André Araújo
-export const validateAndreAraujoAnalysis = (data: any): DataValidationResult => {
-  const validation = validateAnalysisData(data);
-  
-  // Validações específicas baseadas nos dados mostrados nas imagens
-  const specificErrors: string[] = [];
-  const specificWarnings: string[] = [];
-  
-  // Verificar se a distribuição de categorias soma corretamente
-  if (data.category_distribution) {
-    const categoryTotal = Object.values(data.category_distribution).reduce((sum: number, count) => sum + (count as number), 0);
-    if (categoryTotal !== data.total_objections) {
-      specificErrors.push(`Distribuição de categorias inconsistente: ${categoryTotal} vs ${data.total_objections} total`);
-    }
-  }
-
-  // Verificar se a etapa crítica identificada é consistente
-  if (data.critical_stage === 'Pós-Apresentação do Preço' && data.most_common_objection === 'Preço') {
-    specificWarnings.push('Confirmado: problema concentrado na apresentação de preços - requer intervenção imediata');
-  }
-
-  return {
-    ...validation,
-    errors: [...validation.errors, ...specificErrors],
-    warnings: [...validation.warnings, ...specificWarnings]
-  };
+// Função universal para validar análises de qualquer agente
+export const validateUniversalAnalysis = (data: any): DataValidationResult => {
+  return validateAnalysisData(data);
 };

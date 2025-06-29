@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -16,7 +17,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { DataValidationAlert } from './DataValidationAlert';
-import { validateAnalysisData, validateAndreAraujoAnalysis, correctConversionCalculations } from '@/utils/dataValidator';
+import { validateUniversalAnalysis, correctConversionCalculations } from '@/utils/dataValidator';
 import { useState } from 'react';
 
 interface IntentionAnalysisCardProps {
@@ -46,13 +47,8 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
   // Usar dados corrigidos se disponíveis, senão usar dados originais
   const analysisData = correctedData || data.data;
   
-  // Validar dados com foco específico no André Araújo se for o caso
-  const isAndreAraujo = analysisData.agent_name?.toLowerCase().includes('andré') || 
-                       analysisData.agent_name?.toLowerCase().includes('andre');
-  
-  const validation = isAndreAraujo ? 
-    validateAndreAraujoAnalysis(analysisData) : 
-    validateAnalysisData(analysisData);
+  // Validar dados de forma universal para todos os agentes
+  const validation = validateUniversalAnalysis(analysisData);
 
   const handleApplyCorrections = async (corrections: Record<string, any>) => {
     setIsRecalculating(true);
@@ -83,7 +79,8 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     conversions,
     sentiment_analysis,
     appointments,
-    engagement_metrics
+    engagement_metrics,
+    agent_name
   } = analysisData;
 
   const isDataConsistent = data_consistency?.is_consistent;
@@ -124,19 +121,19 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Data Validation Alert with Enhanced Features */}
+      {/* Data Validation Alert - Universal para todos os agentes */}
       <DataValidationAlert 
         validation={validation} 
         onApplyCorrections={handleApplyCorrections}
       />
 
-      {/* Recalculation Controls for André Araújo */}
-      {isAndreAraujo && !validation.isValid && (
+      {/* Recalculation Controls - Universal para todos os agentes */}
+      {!validation.isValid && (
         <Card className="border-orange-200 bg-orange-50">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-orange-800">Revisão Necessária - André Araújo</h3>
+                <h3 className="font-semibold text-orange-800">Revisão Necessária - {agent_name || 'Agente'}</h3>
                 <p className="text-sm text-orange-700">
                   Foram detectadas inconsistências nas etapas de análise que requerem correção.
                 </p>
@@ -260,7 +257,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
         </Card>
       )}
 
-      {/* Main Metrics - UPDATED WITH CORRECTED DATA */}
+      {/* Main Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
@@ -362,7 +359,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
       {/* Analysis Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Resumo da Análise</CardTitle>
+          <CardTitle>Resumo da Análise - {agent_name || 'Agente'}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm">
@@ -393,37 +390,4 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
       </Card>
     </div>
   );
-};
-
-const getAccuracyColor = (level: string) => {
-  switch (level) {
-    case 'high': return 'text-green-600 bg-green-50 border-green-200';
-    case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    default: return 'text-red-600 bg-red-50 border-red-200';
-  }
-};
-
-const getAccuracyIcon = (level: string) => {
-  switch (level) {
-    case 'high': return <Shield className="h-4 w-4 text-green-600" />;
-    case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-    default: return <AlertTriangle className="h-4 w-4 text-red-600" />;
-  }
-};
-
-const getAccuracyText = (level: string) => {
-  switch (level) {
-    case 'high': return 'Dados Reais Verificados';
-    case 'medium': return 'Estimativa Confiável';
-    default: return 'Dados Estimados';
-  }
-};
-
-const formatDate = (dateString: string) => {
-  if (!dateString) return '';
-  try {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  } catch {
-    return dateString;
-  }
 };
