@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import {
   Brain,
   AlertTriangle
 } from 'lucide-react';
-import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
+import { useEvolutiveSystem, AnalysisSettings } from '@/hooks/useEvolutiveSystem';
 import { IntentionAnalysisCard } from './IntentionAnalysisCard';
 import { FunnelAnalysisCard } from './FunnelAnalysisCard';
 import { PerformanceAnalysisCard } from './PerformanceAnalysisCard';
@@ -24,13 +23,14 @@ import { ObjectionAnalysisCard } from './ObjectionAnalysisCard';
 
 interface RealDataAnalysisProps {
   agentName: string;
+  analysisSettings?: AnalysisSettings;
 }
 
-export const RealDataAnalysis = ({ agentName }: RealDataAnalysisProps) => {
+export const RealDataAnalysis = ({ agentName, analysisSettings }: RealDataAnalysisProps) => {
   const { useRealDataAnalysis } = useEvolutiveSystem();
   const [analysisType, setAnalysisType] = useState('all');
   
-  const { data: analysisData, isLoading, refetch } = useRealDataAnalysis(agentName, analysisType);
+  const { data: analysisData, isLoading, refetch } = useRealDataAnalysis(agentName, analysisType, analysisSettings);
 
   const analysisTypes = [
     { key: 'all', label: 'Análise Completa', icon: Database },

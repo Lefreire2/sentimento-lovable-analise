@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,6 +20,7 @@ import {
   BarChart3,
   Users
 } from 'lucide-react';
+import { AppointmentPatternAnalyzer } from '@/components/evolutive/AppointmentPatternAnalyzer';
 
 const EvolutiveSystem = () => {
   const { systemStatus } = useEvolutiveSystem();
@@ -182,10 +182,14 @@ const EvolutiveSystem = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="real-data" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="real-data" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Dados Reais
+            </TabsTrigger>
+            <TabsTrigger value="patterns" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Padrões de Agendamento
             </TabsTrigger>
             <TabsTrigger value="intention" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
@@ -206,6 +210,13 @@ const EvolutiveSystem = () => {
               key={`real-data-${refreshKey}`} 
               agentName={selectedAgent}
               analysisSettings={getAnalysisSettings()}
+            />
+          </TabsContent>
+
+          <TabsContent value="patterns" className="space-y-6">
+            <AppointmentPatternAnalyzer 
+              key={`patterns-${refreshKey}`}
+              agentName={selectedAgent}
             />
           </TabsContent>
 
