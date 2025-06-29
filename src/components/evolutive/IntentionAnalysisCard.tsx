@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
-  Brain, 
   Users, 
+  Target, 
   TrendingUp, 
-  MessageSquare,
+  MessageSquare, 
   Calendar,
-  Clock,
+  AlertTriangle,
   CheckCircle
 } from 'lucide-react';
 
@@ -17,161 +17,165 @@ interface IntentionAnalysisCardProps {
 }
 
 export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
-  const analysisData = data.data;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {/* Total de Conversas */}
+  if (!data || !data.data) {
+    return (
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Total de Conversas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analysisData.total_conversations}</div>
-          <p className="text-sm text-muted-foreground">
-            {analysisData.total_processed_metrics} métricas processadas
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Taxa de Conversão */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Taxa de Conversão
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{analysisData.conversions.rate}%</span>
-              <Badge variant="secondary">{analysisData.conversions.count} conversões</Badge>
-            </div>
-            <Progress value={parseFloat(analysisData.conversions.rate)} className="h-2" />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Análise de Sentimento */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Sentimento Positivo
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{analysisData.sentiment_analysis.positive_rate}%</span>
-              <Badge variant="outline" className="bg-green-50 text-green-700">
-                {analysisData.sentiment_analysis.positive_count} positivos
-              </Badge>
-            </div>
-            <Progress 
-              value={parseFloat(analysisData.sentiment_analysis.positive_rate)} 
-              className="h-2" 
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Agendamentos */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Agendamentos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{analysisData.appointments.rate}%</span>
-              <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                {analysisData.appointments.count} agendados
-              </Badge>
-            </div>
-            <Progress value={parseFloat(analysisData.appointments.rate)} className="h-2" />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tempo Médio de Resposta */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Tempo Médio de Resposta
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{analysisData.engagement_metrics.avg_response_time} min</div>
-          <p className="text-sm text-muted-foreground">Tempo médio por resposta</p>
-        </CardContent>
-      </Card>
-
-      {/* Qualidade da Conversa */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <CheckCircle className="h-4 w-4" />
-            Qualidade da Conversa
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="text-2xl font-bold">{analysisData.engagement_metrics.conversation_quality}%</div>
-            <Progress 
-              value={parseFloat(analysisData.engagement_metrics.conversation_quality)} 
-              className="h-2" 
-            />
-            <p className="text-sm text-muted-foreground">Score de qualidade geral</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Resumo */}
-      <Card className="md:col-span-2 lg:col-span-3">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5" />
-            Resumo da Análise - {data.agent_name}
+            <Target className="h-5 w-5" />
+            Análise de Intenção
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div>
-              <div className="text-lg font-semibold text-green-600">
-                {analysisData.conversions.count}
+          <p className="text-muted-foreground">Dados não disponíveis</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const {
+    total_conversations,
+    total_processed_metrics,
+    data_consistency,
+    conversions,
+    sentiment_analysis,
+    appointments,
+    engagement_metrics
+  } = data.data;
+
+  const isDataConsistent = data_consistency?.is_consistent;
+
+  return (
+    <div className="space-y-4">
+      {/* Data Consistency Alert */}
+      {data_consistency && (
+        <Card className={`border-l-4 ${isDataConsistent ? 'border-l-green-500' : 'border-l-yellow-500'}`}>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              {isDataConsistent ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+              )}
+              <span className="font-medium">
+                {isDataConsistent ? 'Dados Consistentes' : 'Inconsistência Detectada'}
+              </span>
+            </div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              <p>Leads únicos: {data_consistency.unique_leads}</p>
+              <p>Métricas processadas: {data_consistency.processed_metrics}</p>
+              {!isDataConsistent && (
+                <p className="text-yellow-600 font-medium">
+                  Diferença: {data_consistency.difference} registros
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{total_conversations}</p>
+                <p className="text-xs text-muted-foreground">Total de Conversas</p>
+                <p className="text-xs text-blue-600">{total_processed_metrics} métricas processadas</p>
               </div>
-              <div className="text-sm text-muted-foreground">Conversões</div>
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{conversions?.count || 0}</p>
+                <p className="text-xs text-muted-foreground">Conversões</p>
+                <Badge variant="secondary">{conversions?.rate || 0}%</Badge>
+              </div>
+              <Target className="h-8 w-8 text-green-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{appointments?.count || 0}</p>
+                <p className="text-xs text-muted-foreground">Agendamentos</p>
+                <Badge variant="secondary">{appointments?.rate || 0}%</Badge>
+              </div>
+              <Calendar className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{sentiment_analysis?.positive_count || 0}</p>
+                <p className="text-xs text-muted-foreground">Sentimentos Positivos</p>
+                <Badge variant="secondary">{sentiment_analysis?.positive_rate || 0}%</Badge>
+              </div>
+              <MessageSquare className="h-8 w-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Engagement Metrics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Métricas de Engajamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium">Tempo Médio de Resposta</p>
+              <p className="text-2xl font-bold">{engagement_metrics?.avg_response_time || 0} min</p>
             </div>
             <div>
-              <div className="text-lg font-semibold text-blue-600">
-                {analysisData.appointments.count}
+              <p className="text-sm font-medium">Qualidade da Conversa</p>
+              <div className="flex items-center gap-2">
+                <Progress 
+                  value={parseFloat(engagement_metrics?.conversation_quality || '0')} 
+                  className="flex-1" 
+                />
+                <span className="text-sm">{engagement_metrics?.conversation_quality || 0}%</span>
               </div>
-              <div className="text-sm text-muted-foreground">Agendamentos</div>
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-purple-600">
-                {analysisData.sentiment_analysis.positive_count}
-              </div>
-              <div className="text-sm text-muted-foreground">Sentimentos Positivos</div>
-            </div>
-            <div>
-              <div className="text-lg font-semibold text-orange-600">
-                {analysisData.engagement_metrics.avg_response_time} min
-              </div>
-              <div className="text-sm text-muted-foreground">Tempo Médio</div>
             </div>
           </div>
-          <div className="mt-4 text-xs text-muted-foreground">
-            Análise realizada em: {new Date(data.timestamp).toLocaleString('pt-BR')}
+        </CardContent>
+      </Card>
+
+      {/* Analysis Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Resumo da Análise</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 text-sm">
+            <p>
+              <strong>Fonte dos Dados:</strong> {data_consistency?.processed_metrics > 0 ? 'Tabela de métricas processadas' : 'Estimativa baseada em leads únicos'}
+            </p>
+            <p>
+              <strong>Taxa de Conversão:</strong> {conversions?.rate}% dos leads foram convertidos
+            </p>
+            <p>
+              <strong>Taxa de Agendamento:</strong> {appointments?.rate}% dos leads foram agendados
+            </p>
+            <p>
+              <strong>Qualidade do Atendimento:</strong> {engagement_metrics?.conversation_quality}% de aderência
+            </p>
           </div>
         </CardContent>
       </Card>
