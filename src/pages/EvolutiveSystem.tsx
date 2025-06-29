@@ -8,6 +8,7 @@ import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysis
 import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
 import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
 import { SystemRefreshButton } from '@/components/evolutive/SystemRefreshButton';
+import { RealDataSyncPanel } from '@/components/evolutive/RealDataSyncPanel';
 import { PeriodSelector, PeriodFilter } from '@/components/dashboard/PeriodSelector';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { formatAgentName, agentTables } from '@/lib/agents';
@@ -20,7 +21,8 @@ import {
   Calendar,
   BarChart3,
   Users,
-  Shield
+  Shield,
+  Sync
 } from 'lucide-react';
 import { AppointmentPatternAnalyzer } from '@/components/evolutive/AppointmentPatternAnalyzer';
 import { DataSanitizer } from '@/components/evolutive/DataSanitizer';
@@ -184,19 +186,23 @@ const EvolutiveSystem = () => {
         </Card>
 
         {/* Main Content */}
-        <Tabs defaultValue="real-data" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+        <Tabs defaultValue="sync" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="sync" className="flex items-center gap-2">
+              <Sync className="h-4 w-4" />
+              Sincronização
+            </TabsTrigger>
             <TabsTrigger value="real-data" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Dados Reais
             </TabsTrigger>
             <TabsTrigger value="patterns" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
-              Padrões de Agendamento
+              Padrões
             </TabsTrigger>
             <TabsTrigger value="intention" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
-              Análise de Intenção
+              Intenção
             </TabsTrigger>
             <TabsTrigger value="optimization" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -211,6 +217,10 @@ const EvolutiveSystem = () => {
               Segurança
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sync" className="space-y-6">
+            <RealDataSyncPanel />
+          </TabsContent>
 
           <TabsContent value="real-data" className="space-y-6">
             <RealDataAnalysis 
