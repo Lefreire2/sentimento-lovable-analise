@@ -33,9 +33,9 @@ export const useRealDataSync = () => {
     console.log(`🔍 SYNC - Validando dados para ${agentName}`);
     
     try {
-      // Verificar tabela básica
+      // Verificar tabela básica com tratamento de erro adequado
       const { data: basicData, error: basicError } = await supabase
-        .from(basicTable as any)
+        .from(basicTable)
         .select('remoteJid, Timestamp, message')
         .limit(10);
 
@@ -53,14 +53,40 @@ export const useRealDataSync = () => {
       }
 
       // Contar mensagens totais
-      const { count: basicCount } = await supabase
-        .from(basicTable as any)
+      const { count: basicCount, error: countError } = await supabase
+        .from(basicTable)
         .select('*', { count: 'exact', head: true });
 
+      if (countError) {
+        console.error(`❌ SYNC - Erro ao contar registros em ${basicTable}:`, countError);
+        return {
+          agentName,
+          basicMessages: 0,
+          metricsRecords: 0,
+          uniqueLeads: 0,
+          hasValidData: false,
+          dataQuality: 'missing' as const,
+          lastUpdate: new Date().toISOString()
+        };
+      }
+
       // Contar leads únicos
-      const { data: leadsData } = await supabase
-        .from(basicTable as any)
+      const { data: leadsData, error: leadsError } = await supabase
+        .from(basicTable)
         .select('remoteJid');
+
+      if (leadsError) {
+        console.error(`❌ SYNC - Erro ao buscar leads em ${basicTable}:`, leadsError);
+        return {
+          agentName,
+          basicMessages: basicCount || 0,
+          metricsRecords: 0,
+          uniqueLeads: 0,
+          hasValidData: basicCount ? basicCount > 0 : false,
+          dataQuality: 'poor' as const,
+          lastUpdate: new Date().toISOString()
+        };
+      }
 
       const uniqueLeads = leadsData ? 
         new Set(leadsData
@@ -74,7 +100,7 @@ export const useRealDataSync = () => {
       // Verificar tabela de métricas se existir
       if (metricsTable && metricsTable.trim() !== '') {
         const { count: metricsCountResult, error: metricsError } = await supabase
-          .from(metricsTable as any)
+          .from(metricsTable)
           .select('*', { count: 'exact', head: true });
 
         if (!metricsError && metricsCountResult !== null) {

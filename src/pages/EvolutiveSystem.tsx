@@ -22,7 +22,7 @@ import {
   BarChart3,
   Users,
   Shield,
-  Sync
+  RefreshCw
 } from 'lucide-react';
 import { AppointmentPatternAnalyzer } from '@/components/evolutive/AppointmentPatternAnalyzer';
 import { DataSanitizer } from '@/components/evolutive/DataSanitizer';
@@ -189,7 +189,7 @@ const EvolutiveSystem = () => {
         <Tabs defaultValue="sync" className="space-y-6">
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="sync" className="flex items-center gap-2">
-              <Sync className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4" />
               Sincronização
             </TabsTrigger>
             <TabsTrigger value="real-data" className="flex items-center gap-2">
