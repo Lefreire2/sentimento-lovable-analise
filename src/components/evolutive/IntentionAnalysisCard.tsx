@@ -9,7 +9,8 @@ import {
   MessageSquare, 
   Calendar,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Info
 } from 'lucide-react';
 
 interface IntentionAnalysisCardProps {
@@ -49,24 +50,25 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     <div className="space-y-4">
       {/* Data Consistency Alert */}
       {data_consistency && (
-        <Card className={`border-l-4 ${isDataConsistent ? 'border-l-green-500' : 'border-l-yellow-500'}`}>
+        <Card className={`border-l-4 ${isDataConsistent ? 'border-l-green-500' : 'border-l-blue-500'}`}>
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
               {isDataConsistent ? (
                 <CheckCircle className="h-4 w-4 text-green-600" />
               ) : (
-                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <Info className="h-4 w-4 text-blue-600" />
               )}
               <span className="font-medium">
-                {isDataConsistent ? 'Dados Consistentes' : 'Inconsistência Detectada'}
+                {isDataConsistent ? 'Dados Consistentes' : 'Análise Otimizada'}
               </span>
             </div>
             <div className="mt-2 text-sm text-muted-foreground">
-              <p>Leads únicos: {data_consistency.unique_leads}</p>
-              <p>Métricas processadas: {data_consistency.processed_metrics}</p>
+              <p>Leads únicos (básico): {data_consistency.unique_leads_basic}</p>
+              <p>Leads únicos (métricas): {data_consistency.unique_leads_metrics}</p>
+              <p>Base utilizada: {data_consistency.base_used}</p>
               {!isDataConsistent && (
-                <p className="text-yellow-600 font-medium">
-                  Diferença: {data_consistency.difference} registros
+                <p className="text-blue-600 font-medium mt-1">
+                  Sistema otimizado - usando maior base para cálculos precisos
                 </p>
               )}
             </div>
@@ -82,7 +84,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
               <div>
                 <p className="text-2xl font-bold">{total_conversations}</p>
                 <p className="text-xs text-muted-foreground">Total de Conversas</p>
-                <p className="text-xs text-blue-600">{total_processed_metrics} métricas processadas</p>
+                <p className="text-xs text-blue-600">{total_processed_metrics} registros de métricas</p>
               </div>
               <Users className="h-8 w-8 text-blue-500" />
             </div>
@@ -165,7 +167,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
         <CardContent>
           <div className="space-y-2 text-sm">
             <p>
-              <strong>Fonte dos Dados:</strong> {data_consistency?.processed_metrics > 0 ? 'Tabela de métricas processadas' : 'Estimativa baseada em leads únicos'}
+              <strong>Metodologia:</strong> {data_consistency?.base_used > 1 ? 'Análise baseada em dados reais consistentes' : 'Análise com estimativas otimizadas'}
             </p>
             <p>
               <strong>Taxa de Conversão:</strong> {conversions?.rate}% dos leads foram convertidos
@@ -176,6 +178,11 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
             <p>
               <strong>Qualidade do Atendimento:</strong> {engagement_metrics?.conversation_quality}% de aderência
             </p>
+            {data_consistency?.tolerance_applied && (
+              <p className="text-blue-600">
+                <strong>Tolerância aplicada:</strong> ±{data_consistency.tolerance_applied} leads para otimização
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

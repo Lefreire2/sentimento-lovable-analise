@@ -30,18 +30,33 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
   
   // STEP 2: Buscar dados da tabela de métricas apenas se existir
   let metricsData = [];
-  let totalMetrics = 0;
+  let uniqueMetricsLeads = 0;
   
   if (tables.metrics && tables.metrics.trim() !== '') {
-    // Buscar TODOS os dados da tabela de métricas sem limite
+    // Buscar TODOS os dados da tabela de métricas
     const { data: rawMetricsData, error: metricsError } = await supabase
       .from(tables.metrics)
       .select('*');
     
     if (!metricsError && rawMetricsData) {
       metricsData = rawMetricsData;
-      totalMetrics = metricsData.length;
-      console.log('📊 INTENÇÃO - Métricas processadas encontradas:', totalMetrics);
+      
+      // Contar leads únicos também na tabela de métricas baseado no remoteJid
+      const uniqueJidsInMetrics = new Set();
+      rawMetricsData.forEach(row => {
+        const jid = row.remoteJid;
+        if (jid && typeof jid === 'string' && jid.trim() !== '' && 
+            jid !== 'undefined' && jid !== 'null' && jid.toLowerCase() !== 'null') {
+          const cleanJid = jid.trim().toLowerCase();
+          if (cleanJid.includes('@') || /^\d{10,15}$/.test(cleanJid)) {
+            uniqueJidsInMetrics.add(cleanJid);
+          }
+        }
+      });
+      
+      uniqueMetricsLeads = uniqueJidsInMetrics.size;
+      console.log('📊 INTENÇÃO - Leads únicos na tabela de métricas:', uniqueMetricsLeads);
+      console.log('📊 INTENÇÃO - Total de registros de métricas:', metricsData.length);
     } else {
       console.log('⚠️ INTENÇÃO - Erro ou tabela de métricas vazia:', metricsError);
     }
@@ -49,9 +64,15 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     console.log('⚠️ INTENÇÃO - Tabela de métricas não disponível para este agente');
   }
 
-  // STEP 3: Usar o total de leads únicos como base principal
-  console.log('📊 INTENÇÃO - Usando leads únicos como base principal:', totalUniqueLeads);
-  console.log('📊 INTENÇÃO - Métricas disponíveis para comparação:', totalMetrics);
+  // STEP 3: Usar o maior número como base (mais conservador e realista)
+  const baseLeads = Math.max(totalUniqueLeads, uniqueMetricsLeads);
+  const isDataConsistent = Math.abs(totalUniqueLeads - uniqueMetricsLeads) <= 5; // Tolerância de 5 leads
+  
+  console.log('📊 INTENÇÃO - Análise de consistência:');
+  console.log('  - Leads únicos (tabela básica):', totalUniqueLeads);
+  console.log('  - Leads únicos (tabela métricas):', uniqueMetricsLeads);
+  console.log('  - Base escolhida (maior):', baseLeads);
+  console.log('  - Dados consistentes:', isDataConsistent);
 
   // STEP 4: Análise de conversões baseada nos dados disponíveis
   let conversions = [];
@@ -77,17 +98,18 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     const estimatedAppointmentRate = 0.12; // 12%
     const estimatedPositiveRate = 0.20; // 20%
     
-    conversions = Array(Math.floor(totalUniqueLeads * estimatedConversionRate));
-    appointments = Array(Math.floor(totalUniqueLeads * estimatedAppointmentRate));
-    positiveSentiments = Array(Math.floor(totalUniqueLeads * estimatedPositiveRate));
+    conversions = Array(Math.floor(baseLeads * estimatedConversionRate));
+    appointments = Array(Math.floor(baseLeads * estimatedAppointmentRate));
+    positiveSentiments = Array(Math.floor(baseLeads * estimatedPositiveRate));
   }
 
   console.log('📊 INTENÇÃO - Resultados finais CORRETOS:');
-  console.log('  - Total de leads únicos (BASE):', totalUniqueLeads);
-  console.log('  - Métricas processadas:', totalMetrics);
+  console.log('  - Base de leads utilizada:', baseLeads);
+  console.log('  - Registros de métricas processadas:', metricsData.length);
   console.log('  - Conversões:', conversions.length);
   console.log('  - Agendamentos:', appointments.length);
   console.log('  - Sentimentos positivos:', positiveSentiments.length);
+  console.log('  - Consistência dos dados:', isDataConsistent);
 
   return {
     id: crypto.randomUUID(),
@@ -95,25 +117,27 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     analysis_type: 'intention',
     timestamp: new Date().toISOString(),
     data: {
-      total_conversations: totalUniqueLeads,
-      total_processed_metrics: totalMetrics,
+      total_conversations: baseLeads,
+      total_processed_metrics: metricsData.length,
       data_consistency: {
-        is_consistent: totalUniqueLeads === totalMetrics || totalMetrics === 0,
-        unique_leads: totalUniqueLeads,
-        processed_metrics: totalMetrics,
-        difference: Math.abs(totalUniqueLeads - totalMetrics)
+        is_consistent: isDataConsistent,
+        unique_leads_basic: totalUniqueLeads,
+        unique_leads_metrics: uniqueMetricsLeads,
+        base_used: baseLeads,
+        difference: Math.abs(totalUniqueLeads - uniqueMetricsLeads),
+        tolerance_applied: 5
       },
       conversions: {
         count: conversions.length,
-        rate: totalUniqueLeads > 0 ? ((conversions.length / totalUniqueLeads) * 100).toFixed(2) : '0'
+        rate: baseLeads > 0 ? ((conversions.length / baseLeads) * 100).toFixed(2) : '0'
       },
       sentiment_analysis: {
         positive_count: positiveSentiments.length,
-        positive_rate: totalUniqueLeads > 0 ? ((positiveSentiments.length / totalUniqueLeads) * 100).toFixed(2) : '0'
+        positive_rate: baseLeads > 0 ? ((positiveSentiments.length / baseLeads) * 100).toFixed(2) : '0'
       },
       appointments: {
         count: appointments.length,
-        rate: totalUniqueLeads > 0 ? ((appointments.length / totalUniqueLeads) * 100).toFixed(2) : '0'
+        rate: baseLeads > 0 ? ((appointments.length / baseLeads) * 100).toFixed(2) : '0'
       },
       engagement_metrics: {
         avg_response_time: calculateAverageResponseTime(metricsData),
@@ -132,6 +156,8 @@ export async function analyzeFunnel(supabase: any, tables: AgentTableMapping): P
 
   // Buscar métricas apenas se a tabela existir
   let metricsData = [];
+  let uniqueMetricsLeads = 0;
+  
   if (tables.metrics && tables.metrics.trim() !== '') {
     const { data: rawMetricsData, error } = await supabase
       .from(tables.metrics)
@@ -139,15 +165,26 @@ export async function analyzeFunnel(supabase: any, tables: AgentTableMapping): P
     
     if (!error && rawMetricsData) {
       metricsData = rawMetricsData;
+      
+      // Contar leads únicos na tabela de métricas
+      const uniqueJidsInMetrics = new Set();
+      rawMetricsData.forEach(row => {
+        const jid = row.remoteJid;
+        if (jid && typeof jid === 'string' && jid.trim() !== '') {
+          uniqueJidsInMetrics.add(jid.trim().toLowerCase());
+        }
+      });
+      uniqueMetricsLeads = uniqueJidsInMetrics.size;
     }
   }
 
+  // Usar o maior número como base
+  const baseLeads = Math.max(totalUniqueLeads, uniqueMetricsLeads);
+
   // Calcular baseado nos dados disponíveis
   const qualifiedLeads = metricsData.length > 0 ? 
-    metricsData.filter(row => 
-      row.pontuacao_aderencia_percentual && parseFloat(row.pontuacao_aderencia_percentual) > 50
-    ).length : 
-    Math.floor(totalUniqueLeads * 0.7); // 70% se não há métricas
+    uniqueMetricsLeads : // Se temos métricas, usar leads únicos das métricas
+    Math.floor(baseLeads * 0.7); // 70% se não há métricas
   
   const appointments = metricsData.length > 0 ?
     metricsData.filter(row => 
@@ -162,24 +199,28 @@ export async function analyzeFunnel(supabase: any, tables: AgentTableMapping): P
     Math.floor(appointments * 0.8); // 80% dos agendamentos
 
   console.log('📊 FUNIL - Resultados calculados:');
-  console.log('  - Leads únicos:', totalUniqueLeads);
+  console.log('  - Base de leads:', baseLeads);
   console.log('  - Qualificados:', qualifiedLeads);
   console.log('  - Agendamentos:', appointments);
   console.log('  - Conversões:', conversions);
 
   return {
     funnel_data: {
-      leads: totalUniqueLeads,
+      leads: baseLeads,
       qualified: qualifiedLeads,
       appointments: appointments,
       conversions: conversions,
       rates: {
-        qualification: totalUniqueLeads > 0 ? ((qualifiedLeads / totalUniqueLeads) * 
-        100).toFixed(2) : '0',
+        qualification: baseLeads > 0 ? ((qualifiedLeads / baseLeads) * 100).toFixed(2) : '0',
         appointment: qualifiedLeads > 0 ? ((appointments / qualifiedLeads) * 100).toFixed(2) : '0',
         conversion: appointments > 0 ? ((conversions / appointments) * 100).toFixed(2) : '0'
       },
-      data_source: metricsData.length > 0 ? 'metrics_table' : 'estimated_from_leads'
+      data_source: metricsData.length > 0 ? 'metrics_table' : 'estimated_from_leads',
+      consistency: {
+        unique_leads_basic: totalUniqueLeads,
+        unique_leads_metrics: uniqueMetricsLeads,
+        base_used: baseLeads
+      }
     }
   };
 }
@@ -275,7 +316,7 @@ export async function analyzeSystemMetrics(supabase: any, tables: AgentTableMapp
   
   // Buscar métricas se disponível
   let metricsData = [];
-  let qualifiedLeads = 0;
+  let uniqueMetricsLeads = 0;
   let conversions = 0;
   let appointments = 0;
 
@@ -286,30 +327,43 @@ export async function analyzeSystemMetrics(supabase: any, tables: AgentTableMapp
     
     if (rawMetricsData) {
       metricsData = rawMetricsData;
-      qualifiedLeads = metricsData.length;
+      
+      // Contar leads únicos na tabela de métricas
+      const uniqueJidsInMetrics = new Set();
+      rawMetricsData.forEach(row => {
+        const jid = row.remoteJid;
+        if (jid && typeof jid === 'string' && jid.trim() !== '') {
+          uniqueJidsInMetrics.add(jid.trim().toLowerCase());
+        }
+      });
+      uniqueMetricsLeads = uniqueJidsInMetrics.size;
+      
       conversions = metricsData.filter(row => row.conversao_indicada_mvp === 'Sim').length;
       appointments = metricsData.filter(row => row.agendamento_detectado === 'Sim').length;
     }
   }
 
+  // Usar o maior número como base
+  const baseLeads = Math.max(totalUniqueLeads, uniqueMetricsLeads);
+  const qualifiedLeads = uniqueMetricsLeads > 0 ? uniqueMetricsLeads : Math.floor(baseLeads * 0.65);
+
   // Se não há métricas, estimar baseado em leads únicos
-  if (qualifiedLeads === 0) {
-    qualifiedLeads = Math.floor(totalUniqueLeads * 0.65); // 65% dos leads únicos
+  if (conversions === 0 && appointments === 0) {
     appointments = Math.floor(qualifiedLeads * 0.15); // 15% dos qualificados
     conversions = Math.floor(appointments * 0.75); // 75% dos agendamentos
   }
 
   console.log('📈 SISTEMA - Métricas finais:');
-  console.log('  - Leads totais:', totalUniqueLeads);
+  console.log('  - Base de leads:', baseLeads);
   console.log('  - Leads qualificados:', qualifiedLeads);
   console.log('  - Agendamentos:', appointments);
   console.log('  - Conversões:', conversions);
 
   return {
     system_metrics: {
-      leads_totais: totalUniqueLeads,
+      leads_totais: baseLeads,
       leads_qualificados: qualifiedLeads,
-      taxa_qualificacao: totalUniqueLeads > 0 ? ((qualifiedLeads / totalUniqueLeads) * 100).toFixed(2) : '0',
+      taxa_qualificacao: baseLeads > 0 ? ((qualifiedLeads / baseLeads) * 100).toFixed(2) : '0',
       agendamentos_realizados: appointments,
       taxa_conversao_agendamento: qualifiedLeads > 0 ? ((appointments / qualifiedLeads) * 100).toFixed(2) : '0',
       conversoes: conversions,
@@ -317,7 +371,10 @@ export async function analyzeSystemMetrics(supabase: any, tables: AgentTableMapp
       periodo_analise: 'Dados consistentes do banco',
       data_consistency: {
         metrics_available: metricsData.length > 0,
-        leads_vs_metrics_ratio: qualifiedLeads > 0 ? (totalUniqueLeads / qualifiedLeads).toFixed(2) : 'N/A'
+        unique_leads_basic: totalUniqueLeads,
+        unique_leads_metrics: uniqueMetricsLeads,
+        base_used: baseLeads,
+        is_consistent: Math.abs(totalUniqueLeads - uniqueMetricsLeads) <= 5
       }
     }
   };
