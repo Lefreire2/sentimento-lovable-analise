@@ -47,7 +47,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
   } = data.data;
 
   const isDataConsistent = data_consistency?.is_consistent;
-  const analysisP period = appointments?.analysis_period;
+  const analysisPeriod = appointments?.analysis_period;
 
   // Determinar nível de precisão dos agendamentos
   const getAccuracyColor = (level: string) => {
@@ -86,7 +86,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
   return (
     <div className="space-y-4">
       {/* Analysis Period Info */}
-      {analysisP period && (
+      {analysisPeriod && (
         <Card className="border-l-4 border-l-blue-500 bg-blue-50">
           <CardContent className="pt-4">
             <div className="flex items-center gap-2 mb-2">
@@ -98,24 +98,24 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="font-medium">Descrição:</p>
-                <p className="text-blue-700">{analysisP period.period_description}</p>
+                <p className="text-blue-700">{analysisPeriod.period_description}</p>
               </div>
-              {(analysisP period.start_date || analysisP period.end_date) && (
+              {(analysisPeriod.start_date || analysisPeriod.end_date) && (
                 <div>
                   <p className="font-medium">Período:</p>
                   <p className="text-blue-700">
-                    {analysisP period.start_date && formatDate(analysisP period.start_date)}
-                    {analysisP period.start_date && analysisP period.end_date && ' até '}
-                    {analysisP period.end_date && formatDate(analysisP period.end_date)}
+                    {analysisPeriod.start_date && formatDate(analysisPeriod.start_date)}
+                    {analysisPeriod.start_date && analysisPeriod.end_date && ' até '}
+                    {analysisPeriod.end_date && formatDate(analysisPeriod.end_date)}
                   </p>
                 </div>
               )}
-              {analysisP period.real_validation && (
+              {analysisPeriod.real_validation && (
                 <div className="col-span-1 md:col-span-2">
                   <p className="font-medium text-green-700">Validação Real:</p>
                   <p className="text-green-600">
-                    ✅ {analysisP period.real_validation.validated_count} agendamentos confirmados 
-                    via {analysisP period.real_validation.validation_source}
+                    ✅ {analysisPeriod.real_validation.validated_count} agendamentos confirmados 
+                    via {analysisPeriod.real_validation.validation_source}
                   </p>
                 </div>
               )}
@@ -221,7 +221,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
                   {appointments?.accuracy_level === 'high' && (
                     <Shield className="h-3 w-3 text-green-600" />
                   )}
-                  {analysisP period?.real_validation && (
+                  {analysisPeriod?.real_validation && (
                     <Badge variant="outline" className="text-xs border-green-500 text-green-700">
                       VALIDADO
                     </Badge>
@@ -285,9 +285,9 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
             <p>
               <strong>Metodologia:</strong> {data_consistency?.base_used > 1 ? 'Análise baseada em dados reais consistentes' : 'Análise com estimativas otimizadas'}
             </p>
-            {analysisP period?.real_validation && (
+            {analysisPeriod?.real_validation && (
               <p className="text-green-700 font-bold">
-                <strong>VALIDAÇÃO REAL:</strong> {analysisP period.real_validation.validated_count} agendamentos confirmados via {analysisP period.real_validation.validation_source}
+                <strong>VALIDAÇÃO REAL:</strong> {analysisPeriod.real_validation.validated_count} agendamentos confirmados via {analysisPeriod.real_validation.validation_source}
               </p>
             )}
             <p className="text-purple-700 font-bold text-base">

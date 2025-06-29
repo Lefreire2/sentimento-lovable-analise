@@ -170,7 +170,7 @@ export async function analyzeAppointmentsAccurately(supabase: any, agentName: st
     ((finalAppointments / finalBaseLeads) * 100).toFixed(2) : '0.00';
   
   // Construir informações do período
-  const analysisP period = {
+  const analysisPeriod = {
     start_date: analysisSettings?.startDate,
     end_date: analysisSettings?.endDate,
     period_description: analysisSettings?.period || 'Período completo disponível',
@@ -183,7 +183,7 @@ export async function analyzeAppointmentsAccurately(supabase: any, agentName: st
   console.log('  - Taxa de agendamento:', appointmentRate + '%');
   console.log('  - Fonte dos dados:', dataSource);
   console.log('  - Nível de precisão:', accuracyLevel);
-  console.log('  - Período de análise:', analysisP period);
+  console.log('  - Período de análise:', analysisPeriod);
   
   return {
     total_appointments: finalAppointments,
@@ -198,6 +198,6 @@ export async function analyzeAppointmentsAccurately(supabase: any, agentName: st
       unique_leads_basic: totalUniqueLeadsBasic,
       total_metrics_records: totalMetricsRecords
     },
-    analysis_period: analysisP period
+    analysis_period: analysisPeriod
   };
 }
