@@ -35,8 +35,38 @@ const EvolutiveSystem = () => {
     type: 'last30days'
   });
 
-  // Obter todos os agentes disponíveis do banco de dados
-  const availableAgents = agentTables.map(table => formatAgentName(table)).sort();
+  // Lista completa de agentes baseada na imagem fornecida (29 agentes)
+  const availableAgents = [
+    'André Araújo',
+    'Adiney Esteves', 
+    'Alana Meneses',
+    'Aline Bigatão',
+    'Aline Franzotti',
+    'Amanda Mota',
+    'Ana Beatriz',
+    'Carlos Antunes',
+    'Danilo Chammas',
+    'Diego Cabrejos',
+    'Haila',
+    'Henrique Maffei',
+    'Jorge Mendes',
+    'Julia Jorge',
+    'Karla Fazollo',
+    'Karla Resende',
+    'Luiza Murad',
+    'Marcelo Soeiro',
+    'Marco Antonio',
+    'Mariana Araújo',
+    'Michelle Meleck',
+    'Patricia Lima',
+    'Raiany Pimentel',
+    'Roberta Xavier',
+    'Roberto Pigini',
+    'Roclides Lima',
+    'Rodrigo Pastore',
+    'Silvia Joly',
+    'Stefanie Lee'
+  ].sort();
 
   console.log('📋 Total de agentes disponíveis:', availableAgents.length);
   console.log('🎯 Agentes carregados:', availableAgents);

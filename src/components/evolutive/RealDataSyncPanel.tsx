@@ -12,7 +12,9 @@ import {
   Users,
   MessageSquare,
   BarChart3,
-  Zap
+  Zap,
+  Eye,
+  Table
 } from 'lucide-react';
 import { useRealDataSync } from '@/hooks/useRealDataSync';
 
@@ -23,7 +25,8 @@ export const RealDataSyncPanel = () => {
     agentSummaries, 
     syncAllAgentsData,
     getDataQualityColor,
-    getDataQualityLabel
+    getDataQualityLabel,
+    totalAgents
   } = useRealDataSync();
 
   const getStageLabel = (stage: string) => {
@@ -39,8 +42,10 @@ export const RealDataSyncPanel = () => {
 
   const totalValidAgents = agentSummaries.filter(s => s.hasValidData).length;
   const excellentQuality = agentSummaries.filter(s => s.dataQuality === 'excellent').length;
+  const goodQuality = agentSummaries.filter(s => s.dataQuality === 'good').length;
   const totalLeads = agentSummaries.reduce((sum, s) => sum + s.uniqueLeads, 0);
   const totalMessages = agentSummaries.reduce((sum, s) => sum + s.basicMessages, 0);
+  const totalMetrics = agentSummaries.reduce((sum, s) => sum + s.metricsRecords, 0);
 
   return (
     <div className="space-y-6">
@@ -51,6 +56,9 @@ export const RealDataSyncPanel = () => {
             <div className="flex items-center gap-2">
               <Database className="h-5 w-5" />
               Sincronização de Dados Reais
+              <Badge variant="outline" className="ml-2">
+                {totalAgents} agentes
+              </Badge>
             </div>
             <Button 
               onClick={syncAllAgentsData}
@@ -89,7 +97,7 @@ export const RealDataSyncPanel = () => {
 
       {/* Resumo Geral */}
       {agentSummaries.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
@@ -108,7 +116,7 @@ export const RealDataSyncPanel = () => {
                 <BarChart3 className="h-4 w-4 text-green-600" />
                 <div>
                   <p className="text-2xl font-bold">{excellentQuality}</p>
-                  <p className="text-xs text-muted-foreground">Com Métricas</p>
+                  <p className="text-xs text-muted-foreground">Excelente ({goodQuality} bons)</p>
                 </div>
               </div>
             </CardContent>
@@ -144,7 +152,10 @@ export const RealDataSyncPanel = () => {
       {agentSummaries.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Status Detalhado por Agente</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Table className="h-5 w-5" />
+              Status Detalhado por Agente ({agentSummaries.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -159,10 +170,10 @@ export const RealDataSyncPanel = () => {
                 .map((agent) => (
                   <div 
                     key={agent.agentName} 
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         {agent.hasValidData ? (
                           <CheckCircle className="h-4 w-4 text-green-500" />
                         ) : (
@@ -171,31 +182,66 @@ export const RealDataSyncPanel = () => {
                         <span className="font-medium">{agent.agentName}</span>
                       </div>
                       
-                      <Badge className={getDataQualityColor(agent.dataQuality)}>
+                      <Badge className={`${getDataQualityColor(agent.dataQuality)} border`}>
                         {getDataQualityLabel(agent.dataQuality)}
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        <span>{agent.uniqueLeads}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-1">
-                        <MessageSquare className="h-3 w-3" />
-                        <span>{agent.basicMessages.toLocaleString()}</span>
-                      </div>
-                      
-                      {agent.metricsRecords > 0 && (
-                        <div className="flex items-center gap-1">
-                          <BarChart3 className="h-3 w-3" />
-                          <span>{agent.metricsRecords}</span>
+                    <div className="flex items-center gap-6">
+                      {/* Estatísticas */}
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1" title="Leads únicos">
+                          <Users className="h-3 w-3" />
+                          <span className="font-medium">{agent.uniqueLeads}</span>
                         </div>
-                      )}
+                        
+                        <div className="flex items-center gap-1" title="Mensagens básicas">
+                          <MessageSquare className="h-3 w-3" />
+                          <span className="font-medium">{agent.basicMessages.toLocaleString()}</span>
+                        </div>
+                        
+                        {agent.metricsRecords > 0 && (
+                          <div className="flex items-center gap-1" title="Registros de métricas">
+                            <BarChart3 className="h-3 w-3" />
+                            <span className="font-medium">{agent.metricsRecords}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Status das Tabelas */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-xs">
+                          <div className={`w-2 h-2 rounded-full ${agent.tableStatus.basicExists ? 'bg-green-500' : 'bg-red-500'}`} 
+                               title={`Tabela básica: ${agent.tableStatus.basicTable}`}></div>
+                          <span className="text-gray-500">B</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs">
+                          <div className={`w-2 h-2 rounded-full ${agent.tableStatus.metricsExists ? 'bg-green-500' : 'bg-red-500'}`} 
+                               title={`Tabela métricas: ${agent.tableStatus.metricsTable}`}></div>
+                          <span className="text-gray-500">M</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
+            </div>
+            
+            {/* Legenda */}
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-4 text-xs text-blue-700">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>B = Tabela Básica</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>M = Tabela Métricas</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  <span>Verde = Existe, Vermelho = Não encontrada</span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -209,13 +255,13 @@ export const RealDataSyncPanel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-700">
                   <XCircle className="h-5 w-5" />
-                  Erros Encontrados ({syncProgress.errors.length})
+                  Erros Críticos ({syncProgress.errors.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {syncProgress.errors.map((error, index) => (
-                    <div key={index} className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                    <div key={index} className="text-sm text-red-600 bg-red-50 p-3 rounded border border-red-200">
                       {error}
                     </div>
                   ))}
@@ -229,13 +275,13 @@ export const RealDataSyncPanel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-yellow-700">
                   <AlertTriangle className="h-5 w-5" />
-                  Avisos ({syncProgress.warnings.length})
+                  Avisos de Atenção ({syncProgress.warnings.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {syncProgress.warnings.map((warning, index) => (
-                    <div key={index} className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+                    <div key={index} className="text-sm text-yellow-600 bg-yellow-50 p-3 rounded border border-yellow-200">
                       {warning}
                     </div>
                   ))}
@@ -244,6 +290,57 @@ export const RealDataSyncPanel = () => {
             </Card>
           )}
         </>
+      )}
+
+      {/* Estatísticas Detalhadas */}
+      {agentSummaries.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Estatísticas Completas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="text-center p-3 bg-green-50 rounded">
+                <div className="text-2xl font-bold text-green-600">{excellentQuality}</div>
+                <div className="text-green-700">Excelente</div>
+              </div>
+              <div className="text-center p-3 bg-blue-50 rounded">
+                <div className="text-2xl font-bold text-blue-600">{goodQuality}</div>
+                <div className="text-blue-700">Boa</div>
+              </div>
+              <div className="text-center p-3 bg-yellow-50 rounded">
+                <div className="text-2xl font-bold text-yellow-600">
+                  {agentSummaries.filter(s => s.dataQuality === 'poor').length}
+                </div>
+                <div className="text-yellow-700">Limitada</div>
+              </div>
+              <div className="text-center p-3 bg-red-50 rounded">
+                <div className="text-2xl font-bold text-red-600">
+                  {agentSummaries.filter(s => s.dataQuality === 'missing').length}
+                </div>
+                <div className="text-red-700">Sem Dados</div>
+              </div>
+            </div>
+            
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="text-center p-3 bg-gray-50 rounded">
+                <div className="text-xl font-bold">{totalMetrics.toLocaleString()}</div>
+                <div className="text-gray-600">Total Métricas</div>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded">
+                <div className="text-xl font-bold">{Math.round((totalValidAgents / totalAgents) * 100)}%</div>
+                <div className="text-gray-600">Taxa de Sucesso</div>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded">
+                <div className="text-xl font-bold">{Math.round(totalLeads / Math.max(totalValidAgents, 1))}</div>
+                <div className="text-gray-600">Leads por Agente</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

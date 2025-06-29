@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { agentTables } from '@/lib/agents';
+import { getMetricsTableName, getBasicTableName } from '@/lib/agents';
 
 interface SyncProgress {
   currentAgent: string;
@@ -21,7 +21,46 @@ interface AgentDataSummary {
   hasValidData: boolean;
   dataQuality: 'excellent' | 'good' | 'poor' | 'missing';
   lastUpdate: string;
+  tableStatus: {
+    basicTable: string;
+    metricsTable: string;
+    basicExists: boolean;
+    metricsExists: boolean;
+  };
 }
+
+// Lista completa de agentes baseada na imagem fornecida
+const AGENT_NAMES = [
+  'André Araújo',
+  'Adiney Esteves', 
+  'Alana Meneses',
+  'Aline Bigatão',
+  'Aline Franzotti',
+  'Amanda Mota',
+  'Ana Beatriz',
+  'Carlos Antunes',
+  'Danilo Chammas',
+  'Diego Cabrejos',
+  'Haila',
+  'Henrique Maffei',
+  'Jorge Mendes',
+  'Julia Jorge',
+  'Karla Fazollo',
+  'Karla Resende',
+  'Luiza Murad',
+  'Marcelo Soeiro',
+  'Marco Antonio',
+  'Mariana Araújo',
+  'Michelle Meleck',
+  'Patricia Lima',
+  'Raiany Pimentel',
+  'Roberta Xavier',
+  'Roberto Pigini',
+  'Roclides Lima',
+  'Rodrigo Pastore',
+  'Silvia Joly',
+  'Stefanie Lee'
+];
 
 export const useRealDataSync = () => {
   const [isSync, setIsSync] = useState(false);
@@ -29,141 +68,142 @@ export const useRealDataSync = () => {
   const [agentSummaries, setAgentSummaries] = useState<AgentDataSummary[]>([]);
   const { toast } = useToast();
 
-  const validateAgentData = async (agentName: string, basicTable: string, metricsTable?: string) => {
+  const validateTableExists = async (tableName: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from(tableName as any)
+        .select('*', { count: 'exact', head: true })
+        .limit(1);
+      
+      return !error;
+    } catch (error) {
+      console.error(`❌ SYNC - Erro ao verificar tabela ${tableName}:`, error);
+      return false;
+    }
+  };
+
+  const validateAgentData = async (agentName: string): Promise<AgentDataSummary> => {
     console.log(`🔍 SYNC - Validando dados para ${agentName}`);
     
-    try {
-      // Verificar tabela básica com tratamento de erro adequado
-      const { data: basicData, error: basicError } = await supabase
-        .from(basicTable as any)
-        .select('remoteJid, Timestamp, message')
-        .limit(10);
+    // Obter nomes das tabelas usando as funções corretas
+    const basicTableName = getBasicTableName(agentName);
+    const metricsTableName = getMetricsTableName(agentName);
+    
+    console.log(`📊 SYNC - Tabelas para ${agentName}:`);
+    console.log(`  - Básica: ${basicTableName}`);
+    console.log(`  - Métricas: ${metricsTableName}`);
+    
+    // Verificar se as tabelas existem
+    const basicExists = basicTableName ? await validateTableExists(basicTableName) : false;
+    const metricsExists = metricsTableName ? await validateTableExists(metricsTableName) : false;
+    
+    console.log(`✅ SYNC - Existência das tabelas para ${agentName}:`);
+    console.log(`  - Básica (${basicTableName}): ${basicExists ? '✅' : '❌'}`);
+    console.log(`  - Métricas (${metricsTableName}): ${metricsExists ? '✅' : '❌'}`);
 
-      if (basicError) {
-        console.error(`❌ SYNC - Erro na tabela básica ${basicTable}:`, basicError);
-        return {
-          agentName,
-          basicMessages: 0,
-          metricsRecords: 0,
-          uniqueLeads: 0,
-          hasValidData: false,
-          dataQuality: 'missing' as const,
-          lastUpdate: new Date().toISOString()
-        };
-      }
+    let basicMessages = 0;
+    let metricsRecords = 0;
+    let uniqueLeads = 0;
+    let hasValidData = false;
 
-      // Contar mensagens totais
-      const { count: basicCount, error: countError } = await supabase
-        .from(basicTable as any)
-        .select('*', { count: 'exact', head: true });
-
-      if (countError) {
-        console.error(`❌ SYNC - Erro ao contar registros em ${basicTable}:`, countError);
-        return {
-          agentName,
-          basicMessages: 0,
-          metricsRecords: 0,
-          uniqueLeads: 0,
-          hasValidData: false,
-          dataQuality: 'missing' as const,
-          lastUpdate: new Date().toISOString()
-        };
-      }
-
-      // Contar leads únicos - usando query mais genérica
-      const { data: leadsData, error: leadsError } = await supabase
-        .from(basicTable as any)
-        .select('*')
-        .limit(1000);
-
-      if (leadsError) {
-        console.error(`❌ SYNC - Erro ao buscar leads em ${basicTable}:`, leadsError);
-        return {
-          agentName,
-          basicMessages: basicCount || 0,
-          metricsRecords: 0,
-          uniqueLeads: 0,
-          hasValidData: basicCount ? basicCount > 0 : false,
-          dataQuality: 'poor' as const,
-          lastUpdate: new Date().toISOString()
-        };
-      }
-
-      // Extrair leads únicos de forma mais robusta
-      const uniqueLeads = leadsData ? 
-        new Set(leadsData
-          .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
-          .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
-        ).size : 0;
-
-      let metricsCount = 0;
-      let hasMetrics = false;
-
-      // Verificar tabela de métricas se existir
-      if (metricsTable && metricsTable.trim() !== '') {
-        const { count: metricsCountResult, error: metricsError } = await supabase
-          .from(metricsTable as any)
+    // Processar tabela básica se existir
+    if (basicExists && basicTableName) {
+      try {
+        console.log(`📊 SYNC - Processando tabela básica: ${basicTableName}`);
+        
+        // Contar mensagens totais
+        const { count: basicCount, error: countError } = await supabase
+          .from(basicTableName as any)
           .select('*', { count: 'exact', head: true });
 
-        if (!metricsError && metricsCountResult !== null) {
-          metricsCount = metricsCountResult;
-          hasMetrics = true;
+        if (!countError && basicCount !== null) {
+          basicMessages = basicCount;
+          console.log(`✅ SYNC - Mensagens básicas encontradas: ${basicMessages}`);
         }
-      }
 
-      // Determinar qualidade dos dados
-      let dataQuality: 'excellent' | 'good' | 'poor' | 'missing' = 'missing';
-      
-      if (basicCount && uniqueLeads > 0) {
-        if (hasMetrics && metricsCount > 0) {
-          dataQuality = 'excellent';
-        } else if (uniqueLeads >= 50) {
-          dataQuality = 'good';
-        } else {
-          dataQuality = 'poor';
+        // Buscar dados para contar leads únicos
+        const { data: leadsData, error: leadsError } = await supabase
+          .from(basicTableName as any)
+          .select('*')
+          .limit(1000);
+
+        if (!leadsError && leadsData) {
+          // Extrair leads únicos de forma robusta
+          const uniqueJids = new Set(leadsData
+            .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
+            .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
+          );
+          
+          uniqueLeads = uniqueJids.size;
+          console.log(`✅ SYNC - Leads únicos encontrados: ${uniqueLeads}`);
         }
+
+        hasValidData = basicMessages > 0 && uniqueLeads > 0;
+      } catch (error) {
+        console.error(`❌ SYNC - Erro ao processar tabela básica ${basicTableName}:`, error);
       }
-
-      const summary: AgentDataSummary = {
-        agentName,
-        basicMessages: basicCount || 0,
-        metricsRecords: metricsCount,
-        uniqueLeads,
-        hasValidData: dataQuality !== 'missing',
-        dataQuality,
-        lastUpdate: new Date().toISOString()
-      };
-
-      console.log(`✅ SYNC - Validação completa para ${agentName}:`, summary);
-      return summary;
-
-    } catch (error) {
-      console.error(`💥 SYNC - Erro na validação de ${agentName}:`, error);
-      return {
-        agentName,
-        basicMessages: 0,
-        metricsRecords: 0,
-        uniqueLeads: 0,
-        hasValidData: false,
-        dataQuality: 'missing' as const,
-        lastUpdate: new Date().toISOString()
-      };
     }
+
+    // Processar tabela de métricas se existir
+    if (metricsExists && metricsTableName) {
+      try {
+        console.log(`📊 SYNC - Processando tabela de métricas: ${metricsTableName}`);
+        
+        const { count: metricsCount, error: metricsError } = await supabase
+          .from(metricsTableName as any)
+          .select('*', { count: 'exact', head: true });
+
+        if (!metricsError && metricsCount !== null) {
+          metricsRecords = metricsCount;
+          console.log(`✅ SYNC - Registros de métricas encontrados: ${metricsRecords}`);
+        }
+      } catch (error) {
+        console.error(`❌ SYNC - Erro ao processar tabela de métricas ${metricsTableName}:`, error);
+      }
+    }
+
+    // Determinar qualidade dos dados
+    let dataQuality: 'excellent' | 'good' | 'poor' | 'missing' = 'missing';
+    
+    if (hasValidData) {
+      if (metricsRecords > 0) {
+        dataQuality = 'excellent';
+      } else if (uniqueLeads >= 50) {
+        dataQuality = 'good';
+      } else {
+        dataQuality = 'poor';
+      }
+    }
+
+    const summary: AgentDataSummary = {
+      agentName,
+      basicMessages,
+      metricsRecords,
+      uniqueLeads,
+      hasValidData,
+      dataQuality,
+      lastUpdate: new Date().toISOString(),
+      tableStatus: {
+        basicTable: basicTableName || 'N/A',
+        metricsTable: metricsTableName || 'N/A',
+        basicExists,
+        metricsExists
+      }
+    };
+
+    console.log(`✅ SYNC - Validação completa para ${agentName}:`, summary);
+    return summary;
   };
 
   const syncAllAgentsData = useCallback(async () => {
     console.log('🚀 SYNC - Iniciando sincronização completa de dados reais');
+    console.log(`📋 SYNC - Total de agentes a processar: ${AGENT_NAMES.length}`);
+    
     setIsSync(true);
     
-    const allAgents = agentTables.map(table => {
-      const agentName = table.replace('Lista_mensagens_', '').replace('_', ' ');
-      const metricsTable = `Lista_mensagens_${table.replace('Lista_mensagens_', '')}`;
-      return { agentName, basicTable: table, metricsTable };
-    });
-
     setSyncProgress({
       currentAgent: '',
-      totalAgents: allAgents.length,
+      totalAgents: AGENT_NAMES.length,
       currentAgentIndex: 0,
       stage: 'preparing',
       errors: [],
@@ -174,8 +214,8 @@ export const useRealDataSync = () => {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    for (let i = 0; i < allAgents.length; i++) {
-      const { agentName, basicTable, metricsTable } = allAgents[i];
+    for (let i = 0; i < AGENT_NAMES.length; i++) {
+      const agentName = AGENT_NAMES[i];
       
       setSyncProgress(prev => prev ? {
         ...prev,
@@ -185,72 +225,101 @@ export const useRealDataSync = () => {
       } : null);
 
       try {
-        const summary = await validateAgentData(agentName, basicTable, metricsTable);
+        console.log(`🎯 SYNC - Processando agente ${i + 1}/${AGENT_NAMES.length}: ${agentName}`);
+        
+        const summary = await validateAgentData(agentName);
         summaries.push(summary);
 
-        if (!summary.hasValidData) {
-          warnings.push(`${agentName}: Sem dados válidos encontrados`);
+        // Gerar avisos baseados no status
+        if (!summary.tableStatus.basicExists && !summary.tableStatus.metricsExists) {
+          warnings.push(`${agentName}: Nenhuma tabela encontrada no banco de dados`);
+        } else if (!summary.hasValidData) {
+          warnings.push(`${agentName}: Tabelas existem mas não contêm dados válidos`);
         } else if (summary.dataQuality === 'poor') {
           warnings.push(`${agentName}: Qualidade de dados baixa (${summary.uniqueLeads} leads únicos)`);
         }
+
+        // Pausa pequena para não sobrecarregar o banco
+        await new Promise(resolve => setTimeout(resolve, 100));
 
       } catch (error) {
         const errorMsg = `${agentName}: Erro na sincronização - ${error}`;
         errors.push(errorMsg);
         console.error(`❌ SYNC - ${errorMsg}`);
+        
+        // Adicionar um summary com erro para manter consistência
+        summaries.push({
+          agentName,
+          basicMessages: 0,
+          metricsRecords: 0,
+          uniqueLeads: 0,
+          hasValidData: false,
+          dataQuality: 'missing',
+          lastUpdate: new Date().toISOString(),
+          tableStatus: {
+            basicTable: 'ERRO',
+            metricsTable: 'ERRO',
+            basicExists: false,
+            metricsExists: false
+          }
+        });
       }
-
-      // Pequena pausa para não sobrecarregar o banco
-      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     setAgentSummaries(summaries);
     
     setSyncProgress({
       currentAgent: '',
-      totalAgents: allAgents.length,
-      currentAgentIndex: allAgents.length,
+      totalAgents: AGENT_NAMES.length,
+      currentAgentIndex: AGENT_NAMES.length,
       stage: 'complete',
       errors,
       warnings
     });
 
-    // Estatísticas finais
+    // Calcular estatísticas finais
     const validAgents = summaries.filter(s => s.hasValidData).length;
     const excellentData = summaries.filter(s => s.dataQuality === 'excellent').length;
+    const goodData = summaries.filter(s => s.dataQuality === 'good').length;
+    const poorData = summaries.filter(s => s.dataQuality === 'poor').length;
     const totalLeads = summaries.reduce((sum, s) => sum + s.uniqueLeads, 0);
     const totalMessages = summaries.reduce((sum, s) => sum + s.basicMessages, 0);
+    const totalMetrics = summaries.reduce((sum, s) => sum + s.metricsRecords, 0);
+
+    console.log('✅ SYNC - Sincronização completa - ESTATÍSTICAS FINAIS:');
+    console.log(`📊 Agentes processados: ${AGENT_NAMES.length}`);
+    console.log(`✅ Agentes com dados válidos: ${validAgents}`);
+    console.log(`🥇 Qualidade excelente: ${excellentData}`);
+    console.log(`🥈 Qualidade boa: ${goodData}`);
+    console.log(`🥉 Qualidade pobre: ${poorData}`);
+    console.log(`👥 Total de leads únicos: ${totalLeads.toLocaleString()}`);
+    console.log(`💬 Total de mensagens: ${totalMessages.toLocaleString()}`);
+    console.log(`📈 Total de métricas: ${totalMetrics.toLocaleString()}`);
+    console.log(`⚠️ Erros: ${errors.length}`);
+    console.log(`🔔 Avisos: ${warnings.length}`);
 
     toast({
       title: "Sincronização Completa",
-      description: `${validAgents}/${allAgents.length} agentes com dados válidos. ${excellentData} com métricas completas. ${totalLeads} leads únicos, ${totalMessages} mensagens processadas.`,
+      description: `${validAgents}/${AGENT_NAMES.length} agentes com dados válidos. ${excellentData} excelentes, ${goodData} bons, ${poorData} pobres. ${totalLeads.toLocaleString()} leads, ${totalMessages.toLocaleString()} mensagens.`,
     });
-
-    console.log('✅ SYNC - Sincronização completa:');
-    console.log(`  - Agentes válidos: ${validAgents}/${allAgents.length}`);
-    console.log(`  - Com métricas: ${excellentData}`);
-    console.log(`  - Total de leads: ${totalLeads}`);
-    console.log(`  - Total de mensagens: ${totalMessages}`);
-    console.log(`  - Erros: ${errors.length}`);
-    console.log(`  - Avisos: ${warnings.length}`);
 
     setIsSync(false);
   }, [toast]);
 
   const getDataQualityColor = (quality: AgentDataSummary['dataQuality']) => {
     switch (quality) {
-      case 'excellent': return 'text-green-600 bg-green-50';
-      case 'good': return 'text-blue-600 bg-blue-50';
-      case 'poor': return 'text-yellow-600 bg-yellow-50';
-      case 'missing': return 'text-red-600 bg-red-50';
+      case 'excellent': return 'text-green-600 bg-green-50 border-green-200';
+      case 'good': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'poor': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'missing': return 'text-red-600 bg-red-50 border-red-200';
     }
   };
 
   const getDataQualityLabel = (quality: AgentDataSummary['dataQuality']) => {
     switch (quality) {
       case 'excellent': return 'Excelente (com métricas)';
-      case 'good': return 'Boa (só mensagens básicas)';
-      case 'poor': return 'Pobre (poucos dados)';
+      case 'good': return 'Boa (dados básicos)';
+      case 'poor': return 'Limitada (poucos dados)';
       case 'missing': return 'Sem dados';
     }
   };
@@ -261,6 +330,7 @@ export const useRealDataSync = () => {
     agentSummaries,
     syncAllAgentsData,
     getDataQualityColor,
-    getDataQualityLabel
+    getDataQualityLabel,
+    totalAgents: AGENT_NAMES.length
   };
 };
