@@ -10,7 +10,8 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle,
-  Info
+  Info,
+  Shield
 } from 'lucide-react';
 
 interface IntentionAnalysisCardProps {
@@ -46,6 +47,31 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
 
   const isDataConsistent = data_consistency?.is_consistent;
 
+  // Determinar nível de precisão dos agendamentos
+  const getAccuracyColor = (level: string) => {
+    switch (level) {
+      case 'high': return 'text-green-600 bg-green-50 border-green-200';
+      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      default: return 'text-red-600 bg-red-50 border-red-200';
+    }
+  };
+
+  const getAccuracyIcon = (level: string) => {
+    switch (level) {
+      case 'high': return <Shield className="h-4 w-4 text-green-600" />;
+      case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      default: return <AlertTriangle className="h-4 w-4 text-red-600" />;
+    }
+  };
+
+  const getAccuracyText = (level: string) => {
+    switch (level) {
+      case 'high': return 'Dados Reais Verificados';
+      case 'medium': return 'Estimativa Confiável';
+      default: return 'Dados Estimados';
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Data Consistency Alert */}
@@ -70,6 +96,29 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
                 <p className="text-blue-600 font-medium mt-1">
                   Sistema otimizado - usando maior base para cálculos precisos
                 </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Appointment Accuracy Indicator */}
+      {appointments?.accuracy_level && (
+        <Card className={`border-l-4 border-l-purple-500 ${getAccuracyColor(appointments.accuracy_level)}`}>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              {getAccuracyIcon(appointments.accuracy_level)}
+              <span className="font-bold text-lg">
+                MÉTRICA PRINCIPAL - {getAccuracyText(appointments.accuracy_level)}
+              </span>
+            </div>
+            <div className="mt-2 text-sm">
+              <p className="font-medium">Fonte dos dados: {appointments.data_source === 'metrics_table' ? 'Tabela de Métricas' : 'Estimativa'}</p>
+              {appointments.verification_details && (
+                <div className="mt-1 text-xs">
+                  <p>Registros de métricas: {appointments.verification_details.total_metrics_records}</p>
+                  <p>Agendamentos detectados: {appointments.verification_details.appointments_from_metrics}</p>
+                </div>
               )}
             </div>
           </CardContent>
@@ -104,13 +153,19 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* AGENDAMENTOS - MÉTRICA PRINCIPAL */}
+        <Card className="ring-2 ring-purple-500 ring-opacity-50 bg-purple-50">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{appointments?.count || 0}</p>
-                <p className="text-xs text-muted-foreground">Agendamentos</p>
-                <Badge variant="secondary">{appointments?.rate || 0}%</Badge>
+                <p className="text-3xl font-bold text-purple-700">{appointments?.count || 0}</p>
+                <p className="text-xs font-bold text-purple-600">AGENDAMENTOS (PRINCIPAL)</p>
+                <div className="flex items-center gap-1">
+                  <Badge variant="default" className="bg-purple-600">{appointments?.rate || 0}%</Badge>
+                  {appointments?.accuracy_level === 'high' && (
+                    <Shield className="h-3 w-3 text-green-600" />
+                  )}
+                </div>
               </div>
               <Calendar className="h-8 w-8 text-purple-500" />
             </div>
@@ -169,11 +224,11 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
             <p>
               <strong>Metodologia:</strong> {data_consistency?.base_used > 1 ? 'Análise baseada em dados reais consistentes' : 'Análise com estimativas otimizadas'}
             </p>
-            <p>
-              <strong>Taxa de Conversão:</strong> {conversions?.rate}% dos leads foram convertidos
+            <p className="text-purple-700 font-bold text-base">
+              <strong>AGENDAMENTOS (MÉTRICA PRINCIPAL):</strong> {appointments?.rate}% - {getAccuracyText(appointments?.accuracy_level || 'low')}
             </p>
             <p>
-              <strong>Taxa de Agendamento:</strong> {appointments?.rate}% dos leads foram agendados
+              <strong>Taxa de Conversão:</strong> {conversions?.rate}% dos leads foram convertidos
             </p>
             <p>
               <strong>Qualidade do Atendimento:</strong> {engagement_metrics?.conversation_quality}% de aderência

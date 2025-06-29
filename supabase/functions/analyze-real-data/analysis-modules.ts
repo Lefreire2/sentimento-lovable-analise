@@ -1,6 +1,6 @@
-
 import { AgentTableMapping, AnalysisResult } from './types.ts';
 import { analyzeUniqueLeads } from './leads-analyzer.ts';
+import { analyzeAppointmentsAccurately } from './appointment-analyzer.ts';
 import { 
   calculateAverageResponseTime, 
   calculateConversionRate, 
@@ -22,18 +22,23 @@ import {
 } from './objection-analyzer.ts';
 
 export async function analyzeIntention(supabase: any, tables: AgentTableMapping): Promise<AnalysisResult> {
-  console.log('🧠 Analisando intenção com dados reais...');
+  console.log('🧠 Analisando intenção com dados reais OTIMIZADOS...');
   
-  // STEP 1: Analisar leads únicos pela tabela básica PRIMEIRO
+  // STEP 1: Análise PRECISA de agendamentos (métrica principal)
+  const agentName = tables.basic.replace('Lista_de_Mensagens_', '').replace('Lista_mensagens_', '').replace('_', ' ');
+  const appointmentAnalysis = await analyzeAppointmentsAccurately(supabase, agentName, tables);
+  
+  console.log('📅 INTENÇÃO - Análise de agendamentos PRECISA concluída:', appointmentAnalysis);
+  
+  // STEP 2: Analisar leads únicos pela tabela básica
   const totalUniqueLeads = await analyzeUniqueLeads(supabase, tables.basic);
   console.log('📊 INTENÇÃO - Total de leads únicos encontrados:', totalUniqueLeads);
   
-  // STEP 2: Buscar dados da tabela de métricas apenas se existir
+  // STEP 3: Buscar dados da tabela de métricas para outras análises
   let metricsData = [];
   let uniqueMetricsLeads = 0;
   
   if (tables.metrics && tables.metrics.trim() !== '') {
-    // Buscar TODOS os dados da tabela de métricas
     const { data: rawMetricsData, error: metricsError } = await supabase
       .from(tables.metrics)
       .select('*');
@@ -41,7 +46,6 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     if (!metricsError && rawMetricsData) {
       metricsData = rawMetricsData;
       
-      // Contar leads únicos também na tabela de métricas baseado no remoteJid
       const uniqueJidsInMetrics = new Set();
       rawMetricsData.forEach(row => {
         const jid = row.remoteJid;
@@ -53,67 +57,46 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
           }
         }
       });
-      
       uniqueMetricsLeads = uniqueJidsInMetrics.size;
-      console.log('📊 INTENÇÃO - Leads únicos na tabela de métricas:', uniqueMetricsLeads);
-      console.log('📊 INTENÇÃO - Total de registros de métricas:', metricsData.length);
-    } else {
-      console.log('⚠️ INTENÇÃO - Erro ou tabela de métricas vazia:', metricsError);
     }
-  } else {
-    console.log('⚠️ INTENÇÃO - Tabela de métricas não disponível para este agente');
   }
 
-  // STEP 3: Usar o maior número como base (mais conservador e realista)
-  const baseLeads = Math.max(totalUniqueLeads, uniqueMetricsLeads);
-  const isDataConsistent = Math.abs(totalUniqueLeads - uniqueMetricsLeads) <= 5; // Tolerância de 5 leads
+  // STEP 4: Usar os dados mais confiáveis como base
+  const baseLeads = appointmentAnalysis.base_leads;
+  const isDataConsistent = Math.abs(totalUniqueLeads - uniqueMetricsLeads) <= 5;
   
-  console.log('📊 INTENÇÃO - Análise de consistência:');
-  console.log('  - Leads únicos (tabela básica):', totalUniqueLeads);
-  console.log('  - Leads únicos (tabela métricas):', uniqueMetricsLeads);
-  console.log('  - Base escolhida (maior):', baseLeads);
-  console.log('  - Dados consistentes:', isDataConsistent);
-
-  // STEP 4: Análise de conversões baseada nos dados disponíveis
+  // STEP 5: Análise de conversões baseada nos dados disponíveis
   let conversions = [];
-  let appointments = [];
   let positiveSentiments = [];
 
   if (metricsData.length > 0) {
-    // Usar dados reais das métricas
     conversions = metricsData.filter(row => 
       row.conversao_indicada_mvp === 'Sim' || row.conversao_indicada_mvp === 'sim'
-    );
-    
-    appointments = metricsData.filter(row => 
-      row.agendamento_detectado === 'Sim' || row.agendamento_detectado === 'sim'
     );
     
     positiveSentiments = metricsData.filter(row => 
       row.sentimento_geral_conversa === 'Positivo'
     );
   } else {
-    // Estimar baseado em percentuais realistas se não há métricas
-    const estimatedConversionRate = 0.15; // 15%
-    const estimatedAppointmentRate = 0.12; // 12%
-    const estimatedPositiveRate = 0.20; // 20%
+    // Estimar baseado em percentuais realistas
+    const estimatedConversionRate = 0.15;
+    const estimatedPositiveRate = 0.20;
     
     conversions = Array(Math.floor(baseLeads * estimatedConversionRate));
-    appointments = Array(Math.floor(baseLeads * estimatedAppointmentRate));
     positiveSentiments = Array(Math.floor(baseLeads * estimatedPositiveRate));
   }
 
-  console.log('📊 INTENÇÃO - Resultados finais CORRETOS:');
+  console.log('📊 INTENÇÃO - Resultados finais OTIMIZADOS:');
   console.log('  - Base de leads utilizada:', baseLeads);
-  console.log('  - Registros de métricas processadas:', metricsData.length);
+  console.log('  - Agendamentos (MÉTRICA PRINCIPAL):', appointmentAnalysis.total_appointments);
+  console.log('  - Taxa de agendamento:', appointmentAnalysis.appointment_rate + '%');
+  console.log('  - Nível de precisão:', appointmentAnalysis.accuracy_level);
   console.log('  - Conversões:', conversions.length);
-  console.log('  - Agendamentos:', appointments.length);
   console.log('  - Sentimentos positivos:', positiveSentiments.length);
-  console.log('  - Consistência dos dados:', isDataConsistent);
 
   return {
     id: crypto.randomUUID(),
-    agent_name: tables.basic.replace('Lista_de_Mensagens_', '').replace('Lista_mensagens_', '').replace('_', ' '),
+    agent_name: agentName,
     analysis_type: 'intention',
     timestamp: new Date().toISOString(),
     data: {
@@ -136,8 +119,11 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
         positive_rate: baseLeads > 0 ? ((positiveSentiments.length / baseLeads) * 100).toFixed(2) : '0'
       },
       appointments: {
-        count: appointments.length,
-        rate: baseLeads > 0 ? ((appointments.length / baseLeads) * 100).toFixed(2) : '0'
+        count: appointmentAnalysis.total_appointments,
+        rate: appointmentAnalysis.appointment_rate,
+        accuracy_level: appointmentAnalysis.accuracy_level,
+        data_source: appointmentAnalysis.data_source,
+        verification_details: appointmentAnalysis.verification_details
       },
       engagement_metrics: {
         avg_response_time: calculateAverageResponseTime(metricsData),
