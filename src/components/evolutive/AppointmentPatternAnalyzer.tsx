@@ -23,6 +23,65 @@ interface AppointmentPatternAnalyzerProps {
   agentName: string;
 }
 
+interface MessageData {
+  id: number;
+  remoteJid: string;
+  Timestamp: string;
+  nome: string;
+  message: string;
+}
+
+interface KeywordCount {
+  [key: string]: number;
+}
+
+interface UniqueKeywordData {
+  appointed: number;
+  nonAppointed: number;
+  ratio: number;
+}
+
+interface UniqueKeywords {
+  [key: string]: UniqueKeywordData;
+}
+
+interface TimePatterns {
+  averageMessagesPerConversation: number;
+  conversationDurations: number[];
+  messageFrequency: KeywordCount;
+}
+
+interface SequencePatterns {
+  commonSequences: string[];
+  avgSequenceLength: number;
+  successPatterns: string[];
+}
+
+interface DetectionRules {
+  keywordBasedRules: string[];
+  sequenceBasedRules: string[];
+  contextualRules: string[];
+}
+
+interface AnalysisResults {
+  totalAppointedConversations: number;
+  totalNonAppointedSample: number;
+  keywordPatterns: {
+    appointed: KeywordCount;
+    nonAppointed: KeywordCount;
+    uniqueToAppointed: UniqueKeywords;
+  };
+  timePatterns: TimePatterns;
+  sequencePatterns: SequencePatterns;
+  commonPhrases: KeywordCount;
+  detectionRules: DetectionRules;
+}
+
+interface ConversationSample {
+  jid: string;
+  messages: MessageData[];
+}
+
 const CONFIRMED_APPOINTMENTS_HAILA = [
   '5511998557658@s.whatsapp.net',
   '5511974647966@s.whatsapp.net',
@@ -53,8 +112,8 @@ const CONFIRMED_APPOINTMENTS_HAILA = [
 
 export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnalyzerProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [patterns, setPatterns] = useState<any>(null);
-  const [conversationSamples, setConversationSamples] = useState<any[]>([]);
+  const [patterns, setPatterns] = useState<AnalysisResults | null>(null);
+  const [conversationSamples, setConversationSamples] = useState<ConversationSample[]>([]);
 
   const analyzeAppointmentPatterns = async () => {
     setIsAnalyzing(true);
@@ -90,8 +149,8 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       console.log('❌ Conversas de leads não agendados (amostra):', nonAppointedConversations?.length);
 
       // 3. Analisar padrões nas mensagens
-      const appointedMessages = appointedConversations || [];
-      const nonAppointedMessages = nonAppointedConversations || [];
+      const appointedMessages = (appointedConversations || []) as MessageData[];
+      const nonAppointedMessages = (nonAppointedConversations || []) as MessageData[];
 
       // Agrupar por remoteJid para análise por conversa
       const appointedByJid = groupMessagesByJid(appointedMessages);
@@ -107,7 +166,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       // 6. Analisar sequências de mensagens
       const sequencePatterns = analyzeMessageSequences(appointedByJid);
 
-      const analysisResults = {
+      const analysisResults: AnalysisResults = {
         totalAppointedConversations: Object.keys(appointedByJid).length,
         totalNonAppointedSample: Object.keys(nonAppointedByJid).length,
         keywordPatterns: {
@@ -124,7 +183,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       setPatterns(analysisResults);
       setConversationSamples(Object.entries(appointedByJid).slice(0, 5).map(([jid, messages]) => ({
         jid,
-        messages: messages.slice(-10) // Últimas 10 mensagens de cada conversa
+        messages: (messages as MessageData[]).slice(-10) // Últimas 10 mensagens de cada conversa
       })));
 
       console.log('✅ Análise de padrões concluída:', analysisResults);
@@ -136,18 +195,18 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
     }
   };
 
-  const groupMessagesByJid = (messages: any[]) => {
+  const groupMessagesByJid = (messages: MessageData[]): Record<string, MessageData[]> => {
     return messages.reduce((acc, msg) => {
       if (!acc[msg.remoteJid]) {
         acc[msg.remoteJid] = [];
       }
       acc[msg.remoteJid].push(msg);
       return acc;
-    }, {});
+    }, {} as Record<string, MessageData[]>);
   };
 
-  const analyzeKeywords = (messages: any[]) => {
-    const keywords = {};
+  const analyzeKeywords = (messages: MessageData[]): KeywordCount => {
+    const keywords: KeywordCount = {};
     const appointmentWords = [
       'agenda', 'agend', 'horário', 'horario', 'data', 'dia', 'quando', 
       'disponível', 'disponivel', 'livre', 'pode', 'vamos', 'marcar',
@@ -168,43 +227,46 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
     });
 
     return Object.entries(keywords)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([,a], [,b]) => (b as number) - (a as number))
       .slice(0, 20)
       .reduce((acc, [word, count]) => {
-        acc[word] = count;
+        acc[word] = count as number;
         return acc;
-      }, {});
+      }, {} as KeywordCount);
   };
 
-  const findUniqueKeywords = (appointed, nonAppointed) => {
-    const unique = {};
+  const findUniqueKeywords = (appointed: KeywordCount, nonAppointed: KeywordCount): UniqueKeywords => {
+    const unique: UniqueKeywords = {};
     Object.entries(appointed).forEach(([word, appointedCount]) => {
       const nonAppointedCount = nonAppointed[word] || 0;
-      const ratio = appointedCount / (nonAppointedCount + 1);
+      const ratio = (appointedCount as number) / (nonAppointedCount + 1);
       if (ratio > 2) { // Palavras 2x mais frequentes em agendamentos
-        unique[word] = { appointed: appointedCount, nonAppointed: nonAppointedCount, ratio };
+        unique[word] = { 
+          appointed: appointedCount as number, 
+          nonAppointed: nonAppointedCount as number, 
+          ratio 
+        };
       }
     });
     return unique;
   };
 
-  const analyzeTimePatterns = (appointedByJid) => {
-    const patterns = {
+  const analyzeTimePatterns = (appointedByJid: Record<string, MessageData[]>): TimePatterns => {
+    const patterns: TimePatterns = {
       averageMessagesPerConversation: 0,
       conversationDurations: [],
       messageFrequency: {}
     };
 
-    Object.values(appointedByJid).forEach(messages => {
-      patterns.averageMessagesPerConversation += messages.length;
-      // Adicionar mais análises temporais aqui
-    });
-
-    patterns.averageMessagesPerConversation /= Object.keys(appointedByJid).length;
+    const conversationLengths = Object.values(appointedByJid).map(messages => messages.length);
+    patterns.averageMessagesPerConversation = conversationLengths.length > 0 
+      ? conversationLengths.reduce((sum, length) => sum + length, 0) / conversationLengths.length 
+      : 0;
+    
     return patterns;
   };
 
-  const analyzeMessageSequences = (appointedByJid) => {
+  const analyzeMessageSequences = (appointedByJid: Record<string, MessageData[]>): SequencePatterns => {
     // Analisar sequências comuns de mensagens que levam ao agendamento
     return {
       commonSequences: ['interesse → disponibilidade → confirmação'],
@@ -213,8 +275,8 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
     };
   };
 
-  const findCommonPhrases = (messages) => {
-    const phrases = {};
+  const findCommonPhrases = (messages: MessageData[]): KeywordCount => {
+    const phrases: KeywordCount = {};
     const commonPhrases = [
       'qual o melhor horário',
       'vamos agendar',
@@ -239,7 +301,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
     return phrases;
   };
 
-  const generateDetectionRules = (keywords, timePatterns, sequencePatterns) => {
+  const generateDetectionRules = (keywords: KeywordCount, timePatterns: TimePatterns, sequencePatterns: SequencePatterns): DetectionRules => {
     return {
       keywordBasedRules: [
         'Se mensagem contém "agendar" + "horário" → ALTA probabilidade',
