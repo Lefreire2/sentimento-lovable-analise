@@ -91,6 +91,10 @@ export const getAgentTableMapping = (): Record<string, AgentTableMapping> => {
       basic: 'Lista_de_Mensagens_Patricia_lima',
       metrics: 'Lista_mensagens_Patricia_lima'
     },
+    'Rachel Carmo': {
+      basic: 'Lista_de_Mensagens_Rachel_Carmo',
+      metrics: '' // Não possui tabela de métricas
+    },
     'Raiany Pimentel': {
       basic: 'Lista_de_Mensagens_Raiany_pimentel',
       metrics: 'Lista_mensagens_Raiany_pimentel'
@@ -110,6 +114,10 @@ export const getAgentTableMapping = (): Record<string, AgentTableMapping> => {
     'Rodrigo Pastore': {
       basic: 'Lista_de_Mensagens_Rodrigo_Pastore',
       metrics: 'Lista_mensagens_Rodrigo_Pastore'
+    },
+    'Samuel Nolasco': {
+      basic: 'Lista_de_Mensagens_Samuel_Nolasco',
+      metrics: '' // Não possui tabela de métricas
     },
     'Silvia Joly': {
       basic: 'Lista_de_Mensagens_Silvia_Joly',

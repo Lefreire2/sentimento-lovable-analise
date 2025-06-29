@@ -1,3 +1,4 @@
+
 // Tabelas de métricas agregadas (dados processados) - nomes exatos do banco conforme screenshots
 export const metricsAgentTables = [
     'Lista_mensagens_ Carlos_Antunes',
@@ -55,11 +56,13 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Mariana_araújo',
     'Lista_de_Mensagens_Michelle_Meleck',
     'Lista_de_Mensagens_Patricia_lima',
+    'Lista_de_Mensagens_Rachel_Carmo',
     'Lista_de_Mensagens_Raiany_pimentel',
     'Lista_de_Mensagens_Roberta_Xavier',
     'Lista_de_Mensagens_Roberto_pigini',
     'Lista_de_Mensagens_Roclides_lima',
     'Lista_de_Mensagens_Rodrigo_Pastore',
+    'Lista_de_Mensagens_Samuel_Nolasco',
     'Lista_de_Mensagens_Silvia_Joly',
     'Lista_de_Mensagens_Stefanie_lee'
 ].sort();
@@ -91,11 +94,13 @@ const nameToTableMapping: Record<string, string> = {
     'Mariana Araújo': 'Mariana_araújo',
     'Michelle Meleck': 'Michelle_Meleck',
     'Patricia Lima': 'Patricia_lima',
+    'Rachel Carmo': 'Rachel_Carmo',
     'Raiany Pimentel': 'Raiany_pimentel',
     'Roberta Xavier': 'Roberta_Xavier',
     'Roberto Pigini': 'Roberto_pigini',
     'Roclides Lima': 'Roclides_lima',
     'Rodrigo Pastore': 'Rodrigo_Pastore',
+    'Samuel Nolasco': 'Samuel_Nolasco',
     'Silvia Joly': 'Silvia_Joly',
     'Stefanie Lee': 'Stefanie_lee'
 };
@@ -135,6 +140,8 @@ export const formatAgentName = (tableName: string) => {
         'Mariana araújo': 'Mariana Araújo',
         'Michelle Meleck': 'Michelle Meleck',
         'Patricia lima': 'Patricia Lima',
+        'Rachel Carmo': 'Rachel Carmo',
+        'Rachel carmo': 'Rachel Carmo',
         'Raiany pimentel': 'Raiany Pimentel',
         'Roberta Xavier': 'Roberta Xavier',
         'Roberta xavier': 'Roberta Xavier',
@@ -142,6 +149,8 @@ export const formatAgentName = (tableName: string) => {
         'Roclides lima': 'Roclides Lima',
         'Rodrigo Pastore': 'Rodrigo Pastore',
         'Rodrigo pastore': 'Rodrigo Pastore',
+        'Samuel Nolasco': 'Samuel Nolasco',
+        'Samuel nolasco': 'Samuel Nolasco',
         'Silvia Joly': 'Silvia Joly',
         'Stefanie lee': 'Stefanie Lee'
     };
@@ -266,7 +275,7 @@ export const getAllAvailableTables = (): string[] => {
 
 // Debug completo para TODOS os agentes
 export const debugAllAgents = (): void => {
-    console.log('🗺️ DEBUG COMPLETO - VERIFICANDO TODOS OS 29 AGENTES:');
+    console.log('🗺️ DEBUG COMPLETO - VERIFICANDO TODOS OS 31 AGENTES:');
     console.log('📊 Total de tabelas de métricas:', metricsAgentTables.length);
     console.log('💬 Total de tabelas básicas:', basicMessageTables.length);
     console.log('🔗 Total de mapeamentos:', Object.keys(nameToTableMapping).length);
@@ -301,6 +310,6 @@ export const debugAllAgents = (): void => {
 // Inicialização com debug completo
 if (typeof window !== 'undefined') {
     console.log('🔧 INIT - Sistema atualizado com base no banco de dados real');
-    console.log('📊 INIT - Total de 29 agentes confirmados no Supabase');
+    console.log('📊 INIT - Total de 31 agentes confirmados no Supabase');
     debugAllAgents();
 }
