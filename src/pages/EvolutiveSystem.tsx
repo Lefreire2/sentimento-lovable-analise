@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,9 +19,11 @@ import {
   Activity,
   Calendar,
   BarChart3,
-  Users
+  Users,
+  Shield
 } from 'lucide-react';
 import { AppointmentPatternAnalyzer } from '@/components/evolutive/AppointmentPatternAnalyzer';
+import { DataSanitizer } from '@/components/evolutive/DataSanitizer';
 
 const EvolutiveSystem = () => {
   const { systemStatus } = useEvolutiveSystem();
@@ -182,7 +185,7 @@ const EvolutiveSystem = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="real-data" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="real-data" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Dados Reais
@@ -202,6 +205,10 @@ const EvolutiveSystem = () => {
             <TabsTrigger value="metrics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Métricas
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Segurança
             </TabsTrigger>
           </TabsList>
 
@@ -233,6 +240,10 @@ const EvolutiveSystem = () => {
 
           <TabsContent value="metrics" className="space-y-6">
             <SystemMetricsDashboard key={`metrics-${refreshKey}`} />
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-6">
+            <DataSanitizer key={`security-${refreshKey}`} />
           </TabsContent>
         </Tabs>
       </div>
