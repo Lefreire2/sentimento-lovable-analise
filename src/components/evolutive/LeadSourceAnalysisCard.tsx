@@ -38,14 +38,14 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   const sourceDistributionValues = Object.values(sourceDistribution);
   
   const totalObjections = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
-    const numericCount = typeof count === 'number' ? count : (Number(count) || 0);
-    return sum + numericCount;
+    const numericCount = typeof count === 'number' ? count : (typeof count === 'string' ? Number(count) : 0);
+    return sum + (isNaN(numericCount) ? 0 : numericCount);
   }, 0);
 
   const totalSources = Object.keys(sourceDistribution).filter(key => {
     const value = sourceDistribution[key];
-    const numericValue = typeof value === 'number' ? value : (Number(value) || 0);
-    return numericValue > 0;
+    const numericValue = typeof value === 'number' ? value : (typeof value === 'string' ? Number(value) : 0);
+    return !isNaN(numericValue) && numericValue > 0;
   }).length;
 
   // Verificar qualidade dos dados
@@ -141,4 +141,3 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
     </div>
   );
 };
-
