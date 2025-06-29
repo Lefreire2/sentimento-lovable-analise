@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +6,7 @@ import { RealDataAnalysis } from '@/components/evolutive/RealDataAnalysis';
 import { IntentionAnalysisPanel } from '@/components/evolutive/IntentionAnalysisPanel';
 import { AppointmentOptimizer } from '@/components/evolutive/AppointmentOptimizer';
 import { SystemMetricsDashboard } from '@/components/evolutive/SystemMetricsDashboard';
+import { SystemRefreshButton } from '@/components/evolutive/SystemRefreshButton';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { formatAgentName, agentTables } from '@/lib/agents';
 import { 
@@ -23,12 +23,18 @@ import {
 const EvolutiveSystem = () => {
   const { systemStatus } = useEvolutiveSystem();
   const [selectedAgent, setSelectedAgent] = useState('André Araújo');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Obter todos os agentes disponíveis do banco de dados
   const availableAgents = agentTables.map(table => formatAgentName(table)).sort();
 
   console.log('📋 Total de agentes disponíveis:', availableAgents.length);
   console.log('🎯 Agentes carregados:', availableAgents);
+
+  const handleRefreshComplete = () => {
+    console.log('🔄 SISTEMA - Forçando re-render dos componentes');
+    setRefreshKey(prev => prev + 1);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -63,11 +69,17 @@ const EvolutiveSystem = () => {
                 Análise inteligente e otimização contínua de conversões
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${getStatusColor(systemStatus)}`}></div>
-              <Badge variant="outline">
-                {getStatusText(systemStatus)}
-              </Badge>
+            <div className="flex items-center gap-4">
+              <SystemRefreshButton 
+                selectedAgent={selectedAgent}
+                onRefreshComplete={handleRefreshComplete}
+              />
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${getStatusColor(systemStatus)}`}></div>
+                <Badge variant="outline">
+                  {getStatusText(systemStatus)}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
@@ -137,19 +149,19 @@ const EvolutiveSystem = () => {
           </TabsList>
 
           <TabsContent value="real-data" className="space-y-6">
-            <RealDataAnalysis agentName={selectedAgent} />
+            <RealDataAnalysis key={`real-data-${refreshKey}`} agentName={selectedAgent} />
           </TabsContent>
 
           <TabsContent value="intention" className="space-y-6">
-            <IntentionAnalysisPanel />
+            <IntentionAnalysisPanel key={`intention-${refreshKey}`} />
           </TabsContent>
 
           <TabsContent value="optimization" className="space-y-6">
-            <AppointmentOptimizer />
+            <AppointmentOptimizer key={`optimization-${refreshKey}`} />
           </TabsContent>
 
           <TabsContent value="metrics" className="space-y-6">
-            <SystemMetricsDashboard />
+            <SystemMetricsDashboard key={`metrics-${refreshKey}`} />
           </TabsContent>
         </Tabs>
       </div>

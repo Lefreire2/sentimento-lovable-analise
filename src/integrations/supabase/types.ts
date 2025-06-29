@@ -846,19 +846,23 @@ export type Database = {
         }
         Relationships: []
       }
-      "Lista_mensagens_ Carlos_Antunes": {
+      Lista_mensagens_Adiney_esteves: {
         Row: {
           aderência_script_nivel: string | null
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -881,13 +885,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -910,13 +918,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -933,84 +945,6 @@ export type Database = {
           tempo_primeira_resposta_minutos?: string | null
           termo_chave_conversao?: string | null
           ultima_etapa_alcancada?: string | null
-        }
-        Relationships: []
-      }
-      Lista_mensagens_Adiney_esteves: {
-        Row: {
-          aderência_script_nivel: string | null
-          contagem_palavras_risco: string | null
-          conversao_indicada_mvp: string | null
-          duracao_total_conversa_horas: string | null
-          duracao_total_conversa_minutos: string | null
-          id: number
-          indicador_escalonamento_transferencia: string | null
-          indicador_resolucao_primeira_resposta: string | null
-          nome: string | null
-          numero_perguntas_vendedor: string | null
-          pontuacao_aderencia_percentual: string | null
-          remoteJid: string | null
-          sentimento_atendente: string | null
-          sentimento_geral_conversa: string | null
-          sentimento_usuario: string | null
-          taxa_mensagens_vendedor_percentual: string | null
-          tempo_maximo_resposta_atendente_horas: string | null
-          tempo_maximo_resposta_atendente_minutos: string | null
-          tempo_medio_resposta_atendente_horas: string | null
-          tempo_medio_resposta_atendente_minutos: string | null
-          tempo_primeira_resposta_horas: string | null
-          tempo_primeira_resposta_minutos: string | null
-          termo_chave_conversao: string | null
-        }
-        Insert: {
-          aderência_script_nivel?: string | null
-          contagem_palavras_risco?: string | null
-          conversao_indicada_mvp?: string | null
-          duracao_total_conversa_horas?: string | null
-          duracao_total_conversa_minutos?: string | null
-          id?: number
-          indicador_escalonamento_transferencia?: string | null
-          indicador_resolucao_primeira_resposta?: string | null
-          nome?: string | null
-          numero_perguntas_vendedor?: string | null
-          pontuacao_aderencia_percentual?: string | null
-          remoteJid?: string | null
-          sentimento_atendente?: string | null
-          sentimento_geral_conversa?: string | null
-          sentimento_usuario?: string | null
-          taxa_mensagens_vendedor_percentual?: string | null
-          tempo_maximo_resposta_atendente_horas?: string | null
-          tempo_maximo_resposta_atendente_minutos?: string | null
-          tempo_medio_resposta_atendente_horas?: string | null
-          tempo_medio_resposta_atendente_minutos?: string | null
-          tempo_primeira_resposta_horas?: string | null
-          tempo_primeira_resposta_minutos?: string | null
-          termo_chave_conversao?: string | null
-        }
-        Update: {
-          aderência_script_nivel?: string | null
-          contagem_palavras_risco?: string | null
-          conversao_indicada_mvp?: string | null
-          duracao_total_conversa_horas?: string | null
-          duracao_total_conversa_minutos?: string | null
-          id?: number
-          indicador_escalonamento_transferencia?: string | null
-          indicador_resolucao_primeira_resposta?: string | null
-          nome?: string | null
-          numero_perguntas_vendedor?: string | null
-          pontuacao_aderencia_percentual?: string | null
-          remoteJid?: string | null
-          sentimento_atendente?: string | null
-          sentimento_geral_conversa?: string | null
-          sentimento_usuario?: string | null
-          taxa_mensagens_vendedor_percentual?: string | null
-          tempo_maximo_resposta_atendente_horas?: string | null
-          tempo_maximo_resposta_atendente_minutos?: string | null
-          tempo_medio_resposta_atendente_horas?: string | null
-          tempo_medio_resposta_atendente_minutos?: string | null
-          tempo_primeira_resposta_horas?: string | null
-          tempo_primeira_resposta_minutos?: string | null
-          termo_chave_conversao?: string | null
         }
         Relationships: []
       }
@@ -1020,13 +954,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1049,13 +987,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1078,13 +1020,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1110,13 +1056,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1139,13 +1089,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1168,13 +1122,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1200,13 +1158,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1229,13 +1191,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1258,13 +1224,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1287,94 +1257,20 @@ export type Database = {
       Lista_mensagens_Amanda_Mota: {
         Row: {
           aderência_script_nivel: string | null
-          contagem_palavras_risco: string | null
-          conversao_indicada_mvp: string | null
-          duracao_total_conversa_horas: string | null
-          duracao_total_conversa_minutos: string | null
-          id: number
-          indicador_escalonamento_transferencia: string | null
-          indicador_resolucao_primeira_resposta: string | null
-          nome: string | null
-          numero_perguntas_vendedor: string | null
-          pontuacao_aderencia_percentual: string | null
-          remoteJid: string | null
-          sentimento_atendente: string | null
-          sentimento_geral_conversa: string | null
-          sentimento_usuario: string | null
-          taxa_mensagens_vendedor_percentual: string | null
-          tempo_maximo_resposta_atendente_horas: string | null
-          tempo_maximo_resposta_atendente_minutos: string | null
-          tempo_medio_resposta_atendente_horas: string | null
-          tempo_medio_resposta_atendente_minutos: string | null
-          tempo_primeira_resposta_horas: string | null
-          tempo_primeira_resposta_minutos: string | null
-          termo_chave_conversao: string | null
-        }
-        Insert: {
-          aderência_script_nivel?: string | null
-          contagem_palavras_risco?: string | null
-          conversao_indicada_mvp?: string | null
-          duracao_total_conversa_horas?: string | null
-          duracao_total_conversa_minutos?: string | null
-          id?: number
-          indicador_escalonamento_transferencia?: string | null
-          indicador_resolucao_primeira_resposta?: string | null
-          nome?: string | null
-          numero_perguntas_vendedor?: string | null
-          pontuacao_aderencia_percentual?: string | null
-          remoteJid?: string | null
-          sentimento_atendente?: string | null
-          sentimento_geral_conversa?: string | null
-          sentimento_usuario?: string | null
-          taxa_mensagens_vendedor_percentual?: string | null
-          tempo_maximo_resposta_atendente_horas?: string | null
-          tempo_maximo_resposta_atendente_minutos?: string | null
-          tempo_medio_resposta_atendente_horas?: string | null
-          tempo_medio_resposta_atendente_minutos?: string | null
-          tempo_primeira_resposta_horas?: string | null
-          tempo_primeira_resposta_minutos?: string | null
-          termo_chave_conversao?: string | null
-        }
-        Update: {
-          aderência_script_nivel?: string | null
-          contagem_palavras_risco?: string | null
-          conversao_indicada_mvp?: string | null
-          duracao_total_conversa_horas?: string | null
-          duracao_total_conversa_minutos?: string | null
-          id?: number
-          indicador_escalonamento_transferencia?: string | null
-          indicador_resolucao_primeira_resposta?: string | null
-          nome?: string | null
-          numero_perguntas_vendedor?: string | null
-          pontuacao_aderencia_percentual?: string | null
-          remoteJid?: string | null
-          sentimento_atendente?: string | null
-          sentimento_geral_conversa?: string | null
-          sentimento_usuario?: string | null
-          taxa_mensagens_vendedor_percentual?: string | null
-          tempo_maximo_resposta_atendente_horas?: string | null
-          tempo_maximo_resposta_atendente_minutos?: string | null
-          tempo_medio_resposta_atendente_horas?: string | null
-          tempo_medio_resposta_atendente_minutos?: string | null
-          tempo_primeira_resposta_horas?: string | null
-          tempo_primeira_resposta_minutos?: string | null
-          termo_chave_conversao?: string | null
-        }
-        Relationships: []
-      }
-      Lista_mensagens_Ana_beatriz: {
-        Row: {
-          aderência_script_nivel: string | null
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1397,13 +1293,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1426,13 +1326,119 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
+          numero_perguntas_vendedor?: string | null
+          pontuacao_aderencia_percentual?: string | null
+          remoteJid?: string | null
+          resumo_atendimento?: string | null
+          sentimento_atendente?: string | null
+          sentimento_geral_conversa?: string | null
+          sentimento_usuario?: string | null
+          taxa_mensagens_vendedor_percentual?: string | null
+          tempo_maximo_resposta_atendente_horas?: string | null
+          tempo_maximo_resposta_atendente_minutos?: string | null
+          tempo_medio_resposta_atendente_horas?: string | null
+          tempo_medio_resposta_atendente_minutos?: string | null
+          tempo_primeira_resposta_horas?: string | null
+          tempo_primeira_resposta_minutos?: string | null
+          termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
+        }
+        Relationships: []
+      }
+      Lista_mensagens_Ana_beatriz: {
+        Row: {
+          aderência_script_nivel: string | null
+          agendamento_detectado: string | null
+          contagem_palavras_risco: string | null
+          conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
+          duracao_total_conversa_horas: string | null
+          duracao_total_conversa_minutos: string | null
+          id: number
+          indicador_escalonamento_transferencia: string | null
+          indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
+          motivo_nao_conversao: string | null
+          nome: string | null
+          nota_atendimento: string | null
+          numero_perguntas_vendedor: string | null
+          pontuacao_aderencia_percentual: string | null
+          remoteJid: string | null
+          resumo_atendimento: string | null
+          sentimento_atendente: string | null
+          sentimento_geral_conversa: string | null
+          sentimento_usuario: string | null
+          taxa_mensagens_vendedor_percentual: string | null
+          tempo_maximo_resposta_atendente_horas: string | null
+          tempo_maximo_resposta_atendente_minutos: string | null
+          tempo_medio_resposta_atendente_horas: string | null
+          tempo_medio_resposta_atendente_minutos: string | null
+          tempo_primeira_resposta_horas: string | null
+          tempo_primeira_resposta_minutos: string | null
+          termo_chave_conversao: string | null
+          ultima_etapa_alcancada: string | null
+        }
+        Insert: {
+          aderência_script_nivel?: string | null
+          agendamento_detectado?: string | null
+          contagem_palavras_risco?: string | null
+          conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
+          duracao_total_conversa_horas?: string | null
+          duracao_total_conversa_minutos?: string | null
+          id?: number
+          indicador_escalonamento_transferencia?: string | null
+          indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
+          nome?: string | null
+          nota_atendimento?: string | null
+          numero_perguntas_vendedor?: string | null
+          pontuacao_aderencia_percentual?: string | null
+          remoteJid?: string | null
+          resumo_atendimento?: string | null
+          sentimento_atendente?: string | null
+          sentimento_geral_conversa?: string | null
+          sentimento_usuario?: string | null
+          taxa_mensagens_vendedor_percentual?: string | null
+          tempo_maximo_resposta_atendente_horas?: string | null
+          tempo_maximo_resposta_atendente_minutos?: string | null
+          tempo_medio_resposta_atendente_horas?: string | null
+          tempo_medio_resposta_atendente_minutos?: string | null
+          tempo_primeira_resposta_horas?: string | null
+          tempo_primeira_resposta_minutos?: string | null
+          termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
+        }
+        Update: {
+          aderência_script_nivel?: string | null
+          agendamento_detectado?: string | null
+          contagem_palavras_risco?: string | null
+          conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
+          duracao_total_conversa_horas?: string | null
+          duracao_total_conversa_minutos?: string | null
+          id?: number
+          indicador_escalonamento_transferencia?: string | null
+          indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
+          nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1458,13 +1464,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1487,13 +1497,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1516,13 +1530,119 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
+          numero_perguntas_vendedor?: string | null
+          pontuacao_aderencia_percentual?: string | null
+          remoteJid?: string | null
+          resumo_atendimento?: string | null
+          sentimento_atendente?: string | null
+          sentimento_geral_conversa?: string | null
+          sentimento_usuario?: string | null
+          taxa_mensagens_vendedor_percentual?: string | null
+          tempo_maximo_resposta_atendente_horas?: string | null
+          tempo_maximo_resposta_atendente_minutos?: string | null
+          tempo_medio_resposta_atendente_horas?: string | null
+          tempo_medio_resposta_atendente_minutos?: string | null
+          tempo_primeira_resposta_horas?: string | null
+          tempo_primeira_resposta_minutos?: string | null
+          termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
+        }
+        Relationships: []
+      }
+      Lista_mensagens_Carlos_Antunes: {
+        Row: {
+          aderência_script_nivel: string | null
+          agendamento_detectado: string | null
+          contagem_palavras_risco: string | null
+          conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
+          duracao_total_conversa_horas: string | null
+          duracao_total_conversa_minutos: string | null
+          id: number
+          indicador_escalonamento_transferencia: string | null
+          indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
+          motivo_nao_conversao: string | null
+          nome: string | null
+          nota_atendimento: string | null
+          numero_perguntas_vendedor: string | null
+          pontuacao_aderencia_percentual: string | null
+          remoteJid: string | null
+          resumo_atendimento: string | null
+          sentimento_atendente: string | null
+          sentimento_geral_conversa: string | null
+          sentimento_usuario: string | null
+          taxa_mensagens_vendedor_percentual: string | null
+          tempo_maximo_resposta_atendente_horas: string | null
+          tempo_maximo_resposta_atendente_minutos: string | null
+          tempo_medio_resposta_atendente_horas: string | null
+          tempo_medio_resposta_atendente_minutos: string | null
+          tempo_primeira_resposta_horas: string | null
+          tempo_primeira_resposta_minutos: string | null
+          termo_chave_conversao: string | null
+          ultima_etapa_alcancada: string | null
+        }
+        Insert: {
+          aderência_script_nivel?: string | null
+          agendamento_detectado?: string | null
+          contagem_palavras_risco?: string | null
+          conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
+          duracao_total_conversa_horas?: string | null
+          duracao_total_conversa_minutos?: string | null
+          id?: number
+          indicador_escalonamento_transferencia?: string | null
+          indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
+          nome?: string | null
+          nota_atendimento?: string | null
+          numero_perguntas_vendedor?: string | null
+          pontuacao_aderencia_percentual?: string | null
+          remoteJid?: string | null
+          resumo_atendimento?: string | null
+          sentimento_atendente?: string | null
+          sentimento_geral_conversa?: string | null
+          sentimento_usuario?: string | null
+          taxa_mensagens_vendedor_percentual?: string | null
+          tempo_maximo_resposta_atendente_horas?: string | null
+          tempo_maximo_resposta_atendente_minutos?: string | null
+          tempo_medio_resposta_atendente_horas?: string | null
+          tempo_medio_resposta_atendente_minutos?: string | null
+          tempo_primeira_resposta_horas?: string | null
+          tempo_primeira_resposta_minutos?: string | null
+          termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
+        }
+        Update: {
+          aderência_script_nivel?: string | null
+          agendamento_detectado?: string | null
+          contagem_palavras_risco?: string | null
+          conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
+          duracao_total_conversa_horas?: string | null
+          duracao_total_conversa_minutos?: string | null
+          id?: number
+          indicador_escalonamento_transferencia?: string | null
+          indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
+          nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1548,13 +1668,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1577,13 +1701,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1606,13 +1734,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1638,13 +1770,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1667,13 +1803,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1696,13 +1836,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1728,13 +1872,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1757,13 +1905,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1786,13 +1938,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1818,13 +1974,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -1847,13 +2007,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -1876,13 +2040,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2017,6 +2185,7 @@ export type Database = {
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
           nota_atendimento: string | null
@@ -2049,6 +2218,7 @@ export type Database = {
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
           nota_atendimento?: string | null
@@ -2081,6 +2251,7 @@ export type Database = {
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
           nota_atendimento?: string | null
@@ -2109,13 +2280,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2138,13 +2313,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2167,13 +2346,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2199,13 +2382,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2228,13 +2415,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2257,13 +2448,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2289,13 +2484,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2318,13 +2517,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2347,13 +2550,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2379,13 +2586,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2408,13 +2619,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2437,13 +2652,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2469,13 +2688,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2498,13 +2721,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2527,13 +2754,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2559,13 +2790,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2588,13 +2823,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2617,13 +2856,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2649,15 +2892,21 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
+          motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
+          resumo_atendimento: string | null
           sentimento_atendente: string | null
           sentimento_geral_conversa: string | null
           sentimento_usuario: string | null
@@ -2669,21 +2918,28 @@ export type Database = {
           tempo_primeira_resposta_horas: string | null
           tempo_primeira_resposta_minutos: string | null
           termo_chave_conversao: string | null
+          ultima_etapa_alcancada: string | null
         }
         Insert: {
           aderência_script_nivel?: string | null
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
+          resumo_atendimento?: string | null
           sentimento_atendente?: string | null
           sentimento_geral_conversa?: string | null
           sentimento_usuario?: string | null
@@ -2695,21 +2951,28 @@ export type Database = {
           tempo_primeira_resposta_horas?: string | null
           tempo_primeira_resposta_minutos?: string | null
           termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
         }
         Update: {
           aderência_script_nivel?: string | null
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
+          motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
+          resumo_atendimento?: string | null
           sentimento_atendente?: string | null
           sentimento_geral_conversa?: string | null
           sentimento_usuario?: string | null
@@ -2721,6 +2984,7 @@ export type Database = {
           tempo_primeira_resposta_horas?: string | null
           tempo_primeira_resposta_minutos?: string | null
           termo_chave_conversao?: string | null
+          ultima_etapa_alcancada?: string | null
         }
         Relationships: []
       }
@@ -2832,13 +3096,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2861,13 +3129,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2890,13 +3162,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2922,13 +3198,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -2951,13 +3231,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -2980,13 +3264,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3012,13 +3300,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3041,13 +3333,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3070,13 +3366,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3102,13 +3402,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3131,13 +3435,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3160,13 +3468,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3192,13 +3504,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3221,13 +3537,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3250,13 +3570,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3282,13 +3606,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3311,13 +3639,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3340,13 +3672,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3462,13 +3798,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3491,13 +3831,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3520,13 +3864,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3552,13 +3900,17 @@ export type Database = {
           agendamento_detectado: string | null
           contagem_palavras_risco: string | null
           conversao_indicada_mvp: string | null
+          data_fim_conversa: string | null
+          data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
+          motivo_contato_lead: string | null
           motivo_nao_conversao: string | null
           nome: string | null
+          nota_atendimento: string | null
           numero_perguntas_vendedor: string | null
           pontuacao_aderencia_percentual: string | null
           remoteJid: string | null
@@ -3581,13 +3933,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
@@ -3610,13 +3966,17 @@ export type Database = {
           agendamento_detectado?: string | null
           contagem_palavras_risco?: string | null
           conversao_indicada_mvp?: string | null
+          data_fim_conversa?: string | null
+          data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
+          motivo_contato_lead?: string | null
           motivo_nao_conversao?: string | null
           nome?: string | null
+          nota_atendimento?: string | null
           numero_perguntas_vendedor?: string | null
           pontuacao_aderencia_percentual?: string | null
           remoteJid?: string | null
