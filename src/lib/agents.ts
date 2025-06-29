@@ -1,4 +1,3 @@
-
 // Tabelas de métricas agregadas (dados processados) - nomes exatos do banco conforme screenshots
 export const metricsAgentTables = [
     'Lista_mensagens_ Carlos_Antunes',
@@ -13,6 +12,7 @@ export const metricsAgentTables = [
     'Lista_mensagens_Diego_cabrejos',
     'Lista_mensagens_Haila',
     'Lista_mensagens_Henrique_maffei',
+    'Lista_mensagens_Jorge_Mendes',
     'Lista_mensagens_Julia_jorge',
     'Lista_mensagens_Karla_fazollo',
     'Lista_mensagens_Karla_resende',
@@ -45,6 +45,7 @@ export const basicMessageTables = [
     'Lista_de_Mensagens_Diego_cabrejos',
     'Lista_de_Mensagens_Haila',
     'Lista_de_Mensagens_Henrique_maffei',
+    'Lista_de_Mensagens_Jorge_Mendes',
     'Lista_de_Mensagens_Julia_jorge',
     'Lista_de_Mensagens_Karla_fazollo',
     'Lista_de_Mensagens_Karla_resende',
@@ -80,6 +81,7 @@ const nameToTableMapping: Record<string, string> = {
     'Diego Cabrejos': 'Diego_cabrejos',
     'Haila': 'Haila',
     'Henrique Maffei': 'Henrique_maffei',
+    'Jorge Mendes': 'Jorge_Mendes',
     'Julia Jorge': 'Julia_jorge',
     'Karla Fazollo': 'Karla_fazollo',
     'Karla Resende': 'Karla_resende',
@@ -122,6 +124,8 @@ export const formatAgentName = (tableName: string) => {
         'Diego cabrejos': 'Diego Cabrejos',
         'Haila': 'Haila',
         'Henrique maffei': 'Henrique Maffei',
+        'Jorge Mendes': 'Jorge Mendes',
+        'Jorge mendes': 'Jorge Mendes',
         'Julia jorge': 'Julia Jorge',
         'Karla fazollo': 'Karla Fazollo',
         'Karla resende': 'Karla Resende',
@@ -262,7 +266,7 @@ export const getAllAvailableTables = (): string[] => {
 
 // Debug completo para TODOS os agentes
 export const debugAllAgents = (): void => {
-    console.log('🗺️ DEBUG COMPLETO - VERIFICANDO TODOS OS 28 AGENTES:');
+    console.log('🗺️ DEBUG COMPLETO - VERIFICANDO TODOS OS 29 AGENTES:');
     console.log('📊 Total de tabelas de métricas:', metricsAgentTables.length);
     console.log('💬 Total de tabelas básicas:', basicMessageTables.length);
     console.log('🔗 Total de mapeamentos:', Object.keys(nameToTableMapping).length);
@@ -297,6 +301,6 @@ export const debugAllAgents = (): void => {
 // Inicialização com debug completo
 if (typeof window !== 'undefined') {
     console.log('🔧 INIT - Sistema atualizado com base no banco de dados real');
-    console.log('📊 INIT - Total de 28 agentes confirmados no Supabase');
+    console.log('📊 INIT - Total de 29 agentes confirmados no Supabase');
     debugAllAgents();
 }

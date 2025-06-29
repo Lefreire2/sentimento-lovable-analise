@@ -51,6 +51,10 @@ export const getAgentTableMapping = (): Record<string, AgentTableMapping> => {
       basic: 'Lista_de_Mensagens_Henrique_maffei',
       metrics: 'Lista_mensagens_Henrique_maffei'
     },
+    'Jorge Mendes': {
+      basic: 'Lista_de_Mensagens_Jorge_Mendes',
+      metrics: 'Lista_mensagens_Jorge_Mendes'
+    },
     'Julia Jorge': {
       basic: 'Lista_de_Mensagens_Julia_jorge',
       metrics: 'Lista_mensagens_Julia_jorge'
