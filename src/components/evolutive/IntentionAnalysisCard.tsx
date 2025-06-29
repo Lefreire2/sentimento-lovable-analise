@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { 
   Users, 
   Target, 
@@ -11,16 +12,21 @@ import {
   CheckCircle,
   Info,
   Shield,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react';
 import { DataValidationAlert } from './DataValidationAlert';
-import { validateAnalysisData, correctConversionCalculations } from '@/utils/dataValidator';
+import { validateAnalysisData, validateAndreAraujoAnalysis, correctConversionCalculations } from '@/utils/dataValidator';
+import { useState } from 'react';
 
 interface IntentionAnalysisCardProps {
   data: any;
 }
 
 export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
+  const [correctedData, setCorrectedData] = useState(data?.data);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+
   if (!data || !data.data) {
     return (
       <Card>
@@ -37,9 +43,38 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     );
   }
 
-  // Validar dados antes de exibir
-  const validation = validateAnalysisData(data.data);
-  const correctedData = validation.isValid ? data.data : correctConversionCalculations(data.data);
+  // Usar dados corrigidos se disponíveis, senão usar dados originais
+  const analysisData = correctedData || data.data;
+  
+  // Validar dados com foco específico no André Araújo se for o caso
+  const isAndreAraujo = analysisData.agent_name?.toLowerCase().includes('andré') || 
+                       analysisData.agent_name?.toLowerCase().includes('andre');
+  
+  const validation = isAndreAraujo ? 
+    validateAndreAraujoAnalysis(analysisData) : 
+    validateAnalysisData(analysisData);
+
+  const handleApplyCorrections = async (corrections: Record<string, any>) => {
+    setIsRecalculating(true);
+    try {
+      const newCorrectedData = correctConversionCalculations(analysisData);
+      setCorrectedData(newCorrectedData);
+    } catch (error) {
+      console.error('Erro ao aplicar correções:', error);
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
+
+  const handleRecalculateAnalysis = () => {
+    setIsRecalculating(true);
+    // Simular recálculo
+    setTimeout(() => {
+      const recalculatedData = correctConversionCalculations(data.data);
+      setCorrectedData(recalculatedData);
+      setIsRecalculating(false);
+    }, 2000);
+  };
 
   const {
     total_conversations,
@@ -49,7 +84,7 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
     sentiment_analysis,
     appointments,
     engagement_metrics
-  } = correctedData;
+  } = analysisData;
 
   const isDataConsistent = data_consistency?.is_consistent;
   const analysisPeriod = appointments?.analysis_period;
@@ -89,8 +124,45 @@ export const IntentionAnalysisCard = ({ data }: IntentionAnalysisCardProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Data Validation Alert */}
-      <DataValidationAlert validation={validation} />
+      {/* Data Validation Alert with Enhanced Features */}
+      <DataValidationAlert 
+        validation={validation} 
+        onApplyCorrections={handleApplyCorrections}
+      />
+
+      {/* Recalculation Controls for André Araújo */}
+      {isAndreAraujo && !validation.isValid && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-orange-800">Revisão Necessária - André Araújo</h3>
+                <p className="text-sm text-orange-700">
+                  Foram detectadas inconsistências nas etapas de análise que requerem correção.
+                </p>
+              </div>
+              <Button 
+                onClick={handleRecalculateAnalysis}
+                disabled={isRecalculating}
+                variant="outline"
+                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+              >
+                {isRecalculating ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Recalculando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Recalcular Análise
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Analysis Period Info */}
       {analysisPeriod && (
