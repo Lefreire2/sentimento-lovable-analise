@@ -16,7 +16,7 @@ export async function analyzeUniqueLeads(supabase: any, basicTableName: string):
 
     console.log('📊 Amostra de dados:', sampleData?.slice(0, 3));
 
-    // Buscar todos os remoteJid únicos
+    // Buscar TODOS os remoteJid sem limite para capturar a base completa
     const { data: allData, error } = await supabase
       .from(basicTableName)
       .select('remoteJid');
@@ -26,7 +26,7 @@ export async function analyzeUniqueLeads(supabase: any, basicTableName: string):
       return 0;
     }
 
-    console.log('📊 Total de registros encontrados:', allData?.length);
+    console.log('📊 Total de registros encontrados na tabela:', allData?.length);
 
     // Filtrar e contar remoteJids únicos válidos
     const uniqueJids = new Set();
@@ -59,14 +59,19 @@ export async function analyzeUniqueLeads(supabase: any, basicTableName: string):
       }
     });
 
-    console.log('📊 Estatísticas de análise:');
-    console.log('  - Total de registros:', allData?.length);
+    console.log('📊 Estatísticas detalhadas de análise:');
+    console.log('  - Tabela analisada:', basicTableName);
+    console.log('  - Total de registros na tabela:', allData?.length);
     console.log('  - JIDs válidos encontrados:', validCount);
     console.log('  - JIDs inválidos/nulos:', invalidCount);
     console.log('  - Leads únicos identificados:', uniqueJids.size);
     console.log('📊 Primeiros 5 JIDs únicos:', Array.from(uniqueJids).slice(0, 5));
     
-    return uniqueJids.size;
+    // Garantir que retornamos o número correto de leads únicos
+    const finalUniqueLeads = uniqueJids.size;
+    console.log('✅ RESULTADO FINAL - Leads únicos confirmados:', finalUniqueLeads);
+    
+    return finalUniqueLeads;
   } catch (error) {
     console.error('Erro na análise de leads únicos:', error);
     return 0;

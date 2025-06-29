@@ -1,3 +1,4 @@
+
 import { AgentTableMapping, AnalysisResult } from './types.ts';
 import { analyzeUniqueLeads } from './leads-analyzer.ts';
 import { 
@@ -32,10 +33,10 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
   let totalMetrics = 0;
   
   if (tables.metrics && tables.metrics.trim() !== '') {
+    // Buscar TODOS os dados da tabela de métricas sem limite
     const { data: rawMetricsData, error: metricsError } = await supabase
       .from(tables.metrics)
-      .select('*')
-      .limit(totalUniqueLeads); // Limitar ao número de leads únicos
+      .select('*');
     
     if (!metricsError && rawMetricsData) {
       metricsData = rawMetricsData;
@@ -48,9 +49,9 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     console.log('⚠️ INTENÇÃO - Tabela de métricas não disponível para este agente');
   }
 
-  // STEP 3: Usar o menor número entre leads únicos e métricas para análises proporcionais
-  const baseNumber = Math.min(totalUniqueLeads, totalMetrics || totalUniqueLeads);
-  console.log('📊 INTENÇÃO - Usando como base para cálculos:', baseNumber);
+  // STEP 3: Usar o total de leads únicos como base principal
+  console.log('📊 INTENÇÃO - Usando leads únicos como base principal:', totalUniqueLeads);
+  console.log('📊 INTENÇÃO - Métricas disponíveis para comparação:', totalMetrics);
 
   // STEP 4: Análise de conversões baseada nos dados disponíveis
   let conversions = [];
@@ -76,13 +77,13 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
     const estimatedAppointmentRate = 0.12; // 12%
     const estimatedPositiveRate = 0.20; // 20%
     
-    conversions = Array(Math.floor(baseNumber * estimatedConversionRate));
-    appointments = Array(Math.floor(baseNumber * estimatedAppointmentRate));
-    positiveSentiments = Array(Math.floor(baseNumber * estimatedPositiveRate));
+    conversions = Array(Math.floor(totalUniqueLeads * estimatedConversionRate));
+    appointments = Array(Math.floor(totalUniqueLeads * estimatedAppointmentRate));
+    positiveSentiments = Array(Math.floor(totalUniqueLeads * estimatedPositiveRate));
   }
 
-  console.log('📊 INTENÇÃO - Resultados finais:');
-  console.log('  - Total de leads únicos:', totalUniqueLeads);
+  console.log('📊 INTENÇÃO - Resultados finais CORRETOS:');
+  console.log('  - Total de leads únicos (BASE):', totalUniqueLeads);
   console.log('  - Métricas processadas:', totalMetrics);
   console.log('  - Conversões:', conversions.length);
   console.log('  - Agendamentos:', appointments.length);
@@ -90,7 +91,7 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
 
   return {
     id: crypto.randomUUID(),
-    agent_name: tables.basic.replace('Lista_de_Mensagens_', '').replace('_', ' '),
+    agent_name: tables.basic.replace('Lista_de_Mensagens_', '').replace('Lista_mensagens_', '').replace('_', ' '),
     analysis_type: 'intention',
     timestamp: new Date().toISOString(),
     data: {
@@ -104,15 +105,15 @@ export async function analyzeIntention(supabase: any, tables: AgentTableMapping)
       },
       conversions: {
         count: conversions.length,
-        rate: baseNumber > 0 ? ((conversions.length / baseNumber) * 100).toFixed(2) : '0'
+        rate: totalUniqueLeads > 0 ? ((conversions.length / totalUniqueLeads) * 100).toFixed(2) : '0'
       },
       sentiment_analysis: {
         positive_count: positiveSentiments.length,
-        positive_rate: baseNumber > 0 ? ((positiveSentiments.length / baseNumber) * 100).toFixed(2) : '0'
+        positive_rate: totalUniqueLeads > 0 ? ((positiveSentiments.length / totalUniqueLeads) * 100).toFixed(2) : '0'
       },
       appointments: {
         count: appointments.length,
-        rate: baseNumber > 0 ? ((appointments.length / baseNumber) * 100).toFixed(2) : '0'
+        rate: totalUniqueLeads > 0 ? ((appointments.length / totalUniqueLeads) * 100).toFixed(2) : '0'
       },
       engagement_metrics: {
         avg_response_time: calculateAverageResponseTime(metricsData),
