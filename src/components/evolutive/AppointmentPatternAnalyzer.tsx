@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
 import { supabase } from '@/integrations/supabase/client';
+import { getBasicTableName } from '@/lib/agents';
 
 interface AppointmentPatternAnalyzerProps {
   agentName: string;
@@ -80,8 +80,11 @@ interface AnalysisResults {
 interface ConversationSample {
   jid: string;
   messages: MessageData[];
+  leadNumber: number;
+  totalMessages: number;
 }
 
+// Lista de JIDs confirmados como agendados para Haila (exemplo)
 const CONFIRMED_APPOINTMENTS_HAILA = [
   '5511998557658@s.whatsapp.net',
   '5511974647966@s.whatsapp.net',
@@ -120,35 +123,78 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
     console.log('🔍 Iniciando análise de padrões de agendamento para:', agentName);
     
     try {
-      // 1. Buscar conversas dos leads confirmados como agendados
-      const { data: appointedConversations, error: appointedError } = await supabase
-        .from('Lista_de_Mensagens_Haila')
-        .select('*')
-        .in('remoteJid', CONFIRMED_APPOINTMENTS_HAILA)
-        .order('Timestamp', { ascending: true });
-
-      if (appointedError) {
-        console.error('Erro ao buscar conversas agendadas:', appointedError);
+      // Obter o nome correto da tabela para o agente
+      const basicTableName = getBasicTableName(agentName);
+      
+      if (!basicTableName) {
+        console.error('❌ Tabela não encontrada para o agente:', agentName);
+        setIsAnalyzing(false);
         return;
       }
 
-      console.log('📅 Conversas de leads agendados encontradas:', appointedConversations?.length);
+      console.log('📊 Tabela identificada:', basicTableName);
+
+      // Para Haila, usar os JIDs confirmados, para outros agentes, usar uma amostra aleatória
+      let appointedJids = [];
+      if (agentName === 'Haila') {
+        appointedJids = CONFIRMED_APPOINTMENTS_HAILA;
+      } else {
+        // Para outros agentes, buscar uma amostra de JIDs únicos
+        const { data: sampleData, error: sampleError } = await supabase
+          .from(basicTableName as any)
+          .select('remoteJid')
+          .not('remoteJid', 'is', null)
+          .limit(25);
+
+        if (!sampleError && sampleData) {
+          const uniqueJids = new Set();
+          sampleData.forEach((row: any) => {
+            if (row.remoteJid && typeof row.remoteJid === 'string' && row.remoteJid.trim() !== '') {
+              uniqueJids.add(row.remoteJid.trim());
+            }
+          });
+          appointedJids = Array.from(uniqueJids).slice(0, 10); // Pegar 10 JIDs únicos
+        }
+      }
+
+      console.log(`📋 JIDs para análise (${agentName}):`, appointedJids.length);
+
+      if (appointedJids.length === 0) {
+        console.warn('⚠️ Nenhum JID encontrado para análise');
+        setIsAnalyzing(false);
+        return;
+      }
+
+      // 1. Buscar TODAS as conversas dos leads selecionados, ordenadas por timestamp
+      const { data: appointedConversations, error: appointedError } = await supabase
+        .from(basicTableName as any)
+        .select('*')
+        .in('remoteJid', appointedJids)
+        .order('Timestamp', { ascending: true });
+
+      if (appointedError) {
+        console.error('❌ Erro ao buscar conversas agendadas:', appointedError);
+        setIsAnalyzing(false);
+        return;
+      }
+
+      console.log('📅 Total de mensagens encontradas:', appointedConversations?.length || 0);
 
       // 2. Buscar uma amostra de conversas não agendadas para comparação
       const { data: nonAppointedConversations, error: nonAppointedError } = await supabase
-        .from('Lista_de_Mensagens_Haila')
+        .from(basicTableName as any)
         .select('*')
-        .not('remoteJid', 'in', `(${CONFIRMED_APPOINTMENTS_HAILA.map(jid => `'${jid}'`).join(',')})`)
-        .limit(50)
+        .not('remoteJid', 'in', `(${appointedJids.map(jid => `'${jid}'`).join(',')})`)
+        .limit(100)
         .order('Timestamp', { ascending: false });
 
       if (nonAppointedError) {
-        console.error('Erro ao buscar conversas não agendadas:', nonAppointedError);
+        console.error('❌ Erro ao buscar conversas não agendadas:', nonAppointedError);
       }
 
-      console.log('❌ Conversas de leads não agendados (amostra):', nonAppointedConversations?.length);
+      console.log('❌ Conversas de leads não agendados (amostra):', nonAppointedConversations?.length || 0);
 
-      // 3. Analisar padrões nas mensagens
+      // 3. Processar e agrupar mensagens por conversa
       const appointedMessages = (appointedConversations || []) as MessageData[];
       const nonAppointedMessages = (nonAppointedConversations || []) as MessageData[];
 
@@ -156,14 +202,39 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       const appointedByJid = groupMessagesByJid(appointedMessages);
       const nonAppointedByJid = groupMessagesByJid(nonAppointedMessages);
 
-      // 4. Identificar palavras-chave comuns em agendamentos
+      // 4. Criar amostras de conversas mais representativas
+      const conversationSamples = Object.entries(appointedByJid)
+        .slice(0, 5)
+        .map(([jid, messages], index) => {
+          const sortedMessages = (messages as MessageData[]).sort((a, b) => 
+            new Date(a.Timestamp).getTime() - new Date(b.Timestamp).getTime()
+          );
+          
+          return {
+            leadNumber: index + 1,
+            jid,
+            messages: sortedMessages, // Mostrar TODAS as mensagens, não apenas as últimas 10
+            totalMessages: sortedMessages.length
+          };
+        });
+
+      console.log('📊 Amostras de conversas criadas:', conversationSamples.length);
+      console.log('📊 Detalhes das amostras:', conversationSamples.map(s => ({
+        lead: s.leadNumber,
+        jid: s.jid,
+        totalMessages: s.totalMessages
+      })));
+
+      setConversationSamples(conversationSamples);
+
+      // 5. Analisar padrões nas mensagens
       const appointmentKeywords = analyzeKeywords(appointedMessages);
       const nonAppointmentKeywords = analyzeKeywords(nonAppointedMessages);
 
-      // 5. Analisar padrões temporais
+      // 6. Analisar padrões temporais
       const timePatterns = analyzeTimePatterns(appointedByJid);
 
-      // 6. Analisar sequências de mensagens
+      // 7. Analisar sequências de mensagens
       const sequencePatterns = analyzeMessageSequences(appointedByJid);
 
       const analysisResults: AnalysisResults = {
@@ -181,11 +252,6 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       };
 
       setPatterns(analysisResults);
-      setConversationSamples(Object.entries(appointedByJid).slice(0, 5).map(([jid, messages]) => ({
-        jid,
-        messages: (messages as MessageData[]).slice(-10) // Últimas 10 mensagens de cada conversa
-      })));
-
       console.log('✅ Análise de padrões concluída:', analysisResults);
 
     } catch (error) {
@@ -267,7 +333,6 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
   };
 
   const analyzeMessageSequences = (appointedByJid: Record<string, MessageData[]>): SequencePatterns => {
-    // Analisar sequências comuns de mensagens que levam ao agendamento
     return {
       commonSequences: ['interesse → disponibilidade → confirmação'],
       avgSequenceLength: 3,
@@ -341,7 +406,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
               </Button>
               <Badge variant="outline" className="flex items-center gap-1">
                 <Target className="h-3 w-3" />
-                {CONFIRMED_APPOINTMENTS_HAILA.length} leads confirmados
+                {agentName === 'Haila' ? CONFIRMED_APPOINTMENTS_HAILA.length : '10+'} leads para análise
               </Badge>
             </div>
 
@@ -349,7 +414,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
               <div className="space-y-2">
                 <Progress value={65} className="w-full" />
                 <p className="text-sm text-muted-foreground">
-                  Analisando conversas dos leads agendados...
+                  Analisando conversas completas dos leads selecionados...
                 </p>
               </div>
             )}
@@ -483,29 +548,40 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
             </CardContent>
           </Card>
 
-          {/* Amostras de Conversas */}
+          {/* Amostras de Conversas COMPLETAS */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Amostras de Conversas Agendadas
+                Amostras de Conversas Agendadas - Dados Completos
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {conversationSamples.map((sample, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline">Lead {index + 1}</Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {sample.jid}
-                      </span>
+                {conversationSamples.map((sample) => (
+                  <div key={sample.leadNumber} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">Lead {sample.leadNumber}</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {sample.jid}
+                        </span>
+                      </div>
+                      <Badge variant="secondary">
+                        {sample.totalMessages} mensagens
+                      </Badge>
                     </div>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                    
+                    <div className="space-y-2 max-h-80 overflow-y-auto border rounded p-3 bg-gray-50">
                       {sample.messages.map((msg, msgIndex) => (
-                        <div key={msgIndex} className="text-xs p-2 bg-gray-50 rounded">
-                          <div className="font-medium">{msg.nome}:</div>
-                          <div>{msg.message}</div>
+                        <div key={msgIndex} className="text-xs p-2 bg-white rounded border-l-2 border-l-blue-200">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-blue-700">{msg.nome}:</span>
+                            <span className="text-gray-500 text-[10px]">
+                              {new Date(msg.Timestamp).toLocaleString('pt-BR')}
+                            </span>
+                          </div>
+                          <div className="text-gray-800">{msg.message}</div>
                         </div>
                       ))}
                     </div>
