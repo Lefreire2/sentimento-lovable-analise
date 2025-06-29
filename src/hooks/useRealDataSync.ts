@@ -35,7 +35,7 @@ export const useRealDataSync = () => {
     try {
       // Verificar tabela básica com tratamento de erro adequado
       const { data: basicData, error: basicError } = await supabase
-        .from(basicTable)
+        .from(basicTable as any)
         .select('remoteJid, Timestamp, message')
         .limit(10);
 
@@ -54,7 +54,7 @@ export const useRealDataSync = () => {
 
       // Contar mensagens totais
       const { count: basicCount, error: countError } = await supabase
-        .from(basicTable)
+        .from(basicTable as any)
         .select('*', { count: 'exact', head: true });
 
       if (countError) {
@@ -70,10 +70,11 @@ export const useRealDataSync = () => {
         };
       }
 
-      // Contar leads únicos
+      // Contar leads únicos - usando query mais genérica
       const { data: leadsData, error: leadsError } = await supabase
-        .from(basicTable)
-        .select('remoteJid');
+        .from(basicTable as any)
+        .select('*')
+        .limit(1000);
 
       if (leadsError) {
         console.error(`❌ SYNC - Erro ao buscar leads em ${basicTable}:`, leadsError);
@@ -88,10 +89,11 @@ export const useRealDataSync = () => {
         };
       }
 
+      // Extrair leads únicos de forma mais robusta
       const uniqueLeads = leadsData ? 
         new Set(leadsData
-          .map(row => row.remoteJid)
-          .filter(jid => jid && jid.trim() !== '' && jid !== 'null')
+          .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
+          .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
         ).size : 0;
 
       let metricsCount = 0;
@@ -100,7 +102,7 @@ export const useRealDataSync = () => {
       // Verificar tabela de métricas se existir
       if (metricsTable && metricsTable.trim() !== '') {
         const { count: metricsCountResult, error: metricsError } = await supabase
-          .from(metricsTable)
+          .from(metricsTable as any)
           .select('*', { count: 'exact', head: true });
 
         if (!metricsError && metricsCountResult !== null) {
@@ -154,8 +156,8 @@ export const useRealDataSync = () => {
     setIsSync(true);
     
     const allAgents = agentTables.map(table => {
-      const agentName = table.replace('Lista_de_Mensagens_', '').replace('_', ' ');
-      const metricsTable = `Lista_mensagens_${table.replace('Lista_de_Mensagens_', '')}`;
+      const agentName = table.replace('Lista_mensagens_', '').replace('_', ' ');
+      const metricsTable = `Lista_mensagens_${table.replace('Lista_mensagens_', '')}`;
       return { agentName, basicTable: table, metricsTable };
     });
 
