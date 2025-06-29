@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -113,6 +114,23 @@ const CONFIRMED_APPOINTMENTS_HAILA = [
   '5511942182534@s.whatsapp.net'
 ];
 
+// Helper function to safely convert query results to MessageData
+const convertToMessageData = (data: any[]): MessageData[] => {
+  if (!data || !Array.isArray(data)) {
+    return [];
+  }
+  
+  return data
+    .filter(item => item && typeof item === 'object' && !item.error)
+    .map(item => ({
+      id: item.id || 0,
+      remoteJid: item.remoteJid || '',
+      Timestamp: item.Timestamp || '',
+      nome: item.nome || '',
+      message: item.message || ''
+    }));
+};
+
 export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnalyzerProps) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [patterns, setPatterns] = useState<AnalysisResults | null>(null);
@@ -166,7 +184,7 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
       }
 
       // 1. Buscar TODAS as conversas dos leads selecionados, ordenadas por timestamp
-      const { data: appointedConversations, error: appointedError } = await supabase
+      const { data: appointedConversationsRaw, error: appointedError } = await supabase
         .from(basicTableName as any)
         .select('*')
         .in('remoteJid', appointedJids)
@@ -178,10 +196,10 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
         return;
       }
 
-      console.log('📅 Total de mensagens encontradas:', appointedConversations?.length || 0);
+      console.log('📅 Total de mensagens encontradas:', appointedConversationsRaw?.length || 0);
 
       // 2. Buscar uma amostra de conversas não agendadas para comparação
-      const { data: nonAppointedConversations, error: nonAppointedError } = await supabase
+      const { data: nonAppointedConversationsRaw, error: nonAppointedError } = await supabase
         .from(basicTableName as any)
         .select('*')
         .not('remoteJid', 'in', `(${appointedJids.map(jid => `'${jid}'`).join(',')})`)
@@ -192,11 +210,11 @@ export const AppointmentPatternAnalyzer = ({ agentName }: AppointmentPatternAnal
         console.error('❌ Erro ao buscar conversas não agendadas:', nonAppointedError);
       }
 
-      console.log('❌ Conversas de leads não agendados (amostra):', nonAppointedConversations?.length || 0);
+      console.log('❌ Conversas de leads não agendados (amostra):', nonAppointedConversationsRaw?.length || 0);
 
-      // 3. Processar e agrupar mensagens por conversa
-      const appointedMessages = (appointedConversations || []) as MessageData[];
-      const nonAppointedMessages = (nonAppointedConversations || []) as MessageData[];
+      // 3. Processar e agrupar mensagens por conversa usando helper function
+      const appointedMessages = convertToMessageData(appointedConversationsRaw || []);
+      const nonAppointedMessages = convertToMessageData(nonAppointedConversationsRaw || []);
 
       // Agrupar por remoteJid para análise por conversa
       const appointedByJid = groupMessagesByJid(appointedMessages);
