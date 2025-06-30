@@ -10,7 +10,7 @@ export const getAgentTableMapping = () => {
       metricsTable: 'Lista_mensagens_Haila'
     },
     'Carlos Antunes': {
-      messagesTable: 'Lista_de_Mensagens_ Carlos_Antunes',
+      messagesTable: 'Lista_de_Mensagens_ Carlos_Antunes', // Note o espaço antes de Carlos
       metricsTable: 'Lista_mensagens_Carlos_Antunes'
     },
     'Adiney Esteves': {
@@ -131,6 +131,40 @@ export const getTableNamesForAgent = (agentName: string) => {
   }
   
   console.log(`✅ Tabelas encontradas para ${agentName}:`, tables);
-  console.log(`📊 Padrão confirmado: ${tables.messagesTable} e ${tables.metricsTable}`);
+  console.log(`📊 Mapeamento confirmado: ${tables.messagesTable} e ${tables.metricsTable}`);
   return tables;
+};
+
+// Função para verificar se uma tabela existe no banco
+export const checkTableExists = async (supabase: any, tableName: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from(tableName)
+      .select('*', { count: 'exact', head: true })
+      .limit(1);
+    
+    return !error;
+  } catch (error) {
+    console.error(`❌ Erro ao verificar tabela ${tableName}:`, error);
+    return false;
+  }
+};
+
+// Função para verificar se uma tabela tem dados
+export const checkTableHasData = async (supabase: any, tableName: string): Promise<number> => {
+  try {
+    const { count, error } = await supabase
+      .from(tableName)
+      .select('*', { count: 'exact', head: true });
+    
+    if (error) {
+      console.error(`❌ Erro ao contar registros da tabela ${tableName}:`, error);
+      return 0;
+    }
+    
+    return count || 0;
+  } catch (error) {
+    console.error(`❌ Erro ao contar registros da tabela ${tableName}:`, error);
+    return 0;
+  }
 };

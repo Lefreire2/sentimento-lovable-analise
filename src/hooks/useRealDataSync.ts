@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +27,8 @@ interface AgentDataSummary {
     metricsExists: boolean;
     basicEmpty: boolean;
     metricsEmpty: boolean;
+    basicError?: string;
+    metricsError?: string;
   };
 }
 
@@ -70,131 +71,140 @@ export const useRealDataSync = () => {
   const [agentSummaries, setAgentSummaries] = useState<AgentDataSummary[]>([]);
   const { toast } = useToast();
 
-  const validateTableExists = async (tableName: string): Promise<boolean> => {
+  const validateTableExists = async (tableName: string): Promise<{ exists: boolean; error?: string }> => {
     try {
+      console.log(`🔍 SYNC - Verificando existência da tabela: ${tableName}`);
       const { error } = await supabase
         .from(tableName as any)
         .select('*', { count: 'exact', head: true })
         .limit(1);
       
-      return !error;
-    } catch (error) {
-      console.error(`❌ SYNC - Erro ao verificar tabela ${tableName}:`, error);
-      return false;
+      if (error) {
+        console.log(`❌ SYNC - Tabela ${tableName} não existe:`, error.message);
+        return { exists: false, error: error.message };
+      }
+      
+      console.log(`✅ SYNC - Tabela ${tableName} existe`);
+      return { exists: true };
+    } catch (error: any) {
+      console.error(`💥 SYNC - Erro crítico ao verificar tabela ${tableName}:`, error);
+      return { exists: false, error: error.message };
     }
   };
 
-  const checkTableEmpty = async (tableName: string): Promise<boolean> => {
+  const checkTableEmpty = async (tableName: string): Promise<{ count: number; empty: boolean; error?: string }> => {
     try {
+      console.log(`📊 SYNC - Verificando se tabela ${tableName} tem dados...`);
       const { count, error } = await supabase
         .from(tableName as any)
         .select('*', { count: 'exact', head: true });
       
-      return !error && (count === 0);
-    } catch (error) {
-      return true; // Assume empty if can't check
+      if (error) {
+        console.log(`❌ SYNC - Erro ao verificar dados da tabela ${tableName}:`, error.message);
+        return { count: 0, empty: true, error: error.message };
+      }
+      
+      const isEmpty = (count === 0);
+      console.log(`📊 SYNC - Tabela ${tableName}: ${count} registros (${isEmpty ? 'VAZIA' : 'COM DADOS'})`);
+      return { count: count || 0, empty: isEmpty };
+    } catch (error: any) {
+      console.error(`💥 SYNC - Erro crítico ao verificar dados da tabela ${tableName}:`, error);
+      return { count: 0, empty: true, error: error.message };
     }
   };
 
   const validateAgentData = async (agentName: string): Promise<AgentDataSummary> => {
-    console.log(`🔍 SYNC - Validando dados para ${agentName}`);
+    console.log(`🎯 SYNC - INICIANDO validação completa para: ${agentName}`);
     
     // Obter nomes das tabelas usando as funções corretas
     const basicTableName = getBasicTableName(agentName);
     const metricsTableName = getMetricsTableName(agentName);
     
-    console.log(`📊 SYNC - Tabelas para ${agentName}:`);
+    console.log(`📊 SYNC - Tabelas mapeadas para ${agentName}:`);
     console.log(`  - Básica: ${basicTableName}`);
     console.log(`  - Métricas: ${metricsTableName}`);
     
-    // Verificar se as tabelas existem
-    const basicExists = basicTableName ? await validateTableExists(basicTableName) : false;
-    const metricsExists = metricsTableName ? await validateTableExists(metricsTableName) : false;
-    
-    // Verificar se as tabelas estão vazias
-    const basicEmpty = basicExists ? await checkTableEmpty(basicTableName!) : true;
-    const metricsEmpty = metricsExists ? await checkTableEmpty(metricsTableName!) : true;
-    
-    console.log(`✅ SYNC - Status das tabelas para ${agentName}:`);
-    console.log(`  - Básica (${basicTableName}): ${basicExists ? '✅ Existe' : '❌ Não existe'} ${basicEmpty ? '📭 Vazia' : '📬 Com dados'}`);
-    console.log(`  - Métricas (${metricsTableName}): ${metricsExists ? '✅ Existe' : '❌ Não existe'} ${metricsEmpty ? '📭 Vazia' : '📬 Com dados'}`);
+    // Inicializar status das tabelas
+    const tableStatus = {
+      basicTable: basicTableName || 'N/A',
+      metricsTable: metricsTableName || 'N/A',
+      basicExists: false,
+      metricsExists: false,
+      basicEmpty: true,
+      metricsEmpty: true,
+      basicError: undefined as string | undefined,
+      metricsError: undefined as string | undefined
+    };
 
     let basicMessages = 0;
     let metricsRecords = 0;
     let uniqueLeads = 0;
     let hasValidData = false;
 
-    // Processar tabela básica se existir e não estiver vazia
-    if (basicExists && !basicEmpty && basicTableName) {
-      try {
-        console.log(`📊 SYNC - Processando tabela básica: ${basicTableName}`);
+    // Verificar tabela básica
+    if (basicTableName) {
+      console.log(`🔍 SYNC - Validando tabela básica: ${basicTableName}`);
+      const basicExistsResult = await validateTableExists(basicTableName);
+      tableStatus.basicExists = basicExistsResult.exists;
+      tableStatus.basicError = basicExistsResult.error;
+
+      if (basicExistsResult.exists) {
+        const basicDataResult = await checkTableEmpty(basicTableName);
+        tableStatus.basicEmpty = basicDataResult.empty;
+        basicMessages = basicDataResult.count;
         
-        // Contar mensagens totais
-        const { count: basicCount, error: countError } = await supabase
-          .from(basicTableName as any)
-          .select('*', { count: 'exact', head: true });
+        if (!basicDataResult.empty && basicMessages > 0) {
+          // Buscar amostra para contar leads únicos
+          try {
+            const { data: sampleData, error: sampleError } = await supabase
+              .from(basicTableName as any)
+              .select('remoteJid')
+              .limit(500);
 
-        if (!countError && basicCount !== null) {
-          basicMessages = basicCount;
-          console.log(`✅ SYNC - Mensagens básicas encontradas: ${basicMessages}`);
-        }
-
-        // Buscar dados para contar leads únicos (apenas se houver dados)
-        if (basicMessages > 0) {
-          const { data: leadsData, error: leadsError } = await supabase
-            .from(basicTableName as any)
-            .select('*')
-            .limit(1000);
-
-          if (!leadsError && leadsData) {
-            // Extrair leads únicos de forma robusta
-            const uniqueJids = new Set(leadsData
-              .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
-              .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
-            );
-            
-            uniqueLeads = uniqueJids.size;
-            console.log(`✅ SYNC - Leads únicos encontrados: ${uniqueLeads}`);
+            if (!sampleError && sampleData) {
+              const uniqueJids = new Set(
+                sampleData
+                  .map((row: any) => row.remoteJid)
+                  .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
+              );
+              uniqueLeads = uniqueJids.size;
+              hasValidData = basicMessages > 0 && uniqueLeads > 0;
+              console.log(`✅ SYNC - Leads únicos encontrados: ${uniqueLeads}`);
+            }
+          } catch (error) {
+            console.error(`💥 SYNC - Erro ao buscar amostra de leads:`, error);
           }
         }
-
-        hasValidData = basicMessages > 0 && uniqueLeads > 0;
-      } catch (error) {
-        console.error(`❌ SYNC - Erro ao processar tabela básica ${basicTableName}:`, error);
       }
     }
 
-    // Processar tabela de métricas se existir e não estiver vazia
-    if (metricsExists && !metricsEmpty && metricsTableName) {
-      try {
-        console.log(`📊 SYNC - Processando tabela de métricas: ${metricsTableName}`);
-        
-        const { count: metricsCount, error: metricsError } = await supabase
-          .from(metricsTableName as any)
-          .select('*', { count: 'exact', head: true });
+    // Verificar tabela de métricas
+    if (metricsTableName) {
+      console.log(`🔍 SYNC - Validando tabela de métricas: ${metricsTableName}`);
+      const metricsExistsResult = await validateTableExists(metricsTableName);
+      tableStatus.metricsExists = metricsExistsResult.exists;
+      tableStatus.metricsError = metricsExistsResult.error;
 
-        if (!metricsError && metricsCount !== null) {
-          metricsRecords = metricsCount;
-          console.log(`✅ SYNC - Registros de métricas encontrados: ${metricsRecords}`);
-        }
-      } catch (error) {
-        console.error(`❌ SYNC - Erro ao processar tabela de métricas ${metricsTableName}:`, error);
+      if (metricsExistsResult.exists) {
+        const metricsDataResult = await checkTableEmpty(metricsTableName);
+        tableStatus.metricsEmpty = metricsDataResult.empty;
+        metricsRecords = metricsDataResult.count;
       }
     }
 
-    // Determinar qualidade dos dados com informações mais detalhadas
+    // Determinar qualidade dos dados
     let dataQuality: 'excellent' | 'good' | 'poor' | 'missing' = 'missing';
     
     if (hasValidData) {
       if (metricsRecords > 0) {
         dataQuality = 'excellent';
-      } else if (uniqueLeads >= 50) {
+      } else if (uniqueLeads >= 10) {
         dataQuality = 'good';
       } else {
         dataQuality = 'poor';
       }
-    } else if (basicExists || metricsExists) {
-      // Tabelas existem mas estão vazias
+    } else if (tableStatus.basicExists || tableStatus.metricsExists) {
+      // Tabelas existem mas não têm dados válidos
       dataQuality = 'missing';
     }
 
@@ -206,14 +216,7 @@ export const useRealDataSync = () => {
       hasValidData,
       dataQuality,
       lastUpdate: new Date().toISOString(),
-      tableStatus: {
-        basicTable: basicTableName || 'N/A',
-        metricsTable: metricsTableName || 'N/A',
-        basicExists,
-        metricsExists,
-        basicEmpty,
-        metricsEmpty
-      }
+      tableStatus
     };
 
     console.log(`✅ SYNC - Validação completa para ${agentName}:`, summary);
@@ -221,8 +224,8 @@ export const useRealDataSync = () => {
   };
 
   const syncAllAgentsData = useCallback(async () => {
-    console.log('🚀 SYNC - Iniciando sincronização completa de dados reais');
-    console.log(`📋 SYNC - Total de agentes a processar: ${AGENT_NAMES.length}`);
+    console.log('🚀 SYNC - INICIANDO sincronização completa de todos os agentes');
+    console.log(`📋 SYNC - Total de agentes para processar: ${AGENT_NAMES.length}`);
     
     setIsSync(true);
     
@@ -246,7 +249,7 @@ export const useRealDataSync = () => {
         ...prev,
         currentAgent: agentName,
         currentAgentIndex: i + 1,
-        stage: 'fetching'
+        stage: 'validating'
       } : null);
 
       try {
@@ -255,26 +258,28 @@ export const useRealDataSync = () => {
         const summary = await validateAgentData(agentName);
         summaries.push(summary);
 
-        // Gerar avisos mais específicos baseado no status
+        // Gerar avisos específicos baseado no status
         if (!summary.tableStatus.basicExists && !summary.tableStatus.metricsExists) {
-          warnings.push(`${agentName}: Nenhuma tabela encontrada no banco de dados`);
+          errors.push(`${agentName}: Tabelas não encontradas no banco de dados`);
         } else if (summary.tableStatus.basicExists && summary.tableStatus.metricsExists) {
           if (summary.tableStatus.basicEmpty && summary.tableStatus.metricsEmpty) {
-            warnings.push(`${agentName}: Tabelas existem mas ambas estão vazias - sem dados para processar`);
-          } else if (summary.tableStatus.basicEmpty) {
-            warnings.push(`${agentName}: Tabela básica vazia, apenas métricas disponíveis`);
-          } else if (summary.tableStatus.metricsEmpty) {
-            warnings.push(`${agentName}: Tabela de métricas vazia, análise limitada`);
+            warnings.push(`${agentName}: Tabelas existem mas ambas estão vazias - dados não foram importados`);
+          } else if (summary.tableStatus.basicEmpty && !summary.tableStatus.metricsEmpty) {
+            warnings.push(`${agentName}: Tabela básica vazia, mas métricas disponíveis`);
+          } else if (!summary.tableStatus.basicEmpty && summary.tableStatus.metricsEmpty) {
+            warnings.push(`${agentName}: Dados básicos disponíveis, mas tabela de métricas vazia`);
           }
-        } else if (!summary.hasValidData && summary.dataQuality === 'poor') {
-          warnings.push(`${agentName}: Qualidade de dados baixa (${summary.uniqueLeads} leads únicos)`);
+        } else if (summary.tableStatus.basicExists && !summary.tableStatus.metricsExists) {
+          warnings.push(`${agentName}: Apenas tabela básica encontrada - tabela de métricas não existe`);
+        } else if (!summary.tableStatus.basicExists && summary.tableStatus.metricsExists) {
+          warnings.push(`${agentName}: Apenas tabela de métricas encontrada - tabela básica não existe`);
         }
 
         // Pausa pequena para não sobrecarregar o banco
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
-      } catch (error) {
-        const errorMsg = `${agentName}: Erro na sincronização - ${error}`;
+      } catch (error: any) {
+        const errorMsg = `${agentName}: Erro crítico na sincronização - ${error.message}`;
         errors.push(errorMsg);
         console.error(`❌ SYNC - ${errorMsg}`);
         
@@ -293,7 +298,9 @@ export const useRealDataSync = () => {
             basicExists: false,
             metricsExists: false,
             basicEmpty: true,
-            metricsEmpty: true
+            metricsEmpty: true,
+            basicError: error.message,
+            metricsError: error.message
           }
         });
       }
@@ -323,23 +330,32 @@ export const useRealDataSync = () => {
     const totalMessages = summaries.reduce((sum, s) => sum + s.basicMessages, 0);
     const totalMetrics = summaries.reduce((sum, s) => sum + s.metricsRecords, 0);
 
-    console.log('✅ SYNC - Sincronização completa - ESTATÍSTICAS FINAIS:');
-    console.log(`📊 Agentes processados: ${AGENT_NAMES.length}`);
+    console.log('🎯 SYNC - RELATÓRIO FINAL DE SINCRONIZAÇÃO:');
+    console.log(`📊 Total de agentes processados: ${AGENT_NAMES.length}`);
     console.log(`✅ Agentes com dados válidos: ${validAgents}`);
-    console.log(`🥇 Qualidade excelente: ${excellentData}`);
-    console.log(`🥈 Qualidade boa: ${goodData}`);
-    console.log(`🥉 Qualidade pobre: ${poorData}`);
+    console.log(`🥇 Qualidade excelente (com métricas): ${excellentData}`);
+    console.log(`🥈 Qualidade boa (dados básicos): ${goodData}`);
+    console.log(`🥉 Qualidade pobre (poucos dados): ${poorData}`);
     console.log(`📭 Tabelas vazias: ${emptyTables}`);
     console.log(`👥 Total de leads únicos: ${totalLeads.toLocaleString()}`);
     console.log(`💬 Total de mensagens: ${totalMessages.toLocaleString()}`);
     console.log(`📈 Total de métricas: ${totalMetrics.toLocaleString()}`);
-    console.log(`⚠️ Erros: ${errors.length}`);
-    console.log(`🔔 Avisos: ${warnings.length}`);
+    console.log(`⚠️ Erros críticos: ${errors.length}`);
+    console.log(`🔔 Avisos de atenção: ${warnings.length}`);
 
-    toast({
-      title: "Sincronização Completa",
-      description: `${validAgents}/${AGENT_NAMES.length} agentes com dados válidos. ${emptyTables} com tabelas vazias. ${totalLeads.toLocaleString()} leads processados.`,
-    });
+    // Toast com informações relevantes
+    if (emptyTables > 0) {
+      toast({
+        title: "Sincronização Completa com Avisos",
+        description: `${validAgents}/${AGENT_NAMES.length} agentes com dados. ${emptyTables} agentes têm tabelas vazias (dados não importados).`,
+        variant: "default"
+      });
+    } else {
+      toast({
+        title: "Sincronização Completa",
+        description: `${validAgents}/${AGENT_NAMES.length} agentes com dados válidos. ${totalLeads.toLocaleString()} leads processados.`,
+      });
+    }
 
     setIsSync(false);
   }, [toast]);

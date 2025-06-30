@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -45,9 +44,12 @@ export const RealDataSyncPanel = () => {
   const totalValidAgents = agentSummaries.filter(s => s.hasValidData).length;
   const excellentQuality = agentSummaries.filter(s => s.dataQuality === 'excellent').length;
   const goodQuality = agentSummaries.filter(s => s.dataQuality === 'good').length;
-  const emptyTables = agentSummaries.filter(s => 
+  const tablesExistButEmpty = agentSummaries.filter(s => 
     (s.tableStatus.basicExists && s.tableStatus.basicEmpty) || 
     (s.tableStatus.metricsExists && s.tableStatus.metricsEmpty)
+  ).length;
+  const tablesNotFound = agentSummaries.filter(s => 
+    !s.tableStatus.basicExists && !s.tableStatus.metricsExists
   ).length;
   const totalLeads = agentSummaries.reduce((sum, s) => sum + s.uniqueLeads, 0);
   const totalMessages = agentSummaries.reduce((sum, s) => sum + s.basicMessages, 0);
@@ -93,7 +95,7 @@ export const RealDataSyncPanel = () => {
               {syncProgress.currentAgent && (
                 <div className="text-sm text-muted-foreground">
                   <Zap className="h-4 w-4 inline mr-1" />
-                  Processando: {syncProgress.currentAgent}
+                  Validando: {syncProgress.currentAgent}
                 </div>
               )}
             </div>
@@ -101,15 +103,15 @@ export const RealDataSyncPanel = () => {
         )}
       </Card>
 
-      {/* Resumo Geral com foco em tabelas vazias */}
+      {/* Resumo Geral com foco em diagnóstico de dados */}
       {agentSummaries.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-blue-600" />
+                <CheckCircle className="h-4 w-4 text-green-600" />
                 <div>
-                  <p className="text-2xl font-bold">{totalValidAgents}</p>
+                  <p className="text-2xl font-bold text-green-600">{totalValidAgents}</p>
                   <p className="text-xs text-muted-foreground">Com Dados Válidos</p>
                 </div>
               </div>
@@ -121,8 +123,20 @@ export const RealDataSyncPanel = () => {
               <div className="flex items-center space-x-2">
                 <Inbox className="h-4 w-4 text-yellow-600" />
                 <div>
-                  <p className="text-2xl font-bold text-yellow-700">{emptyTables}</p>
+                  <p className="text-2xl font-bold text-yellow-700">{tablesExistButEmpty}</p>
                   <p className="text-xs text-yellow-600">Tabelas Vazias</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2">
+                <XCircle className="h-4 w-4 text-red-600" />
+                <div>
+                  <p className="text-2xl font-bold text-red-700">{tablesNotFound}</p>
+                  <p className="text-xs text-red-600">Tabelas Não Encontradas</p>
                 </div>
               </div>
             </CardContent>
@@ -139,47 +153,47 @@ export const RealDataSyncPanel = () => {
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <MessageSquare className="h-4 w-4 text-orange-600" />
-                <div>
-                  <p className="text-2xl font-bold">{totalMessages.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Mensagens</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       )}
 
-      {/* Aviso sobre tabelas vazias */}
-      {emptyTables > 0 && (
+      {/* Diagnóstico detalhado sobre dados ausentes */}
+      {tablesExistButEmpty > 0 && (
         <Card className="border-orange-200 bg-orange-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-orange-700">
               <AlertCircle className="h-5 w-5" />
-              Atenção: Tabelas Vazias Detectadas
+              Diagnóstico: Tabelas Vazias Detectadas
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-orange-800 space-y-2">
+            <div className="text-orange-800 space-y-3">
               <p className="font-medium">
-                {emptyTables} agentes têm tabelas que existem no banco de dados mas estão vazias.
+                {tablesExistButEmpty} agentes têm tabelas criadas no Supabase mas sem dados importados.
               </p>
-              <ul className="text-sm list-disc list-inside space-y-1">
-                <li>As tabelas foram criadas corretamente no Supabase</li>
-                <li>O sistema consegue acessar as tabelas</li>
-                <li>Porém, não há dados inseridos nessas tabelas</li>
-                <li>Verifique se o processo de importação de dados foi executado</li>
-              </ul>
+              <div className="bg-orange-100 border border-orange-200 rounded-lg p-4">
+                <h4 className="font-semibold mb-2">Status do Sistema:</h4>
+                <ul className="text-sm space-y-1 list-disc list-inside">
+                  <li>✅ Conexão com Supabase funcionando</li>
+                  <li>✅ Tabelas criadas corretamente no banco</li>
+                  <li>✅ Permissões de acesso configuradas</li>
+                  <li>❌ Dados não foram importados para essas tabelas</li>
+                </ul>
+              </div>
+              <div className="bg-white border border-orange-200 rounded-lg p-4">
+                <h4 className="font-semibold mb-2">Próximos Passos:</h4>
+                <ul className="text-sm space-y-1 list-decimal list-inside">
+                  <li>Verificar o processo de importação de dados</li>
+                  <li>Confirmar se os arquivos CSV foram processados</li>
+                  <li>Executar novamente a importação para os agentes afetados</li>
+                  <li>Fazer nova sincronização após importação</li>
+                </ul>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Lista Detalhada de Agentes */}
+      {/* Lista Detalhada de Agentes com diagnóstico aprimorado */}
       {agentSummaries.length > 0 && (
         <Card>
           <CardHeader>
@@ -198,94 +212,105 @@ export const RealDataSyncPanel = () => {
                   if (qualityDiff !== 0) return qualityDiff;
                   return b.uniqueLeads - a.uniqueLeads;
                 })
-                .map((agent) => (
-                  <div 
-                    key={agent.agentName} 
-                    className={`flex items-center justify-between p-4 rounded-lg border ${
-                      agent.tableStatus.basicEmpty && agent.tableStatus.metricsEmpty && 
-                      (agent.tableStatus.basicExists || agent.tableStatus.metricsExists)
-                        ? 'bg-yellow-50 border-yellow-200' 
-                        : 'bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        {agent.hasValidData ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : agent.tableStatus.basicExists || agent.tableStatus.metricsExists ? (
-                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                        <span className="font-medium">{agent.agentName}</span>
-                      </div>
-                      
-                      <Badge className={`${getDataQualityColor(agent.dataQuality)} border`}>
-                        {getDataQualityLabel(agent.dataQuality)}
-                      </Badge>
-
-                      {/* Indicador especial para tabelas vazias */}
-                      {(agent.tableStatus.basicEmpty && agent.tableStatus.basicExists) || 
-                       (agent.tableStatus.metricsEmpty && agent.tableStatus.metricsExists) ? (
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
-                          <Inbox className="h-3 w-3 mr-1" />
-                          Tabela Vazia
+                .map((agent) => {
+                  const hasEmptyTables = (agent.tableStatus.basicExists && agent.tableStatus.basicEmpty) || 
+                                       (agent.tableStatus.metricsExists && agent.tableStatus.metricsEmpty);
+                  const hasNotFoundTables = !agent.tableStatus.basicExists && !agent.tableStatus.metricsExists;
+                  
+                  return (
+                    <div 
+                      key={agent.agentName} 
+                      className={`flex items-center justify-between p-4 rounded-lg border ${
+                        hasEmptyTables ? 'bg-yellow-50 border-yellow-200' : 
+                        hasNotFoundTables ? 'bg-red-50 border-red-200' :
+                        'bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          {agent.hasValidData ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : hasNotFoundTables ? (
+                            <XCircle className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                          )}
+                          <span className="font-medium">{agent.agentName}</span>
+                        </div>
+                        
+                        <Badge className={`${getDataQualityColor(agent.dataQuality)} border`}>
+                          {getDataQualityLabel(agent.dataQuality)}
                         </Badge>
-                      ) : null}
-                    </div>
 
-                    <div className="flex items-center gap-6">
-                      {/* Estatísticas */}
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1" title="Leads únicos">
-                          <Users className="h-3 w-3" />
-                          <span className="font-medium">{agent.uniqueLeads}</span>
-                        </div>
+                        {/* Indicadores específicos de diagnóstico */}
+                        {hasEmptyTables && (
+                          <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                            <Inbox className="h-3 w-3 mr-1" />
+                            Dados Não Importados
+                          </Badge>
+                        )}
                         
-                        <div className="flex items-center gap-1" title="Mensagens básicas">
-                          <MessageSquare className="h-3 w-3" />
-                          <span className="font-medium">{agent.basicMessages.toLocaleString()}</span>
-                        </div>
-                        
-                        {agent.metricsRecords > 0 && (
-                          <div className="flex items-center gap-1" title="Registros de métricas">
-                            <BarChart3 className="h-3 w-3" />
-                            <span className="font-medium">{agent.metricsRecords}</span>
-                          </div>
+                        {hasNotFoundTables && (
+                          <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            Tabelas Não Encontradas
+                          </Badge>
                         )}
                       </div>
 
-                      {/* Status das Tabelas com indicador de vazio */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${
-                            !agent.tableStatus.basicExists ? 'bg-red-500' :
-                            agent.tableStatus.basicEmpty ? 'bg-yellow-500' : 'bg-green-500'
-                          }`} 
-                               title={`Tabela básica: ${agent.tableStatus.basicTable} - ${
-                                 !agent.tableStatus.basicExists ? 'Não existe' :
-                                 agent.tableStatus.basicEmpty ? 'Vazia' : 'Com dados'
-                               }`}></div>
-                          <span className="text-gray-500">B</span>
+                      <div className="flex items-center gap-6">
+                        {/* Estatísticas */}
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1" title="Leads únicos">
+                            <Users className="h-3 w-3" />
+                            <span className="font-medium">{agent.uniqueLeads}</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-1" title="Mensagens básicas">
+                            <MessageSquare className="h-3 w-3" />
+                            <span className="font-medium">{agent.basicMessages.toLocaleString()}</span>
+                          </div>
+                          
+                          {agent.metricsRecords > 0 && (
+                            <div className="flex items-center gap-1" title="Registros de métricas">
+                              <BarChart3 className="h-3 w-3" />
+                              <span className="font-medium">{agent.metricsRecords}</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${
-                            !agent.tableStatus.metricsExists ? 'bg-red-500' :
-                            agent.tableStatus.metricsEmpty ? 'bg-yellow-500' : 'bg-green-500'
-                          }`} 
-                               title={`Tabela métricas: ${agent.tableStatus.metricsTable} - ${
-                                 !agent.tableStatus.metricsExists ? 'Não existe' :
-                                 agent.tableStatus.metricsEmpty ? 'Vazia' : 'Com dados'
-                               }`}></div>
-                          <span className="text-gray-500">M</span>
+
+                        {/* Status das Tabelas com diagnóstico detalhado */}
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 text-xs">
+                            <div className={`w-2 h-2 rounded-full ${
+                              !agent.tableStatus.basicExists ? 'bg-red-500' :
+                              agent.tableStatus.basicEmpty ? 'bg-yellow-500' : 'bg-green-500'
+                            }`} 
+                                 title={`Tabela básica: ${agent.tableStatus.basicTable} - ${
+                                   !agent.tableStatus.basicExists ? 'Não encontrada' :
+                                   agent.tableStatus.basicEmpty ? 'Vazia (sem dados)' : 'Com dados'
+                                 }${agent.tableStatus.basicError ? ` (Erro: ${agent.tableStatus.basicError})` : ''}`}></div>
+                            <span className="text-gray-500">B</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs">
+                            <div className={`w-2 h-2 rounded-full ${
+                              !agent.tableStatus.metricsExists ? 'bg-red-500' :
+                              agent.tableStatus.metricsEmpty ? 'bg-yellow-500' : 'bg-green-500'
+                            }`} 
+                                 title={`Tabela métricas: ${agent.tableStatus.metricsTable} - ${
+                                   !agent.tableStatus.metricsExists ? 'Não encontrada' :
+                                   agent.tableStatus.metricsEmpty ? 'Vazia (sem dados)' : 'Com dados'
+                                 }${agent.tableStatus.metricsError ? ` (Erro: ${agent.tableStatus.metricsError})` : ''}`}></div>
+                            <span className="text-gray-500">M</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
             
-            {/* Legenda Atualizada */}
+            {/* Legenda Atualizada com diagnóstico */}
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center gap-6 text-xs text-blue-700 flex-wrap">
                 <div className="flex items-center gap-1">
@@ -294,11 +319,11 @@ export const RealDataSyncPanel = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <span>Amarelo = Tabela vazia</span>
+                  <span>Amarelo = Tabela vazia (dados não importados)</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                  <span>Vermelho = Não existe</span>
+                  <span>Vermelho = Tabela não encontrada</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span>B = Básica | M = Métricas</span>
