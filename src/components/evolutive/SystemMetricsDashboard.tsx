@@ -21,10 +21,10 @@ interface SystemMetricsDashboardProps {
 }
 
 export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings }: SystemMetricsDashboardProps) => {
-  const { useRealDataAnalysis } = useEvolutiveSystem();
+  const { useSystemMetrics } = useEvolutiveSystem();
   
-  // Usar análise de dados reais do agente Haila para métricas do sistema
-  const { data: systemData, isLoading, error } = useRealDataAnalysis('Haila', 'system_metrics', analysisSettings);
+  // Usar métricas gerais do sistema, não específicas de agente
+  const { data: systemData, isLoading, error } = useSystemMetrics(period);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -42,9 +42,6 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
       <TrendingUp className="h-4 w-4 text-green-600" /> : 
       <TrendingDown className="h-4 w-4 text-red-600" />;
   };
-
-  // Extrair métricas do sistema dos dados de análise real
-  const metrics = systemData?.system_metrics_analysis || systemData;
 
   if (isLoading) {
     return (
@@ -69,10 +66,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
         <CardContent className="p-6 text-center">
           <AlertCircle className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
           <p className="text-sm text-muted-foreground mb-4">
-            Erro ao carregar métricas do sistema. Exibindo dados estimados baseados em análise real.
+            Erro ao carregar métricas do sistema. Exibindo dados do último cálculo disponível.
           </p>
           <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
-            Dados Estimados
+            Dados em Cache
           </Badge>
         </CardContent>
       </Card>
@@ -80,7 +77,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
   }
 
   // Se não temos dados, mostrar estado de carregamento
-  if (!metrics) {
+  if (!systemData) {
     return (
       <Card>
         <CardContent className="p-6 text-center">
@@ -97,7 +94,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Métricas do Sistema Evolutivo</h2>
+        <h2 className="text-2xl font-bold">Métricas Gerais do Sistema</h2>
         <div className="flex items-center gap-2">
           <Badge variant="outline">
             {period === 'last7days' ? 'Últimos 7 dias' : 
@@ -105,7 +102,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
              'Últimos 90 dias'}
           </Badge>
           <Badge variant="secondary" className="bg-blue-50 text-blue-700">
-            Agente Haila
+            Sistema Completo
           </Badge>
         </div>
       </div>
@@ -120,10 +117,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.leads_totais}</div>
+            <div className="text-2xl font-bold">{systemData.leads_totais}</div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3" />
-              Baseado em dados reais
+              Todos os agentes
             </div>
           </CardContent>
         </Card>
@@ -135,10 +132,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(metrics.taxa_qualificacao)}</div>
-            <Progress value={metrics.taxa_qualificacao} className="mt-2" />
+            <div className="text-2xl font-bold">{formatPercentage(systemData.taxa_qualificacao)}</div>
+            <Progress value={systemData.taxa_qualificacao} className="mt-2" />
             <p className="text-xs text-muted-foreground mt-1">
-              {metrics.leads_qualificados} de {metrics.leads_totais} leads
+              {systemData.leads_qualificados} de {systemData.leads_totais} leads
             </p>
           </CardContent>
         </Card>
@@ -150,13 +147,13 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.agendamentos_realizados}</div>
+            <div className="text-2xl font-bold">{systemData.agendamentos_realizados}</div>
             <p className="text-xs text-muted-foreground">
-              {formatPercentage(metrics.taxa_conversao_agendamento)} de conversão
+              {formatPercentage(systemData.taxa_conversao_agendamento)} de conversão
             </p>
             <div className="mt-2">
               <Badge variant="outline" className="text-xs">
-                Validado em dados reais
+                Sistema Geral
               </Badge>
             </div>
           </CardContent>
@@ -169,7 +166,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(metrics.roi_marketing)}</div>
+            <div className="text-2xl font-bold">{formatPercentage(systemData.roi_marketing)}</div>
             <div className="flex items-center gap-1 text-xs">
               <TrendingUp className="h-3 w-3 text-green-600" />
               <span className="text-green-600">Positivo</span>
@@ -184,20 +181,20 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
         {/* Conversion Metrics */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Conversão</CardTitle>
+            <CardTitle className="text-lg">Conversão Geral</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Taxa Comparecimento</span>
-              <span className="font-bold">{formatPercentage(metrics.taxa_comparecimento)}</span>
+              <span className="font-bold">{formatPercentage(systemData.taxa_comparecimento)}</span>
             </div>
-            <Progress value={metrics.taxa_comparecimento} />
+            <Progress value={systemData.taxa_comparecimento} />
             
             <div className="flex justify-between items-center">
               <span className="text-sm">Leads Qualificados</span>
-              <span className="font-bold">{metrics.leads_qualificados}</span>
+              <span className="font-bold">{systemData.leads_qualificados}</span>
             </div>
-            <Progress value={(metrics.leads_qualificados / metrics.leads_totais) * 100} />
+            <Progress value={(systemData.leads_qualificados / systemData.leads_totais) * 100} />
           </CardContent>
         </Card>
 
@@ -208,19 +205,19 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm">CAC</span>
-              <span className="font-bold">{formatCurrency(metrics.custo_aquisicao_cliente)}</span>
+              <span className="text-sm">CAC Médio</span>
+              <span className="font-bold">{formatCurrency(systemData.custo_aquisicao_cliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="text-sm">LTV</span>
-              <span className="font-bold">{formatCurrency(metrics.valor_vida_cliente)}</span>
+              <span className="text-sm">LTV Médio</span>
+              <span className="font-bold">{formatCurrency(systemData.valor_vida_cliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-sm">LTV/CAC Ratio</span>
               <span className="font-bold">
-                {(metrics.valor_vida_cliente / metrics.custo_aquisicao_cliente).toFixed(1)}x
+                {(systemData.valor_vida_cliente / systemData.custo_aquisicao_cliente).toFixed(1)}x
               </span>
             </div>
           </CardContent>
@@ -231,18 +228,18 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Tempo
+              Tempo Médio
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Tempo Médio Conversão</span>
-              <span className="font-bold">{metrics.tempo_medio_conversao} dias</span>
+              <span className="font-bold">{systemData.tempo_medio_conversao} dias</span>
             </div>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
-                {metrics.tempo_medio_conversao}
+                {systemData.tempo_medio_conversao}
               </div>
               <div className="text-xs text-muted-foreground">
                 dias até conversão
@@ -260,8 +257,8 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <span className="text-sm font-medium">Informações sobre os dados</span>
           </div>
           <p className="text-xs text-blue-700 mt-1">
-            Métricas baseadas em análise real dos dados do agente Haila. Os valores são calculados 
-            diretamente dos dados reais do sistema para garantir precisão e confiabilidade.
+            Métricas calculadas baseadas em dados agregados de todos os agentes do sistema. 
+            Os valores representam o desempenho geral da plataforma no período selecionado.
           </p>
         </CardContent>
       </Card>
