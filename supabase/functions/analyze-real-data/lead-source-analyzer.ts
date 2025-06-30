@@ -25,18 +25,21 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
   console.log('📊 Iniciando análise de fontes de leads para:', agentName);
   
   try {
-    // Obter mapeamento correto das tabelas
+    // Obter mapeamento correto das tabelas seguindo o padrão especificado
     const tables = getTableNamesForAgent(agentName);
     
     if (!tables) {
       throw new Error(`Agente ${agentName} não possui mapeamento de tabelas válido`);
     }
     
-    console.log(`🔍 Buscando dados nas tabelas: ${tables.messagesTable} e ${tables.metricsTable}`);
+    console.log(`🔍 Padrão de busca confirmado para ${agentName}:`);
+    console.log(`📨 Tabela de mensagens: ${tables.messagesTable}`);
+    console.log(`📈 Tabela de métricas: ${tables.metricsTable}`);
     
-    // Buscar mensagens básicas com verificação de existência da tabela
+    // Buscar mensagens básicas (formato: Lista_de_Mensagens_*)
     let basicMessages: any[] = [];
     try {
+      console.log(`🔍 Buscando dados na tabela de mensagens: ${tables.messagesTable}`);
       const { data: basicData, error: basicError } = await supabase
         .from(tables.messagesTable)
         .select('*')
@@ -44,17 +47,18 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
       
       if (!basicError && basicData) {
         basicMessages = basicData;
-        console.log(`✅ Encontradas ${basicMessages.length} mensagens básicas`);
+        console.log(`✅ Encontradas ${basicMessages.length} mensagens em ${tables.messagesTable}`);
       } else {
-        console.warn(`⚠️ Erro ou tabela vazia para mensagens básicas: ${basicError?.message || 'Sem dados'}`);
+        console.warn(`⚠️ Erro ou tabela vazia para mensagens: ${basicError?.message || 'Sem dados'}`);
       }
     } catch (err) {
       console.error(`❌ Erro ao acessar tabela de mensagens ${tables.messagesTable}:`, err);
     }
     
-    // Buscar dados de métricas com verificação de existência da tabela
+    // Buscar dados de métricas (formato: Lista_mensagens_*)
     let metricsMessages: any[] = [];
     try {
+      console.log(`🔍 Buscando dados na tabela de métricas: ${tables.metricsTable}`);
       const { data: metricsData, error: metricsError } = await supabase
         .from(tables.metricsTable)
         .select('*')
@@ -62,7 +66,7 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
       
       if (!metricsError && metricsData) {
         metricsMessages = metricsData;
-        console.log(`✅ Encontradas ${metricsMessages.length} métricas`);
+        console.log(`✅ Encontradas ${metricsMessages.length} métricas em ${tables.metricsTable}`);
       } else {
         console.warn(`⚠️ Erro ou tabela vazia para métricas: ${metricsError?.message || 'Sem dados'}`);
       }
@@ -70,12 +74,14 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
       console.error(`❌ Erro ao acessar tabela de métricas ${tables.metricsTable}:`, err);
     }
     
-    console.log(`📈 Dados obtidos: ${basicMessages.length} mensagens, ${metricsMessages.length} métricas`);
+    console.log(`📈 Dados obtidos para ${agentName}:`);
+    console.log(`  - ${basicMessages.length} mensagens (${tables.messagesTable})`);
+    console.log(`  - ${metricsMessages.length} métricas (${tables.metricsTable})`);
     
     // Verificar se temos dados suficientes para análise
     if (basicMessages.length === 0 && metricsMessages.length === 0) {
-      console.warn(`⚠️ Nenhum dado encontrado para ${agentName}`);
-      return createFallbackResult(agentName, 'Nenhuma tabela com dados encontrada');
+      console.warn(`⚠️ Nenhum dado encontrado para ${agentName} nas tabelas padrão`);
+      return createFallbackResult(agentName, `Nenhuma das duas tabelas padrão contém dados (${tables.messagesTable} e ${tables.metricsTable})`);
     }
     
     // Analisar mensagens para identificar fontes
@@ -134,7 +140,8 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
       messageAnalysis, 
       sourceDistribution, 
       basicMessages.length,
-      metricsMessages.length
+      metricsMessages.length,
+      tables
     );
     
     const result: LeadSourceAnalysisResult = {
@@ -152,12 +159,11 @@ export const analyzeLeadSources = async (supabase: any, agentName: string): Prom
       }
     };
     
-    console.log('✅ Análise de fontes de leads concluída:', {
-      agent: result.agent_name,
-      totalSources: Object.keys(result.source_distribution).length,
-      bestSource: result.best_performing_source,
-      dataQuality: result.data_quality
-    });
+    console.log(`✅ Análise de fontes de leads concluída para ${agentName}:`);
+    console.log(`  - Padrão de tabelas: ${tables.messagesTable} + ${tables.metricsTable}`);
+    console.log(`  - ${Object.keys(result.source_distribution).length} fontes identificadas`);
+    console.log(`  - Melhor fonte: ${result.best_performing_source}`);
+    console.log(`  - Qualidade: ${result.data_quality.data_consistency ? 'Completa' : 'Parcial'}`);
     
     return result;
     
@@ -192,18 +198,24 @@ function generateRecommendations(
   messageAnalysis: MessageAnalysisResult, 
   sourceDistribution: Record<string, number>,
   totalMessages: number,
-  totalMetrics: number
+  totalMetrics: number,
+  tables?: any
 ): string[] {
   const recommendations: string[] = [];
   
+  // Adicionar informação sobre as tabelas usadas
+  if (tables) {
+    recommendations.push(`📊 Dados extraídos de: ${tables.messagesTable} (${totalMessages} msgs) e ${tables.metricsTable} (${totalMetrics} métricas)`);
+  }
+  
   // Verificar qualidade dos dados
   if (totalMessages === 0) {
-    recommendations.push('⚠️ Nenhuma mensagem encontrada - verificar conexão com banco de dados');
+    recommendations.push('⚠️ Nenhuma mensagem encontrada na tabela de mensagens - verificar padrão de nomenclatura');
     return recommendations;
   }
   
   if (totalMetrics === 0) {
-    recommendations.push('⚠️ Nenhuma métrica encontrada - análise de conversão limitada');
+    recommendations.push('⚠️ Nenhuma métrica encontrada na tabela de métricas - análise de conversão limitada');
   }
   
   // Recomendações baseadas na distribuição de fontes
@@ -246,7 +258,7 @@ function generateRecommendations(
     recommendations.push('🔍 Tráfego significativo do Google - revisar SEO e landing pages');
   }
   
-  if (recommendations.length === 0) {
+  if (recommendations.length === 1 && tables) { // Only the table info was added
     recommendations.push('📈 Análise em andamento - colete mais dados para insights detalhados');
   }
   

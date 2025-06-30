@@ -46,15 +46,20 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
   
   // Validação e normalização dos dados
   const sourceDistribution = analysis.source_distribution || {};
-  const sourceDistributionValues = Object.values(sourceDistribution);
   
-  const totalObjections = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
-    return sum + safeNumberConversion(count);
+  // Ensure all values in sourceDistribution are properly converted to numbers
+  const normalizedSourceDistribution = Object.entries(sourceDistribution).reduce((acc, [key, value]) => {
+    acc[key] = safeNumberConversion(value);
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const totalObjections = Object.values(normalizedSourceDistribution).reduce((sum: number, count: number): number => {
+    return sum + count;
   }, 0);
 
-  const totalSources = Object.keys(sourceDistribution).filter(key => {
-    const value = sourceDistribution[key];
-    return safeNumberConversion(value) > 0;
+  const totalSources = Object.keys(normalizedSourceDistribution).filter(key => {
+    const value = normalizedSourceDistribution[key];
+    return value > 0;
   }).length;
 
   // Verificar qualidade dos dados
@@ -133,7 +138,7 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
 
       {/* Distribuição de Fontes */}
       <LeadSourceDistribution
-        sourceDistribution={sourceDistribution}
+        sourceDistribution={normalizedSourceDistribution}
         totalObjections={totalObjections}
       />
 

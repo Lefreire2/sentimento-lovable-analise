@@ -131,5 +131,6 @@ export const getTableNamesForAgent = (agentName: string) => {
   }
   
   console.log(`✅ Tabelas encontradas para ${agentName}:`, tables);
+  console.log(`📊 Padrão confirmado: ${tables.messagesTable} e ${tables.metricsTable}`);
   return tables;
 };
