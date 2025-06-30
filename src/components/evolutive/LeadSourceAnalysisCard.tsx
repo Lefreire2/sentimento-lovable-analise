@@ -69,6 +69,21 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
     data_consistency: false
   };
 
+  // Helper function to safely convert unknown to number
+  const safeNumberConversion = (value: unknown): number => {
+    if (typeof value === 'number') {
+      return value;
+    } else if (typeof value === 'string') {
+      const parsed = Number(value);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  };
+
+  // Safely convert data quality values
+  const totalMessages = safeNumberConversion(dataQuality.total_messages);
+  const totalMetrics = safeNumberConversion(dataQuality.total_metrics);
+
   const bestPerformingSource = String(analysis.best_performing_source || 'N/A');
   const worstPerformingSource = String(analysis.worst_performing_source || 'N/A');
 
@@ -98,13 +113,13 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center">
               <div className="font-semibold text-lg">
-                {dataQuality.total_messages.toLocaleString()}
+                {totalMessages.toLocaleString()}
               </div>
               <div className="text-muted-foreground">Mensagens</div>
             </div>
             <div className="text-center">
               <div className="font-semibold text-lg">
-                {dataQuality.total_metrics.toLocaleString()}
+                {totalMetrics.toLocaleString()}
               </div>
               <div className="text-muted-foreground">Métricas</div>
             </div>
