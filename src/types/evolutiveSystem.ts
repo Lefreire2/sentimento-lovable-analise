@@ -96,7 +96,7 @@ export interface PredictiveModel {
 }
 
 export interface SystemMetrics {
-  periodo: string;
+  periodo?: string;
   leads_totais: number;
   leads_qualificados: number;
   taxa_qualificacao: number;
@@ -108,6 +108,31 @@ export interface SystemMetrics {
   custo_aquisicao_cliente: number;
   valor_vida_cliente: number;
   tempo_medio_conversao: number;
+  conversoes?: number;
+  taxa_conversao?: number;
+  periodo_analise?: string;
+  
+  // Estruturas adicionais compatíveis com o dashboard
+  system_overview?: {
+    total_messages: number;
+    total_conversations: number;
+    unique_leads: number;
+    conversion_rate: number;
+    avg_response_time_minutes: number;
+    quality_score: number;
+  };
+  performance_indicators?: {
+    message_volume: number;
+    conversation_completion_rate: number;
+    response_efficiency: number;
+    quality_adherence: number;
+  };
+  operational_metrics?: {
+    peak_activity_hours: string;
+    avg_session_duration: number;
+    system_availability: number;
+    data_processing_speed: number;
+  };
 }
 
 export interface ClosedLoopData {
