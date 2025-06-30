@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -35,7 +34,7 @@ const EvolutiveSystem = () => {
     type: 'last30days'
   });
 
-  // Lista completa de agentes baseada na imagem fornecida (29 agentes)
+  // Lista completa de agentes baseada nos dados reais das tabelas (31 agentes)
   const availableAgents = [
     'André Araújo',
     'Adiney Esteves', 
@@ -59,16 +58,18 @@ const EvolutiveSystem = () => {
     'Mariana Araújo',
     'Michelle Meleck',
     'Patricia Lima',
+    'Rachel Carmo',
     'Raiany Pimentel',
     'Roberta Xavier',
     'Roberto Pigini',
     'Roclides Lima',
     'Rodrigo Pastore',
+    'Samuel Nolasco',
     'Silvia Joly',
     'Stefanie Lee'
   ].sort();
 
-  console.log('📋 Total de agentes disponíveis:', availableAgents.length);
+  console.log('📋 Total de agentes disponíveis baseado nos dados reais:', availableAgents.length);
   console.log('🎯 Agentes carregados:', availableAgents);
 
   const handleRefreshComplete = () => {

@@ -32,7 +32,7 @@ interface AgentDataSummary {
   };
 }
 
-// Lista completa de agentes baseada na imagem fornecida
+// Lista completa de agentes baseada nos dados reais das tabelas (31 agentes)
 const AGENT_NAMES = [
   'André Araújo',
   'Adiney Esteves', 
@@ -56,11 +56,13 @@ const AGENT_NAMES = [
   'Mariana Araújo',
   'Michelle Meleck',
   'Patricia Lima',
+  'Rachel Carmo',
   'Raiany Pimentel',
   'Roberta Xavier',
   'Roberto Pigini',
   'Roclides Lima',
   'Rodrigo Pastore',
+  'Samuel Nolasco',
   'Silvia Joly',
   'Stefanie Lee'
 ];
@@ -330,7 +332,7 @@ export const useRealDataSync = () => {
     const totalMessages = summaries.reduce((sum, s) => sum + s.basicMessages, 0);
     const totalMetrics = summaries.reduce((sum, s) => sum + s.metricsRecords, 0);
 
-    console.log('🎯 SYNC - RELATÓRIO FINAL DE SINCRONIZAÇÃO:');
+    console.log('🎯 SYNC - RELATÓRIO FINAL DE SINCRONIZAÇÃO (DADOS REAIS):');
     console.log(`📊 Total de agentes processados: ${AGENT_NAMES.length}`);
     console.log(`✅ Agentes com dados válidos: ${validAgents}`);
     console.log(`🥇 Qualidade excelente (com métricas): ${excellentData}`);

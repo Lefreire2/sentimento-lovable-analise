@@ -1,4 +1,5 @@
 
+
 export const getAgentTableMapping = () => {
   return {
     'André Araújo': {
@@ -89,6 +90,10 @@ export const getAgentTableMapping = () => {
       messagesTable: 'Lista_de_Mensagens_Patricia_lima',
       metricsTable: 'Lista_mensagens_Patricia_lima'
     },
+    'Rachel Carmo': {
+      messagesTable: 'Lista_de_Mensagens_Rachel_Carmo',
+      metricsTable: 'Lista_mensagens_Rachel_Carmo'
+    },
     'Raiany Pimentel': {
       messagesTable: 'Lista_de_Mensagens_Raiany_pimentel',
       metricsTable: 'Lista_mensagens_Raiany_pimentel'
@@ -109,9 +114,13 @@ export const getAgentTableMapping = () => {
       messagesTable: 'Lista_de_Mensagens_Rodrigo_Pastore',
       metricsTable: 'Lista_mensagens_Rodrigo_Pastore'
     },
+    'Samuel Nolasco': {
+      messagesTable: 'Lista_de_Mensagens_Samuel_Nolasco',
+      metricsTable: 'Lista_mensagens_Samuel_Nolasco'
+    },
     'Silvia Joly': {
       messagesTable: 'Lista_de_Mensagens_Silvia_Joly',
-      metricsTable: 'Lista_mensagens_Silvia_Joly'
+      metricsTable: 'Lista_mensagens_Silvia_joly'
     },
     'Stefanie Lee': {
       messagesTable: 'Lista_de_Mensagens_Stefanie_lee',
@@ -168,3 +177,4 @@ export const checkTableHasData = async (supabase: any, tableName: string): Promi
     return 0;
   }
 };
+
