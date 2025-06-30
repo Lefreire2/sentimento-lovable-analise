@@ -27,7 +27,7 @@ import { AppointmentPatternAnalyzer } from '@/components/evolutive/AppointmentPa
 import { DataSanitizer } from '@/components/evolutive/DataSanitizer';
 
 const EvolutiveSystem = () => {
-  const { systemStatus } = useEvolutiveSystem();
+  const { systemStatus, forceRefreshData } = useEvolutiveSystem();
   const [selectedAgent, setSelectedAgent] = useState('André Araújo');
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>({
@@ -72,14 +72,38 @@ const EvolutiveSystem = () => {
   console.log('📋 Total de agentes disponíveis baseado nos dados reais:', availableAgents.length);
   console.log('🎯 Agentes carregados:', availableAgents);
 
-  const handleRefreshComplete = () => {
-    console.log('🔄 SISTEMA - Forçando re-render dos componentes');
+  const handleRefreshComplete = async () => {
+    console.log('🔄 EVOLUTIVE-SYSTEM - Forçando re-render dos componentes');
+    
+    // Forçar atualização de dados no sistema evolutivo
+    await forceRefreshData(selectedAgent, 'intention');
+    
+    // Forçar re-render dos componentes
+    setRefreshKey(prev => prev + 1);
+    
+    console.log('✅ EVOLUTIVE-SYSTEM - Re-render concluído');
+  };
+
+  const handlePeriodChange = async (period: PeriodFilter) => {
+    console.log('📅 EVOLUTIVE-SYSTEM - Alteração de período detectada:', period);
+    setSelectedPeriod(period);
+    
+    // Forçar atualização dos dados para o novo período
+    await forceRefreshData(selectedAgent, 'intention');
+    
+    // Forçar atualização dos componentes
     setRefreshKey(prev => prev + 1);
   };
 
-  const handlePeriodChange = (period: PeriodFilter) => {
-    setSelectedPeriod(period);
-    setRefreshKey(prev => prev + 1); // Forçar atualização dos dados
+  const handleAgentChange = async (newAgent: string) => {
+    console.log('👤 EVOLUTIVE-SYSTEM - Alteração de agente:', newAgent);
+    setSelectedAgent(newAgent);
+    
+    // Forçar atualização dos dados para o novo agente
+    await forceRefreshData(newAgent, 'intention');
+    
+    // Forçar atualização dos componentes
+    setRefreshKey(prev => prev + 1);
   };
 
   const getStatusColor = (status: string) => {
@@ -186,7 +210,7 @@ const EvolutiveSystem = () => {
               {availableAgents.map((agent) => (
                 <button
                   key={agent}
-                  onClick={() => setSelectedAgent(agent)}
+                  onClick={() => handleAgentChange(agent)}
                   className={`p-3 rounded-lg border text-sm transition-all ${
                     selectedAgent === agent
                       ? 'bg-blue-500 text-white border-blue-500'
@@ -255,7 +279,7 @@ const EvolutiveSystem = () => {
 
           <TabsContent value="real-data" className="space-y-6">
             <RealDataAnalysis 
-              key={`real-data-${refreshKey}`} 
+              key={`real-data-${refreshKey}-${selectedAgent}`} 
               agentName={selectedAgent}
               analysisSettings={getAnalysisSettings()}
             />
@@ -263,14 +287,14 @@ const EvolutiveSystem = () => {
 
           <TabsContent value="patterns" className="space-y-6">
             <AppointmentPatternAnalyzer 
-              key={`patterns-${refreshKey}`}
+              key={`patterns-${refreshKey}-${selectedAgent}`}
               agentName={selectedAgent}
             />
           </TabsContent>
 
           <TabsContent value="intention" className="space-y-6">
             <IntentionAnalysisPanel 
-              key={`intention-${refreshKey}`}
+              key={`intention-${refreshKey}-${selectedAgent}-${selectedPeriod.type}`}
               analysisSettings={getAnalysisSettings()}
             />
           </TabsContent>

@@ -25,23 +25,31 @@ export const useEvolutiveSystem = () => {
     return useQuery<any>({
       queryKey: ['real-data-analysis', agentName, analysisType, analysisSettings],
       queryFn: async () => {
-        console.log('🔍 Iniciando análise de dados reais para:', agentName, analysisType);
-        console.log('📅 Configurações de período:', analysisSettings);
+        console.log('🔍 EVOLUTIVE-SYSTEM - Iniciando análise de dados reais para:', agentName, analysisType);
+        console.log('📅 EVOLUTIVE-SYSTEM - Configurações de período:', analysisSettings);
         
-        const { data, error } = await supabase.functions.invoke('analyze-real-data', {
-          body: { agentName, analysisType, analysisSettings }
-        });
-        
-        if (error) {
-          console.error('❌ Erro na análise de dados reais:', error);
+        try {
+          const { data, error } = await supabase.functions.invoke('analyze-real-data', {
+            body: { agentName, analysisType, analysisSettings }
+          });
+          
+          if (error) {
+            console.error('❌ EVOLUTIVE-SYSTEM - Erro na análise de dados reais:', error);
+            throw error;
+          }
+          
+          console.log('✅ EVOLUTIVE-SYSTEM - Análise de dados reais concluída:', data);
+          return data;
+        } catch (error) {
+          console.error('💥 EVOLUTIVE-SYSTEM - Erro crítico na análise:', error);
           throw error;
         }
-        
-        console.log('✅ Análise de dados reais concluída:', data);
-        return data;
       },
       enabled: !!agentName,
-      staleTime: 5 * 60 * 1000, // 5 minutos
+      staleTime: 2 * 60 * 1000, // 2 minutos
+      gcTime: 5 * 60 * 1000, // 5 minutos
+      retry: 3,
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
     });
   };
 
@@ -50,18 +58,18 @@ export const useEvolutiveSystem = () => {
     return useQuery<IntentionAnalysis>({
       queryKey: ['intention-analysis', leadId],
       queryFn: async () => {
-        console.log('🧠 Iniciando análise de intenção para lead:', leadId);
+        console.log('🧠 EVOLUTIVE-SYSTEM - Iniciando análise de intenção para lead:', leadId);
         
         const { data, error } = await supabase.functions.invoke('analyze-intention', {
           body: { leadId }
         });
         
         if (error) {
-          console.error('❌ Erro na análise de intenção:', error);
+          console.error('❌ EVOLUTIVE-SYSTEM - Erro na análise de intenção:', error);
           throw error;
         }
         
-        console.log('✅ Análise de intenção concluída:', data);
+        console.log('✅ EVOLUTIVE-SYSTEM - Análise de intenção concluída:', data);
         return data;
       },
       enabled: !!leadId,
@@ -73,18 +81,18 @@ export const useEvolutiveSystem = () => {
   const useAppointmentOptimization = () => {
     return useMutation({
       mutationFn: async (data: { leadId: string; conversationData: ConversationContext }) => {
-        console.log('🎯 Iniciando otimização de agendamento:', data);
+        console.log('🎯 EVOLUTIVE-SYSTEM - Iniciando otimização de agendamento:', data);
         
         const { data: result, error } = await supabase.functions.invoke('optimize-appointment', {
           body: data
         });
         
         if (error) {
-          console.error('❌ Erro na otimização de agendamento:', error);
+          console.error('❌ EVOLUTIVE-SYSTEM - Erro na otimização de agendamento:', error);
           throw error;
         }
         
-        console.log('✅ Otimização de agendamento concluída:', result);
+        console.log('✅ EVOLUTIVE-SYSTEM - Otimização de agendamento concluída:', result);
         return result;
       },
       onSuccess: () => {
@@ -98,18 +106,18 @@ export const useEvolutiveSystem = () => {
     return useQuery<SystemMetrics>({
       queryKey: ['system-metrics', period],
       queryFn: async () => {
-        console.log('📊 Calculando métricas do sistema para período:', period);
+        console.log('📊 EVOLUTIVE-SYSTEM - Calculando métricas do sistema para período:', period);
         
         const { data, error } = await supabase.functions.invoke('calculate-system-metrics', {
           body: { period }
         });
         
         if (error) {
-          console.error('❌ Erro no cálculo de métricas:', error);
+          console.error('❌ EVOLUTIVE-SYSTEM - Erro no cálculo de métricas:', error);
           throw error;
         }
         
-        console.log('✅ Métricas do sistema calculadas:', data);
+        console.log('✅ EVOLUTIVE-SYSTEM - Métricas do sistema calculadas:', data);
         return data;
       },
       refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minutos
@@ -121,16 +129,16 @@ export const useEvolutiveSystem = () => {
     return useQuery<ClosedLoopData>({
       queryKey: ['closed-loop-data'],
       queryFn: async () => {
-        console.log('🔄 Obtendo dados do closed-loop...');
+        console.log('🔄 EVOLUTIVE-SYSTEM - Obtendo dados do closed-loop...');
         
         const { data, error } = await supabase.functions.invoke('get-closed-loop-data');
         
         if (error) {
-          console.error('❌ Erro ao obter dados do closed-loop:', error);
+          console.error('❌ EVOLUTIVE-SYSTEM - Erro ao obter dados do closed-loop:', error);
           throw error;
         }
         
-        console.log('✅ Dados do closed-loop obtidos:', data);
+        console.log('✅ EVOLUTIVE-SYSTEM - Dados do closed-loop obtidos:', data);
         return data;
       },
       refetchInterval: 10 * 60 * 1000, // Atualiza a cada 10 minutos
@@ -140,18 +148,18 @@ export const useEvolutiveSystem = () => {
   // Função para processar feedback de marketing
   const processMarketingFeedback = useMutation({
     mutationFn: async (feedbackData: any) => {
-      console.log('📈 Processando feedback de marketing:', feedbackData);
+      console.log('📈 EVOLUTIVE-SYSTEM - Processando feedback de marketing:', feedbackData);
       
       const { data, error } = await supabase.functions.invoke('process-marketing-feedback', {
         body: feedbackData
       });
       
       if (error) {
-        console.error('❌ Erro no processamento de feedback:', error);
+        console.error('❌ EVOLUTIVE-SYSTEM - Erro no processamento de feedback:', error);
         throw error;
       }
       
-      console.log('✅ Feedback de marketing processado:', data);
+      console.log('✅ EVOLUTIVE-SYSTEM - Feedback de marketing processado:', data);
       return data;
     },
     onSuccess: () => {
@@ -160,35 +168,54 @@ export const useEvolutiveSystem = () => {
     }
   });
 
+  // Função para forçar atualização de dados
+  const forceRefreshData = async (agentName?: string, analysisType?: string) => {
+    console.log('🔄 EVOLUTIVE-SYSTEM - Forçando atualização de dados...');
+    
+    if (agentName && analysisType) {
+      // Invalidar cache específico
+      await queryClient.invalidateQueries({ 
+        queryKey: ['real-data-analysis', agentName, analysisType] 
+      });
+      console.log(`✅ EVOLUTIVE-SYSTEM - Cache invalidado para ${agentName} - ${analysisType}`);
+    } else {
+      // Invalidar todos os caches de análise
+      await queryClient.invalidateQueries({ 
+        queryKey: ['real-data-analysis'] 
+      });
+      console.log('✅ EVOLUTIVE-SYSTEM - Todos os caches invalidados');
+    }
+  };
+
   // Inicialização do sistema
   useEffect(() => {
     const initializeSystem = async () => {
       try {
-        console.log('🚀 Inicializando Sistema Evolutivo...');
+        console.log('🚀 EVOLUTIVE-SYSTEM - Inicializando Sistema Evolutivo...');
         setSystemStatus('initializing');
         
         // Verificar se as funções necessárias estão disponíveis
-        console.log('🔍 Verificando saúde do sistema...');
+        console.log('🔍 EVOLUTIVE-SYSTEM - Verificando saúde do sistema...');
         const { data: healthCheck, error } = await supabase.functions.invoke('system-health-check');
         
         if (error) {
-          console.error('❌ Erro na verificação de saúde:', error);
+          console.error('❌ EVOLUTIVE-SYSTEM - Erro na verificação de saúde:', error);
           setSystemStatus('error');
           return;
         }
         
-        console.log('✅ Verificação de saúde concluída:', healthCheck);
+        console.log('✅ EVOLUTIVE-SYSTEM - Verificação de saúde concluída:', healthCheck);
         
         if (healthCheck?.status === 'healthy') {
           setSystemStatus('active');
-          console.log('🚀 Sistema Evolutivo inicializado com sucesso');
+          console.log('🚀 EVOLUTIVE-SYSTEM - Sistema Evolutivo inicializado com sucesso');
         } else {
           setSystemStatus('error');
-          console.error('❌ Sistema não está saudável:', healthCheck);
+          console.error('❌ EVOLUTIVE-SYSTEM - Sistema não está saudável:', healthCheck);
         }
       } catch (error) {
         setSystemStatus('error');
-        console.error('💥 Erro na inicialização do sistema:', error);
+        console.error('💥 EVOLUTIVE-SYSTEM - Erro na inicialização do sistema:', error);
       }
     };
 
@@ -202,6 +229,7 @@ export const useEvolutiveSystem = () => {
     useAppointmentOptimization,
     useSystemMetrics,
     useClosedLoopData,
-    processMarketingFeedback
+    processMarketingFeedback,
+    forceRefreshData
   };
 };
