@@ -14,7 +14,9 @@ import {
   BarChart3,
   Zap,
   Eye,
-  Table
+  Table,
+  AlertCircle,
+  Inbox
 } from 'lucide-react';
 import { useRealDataSync } from '@/hooks/useRealDataSync';
 
@@ -43,6 +45,10 @@ export const RealDataSyncPanel = () => {
   const totalValidAgents = agentSummaries.filter(s => s.hasValidData).length;
   const excellentQuality = agentSummaries.filter(s => s.dataQuality === 'excellent').length;
   const goodQuality = agentSummaries.filter(s => s.dataQuality === 'good').length;
+  const emptyTables = agentSummaries.filter(s => 
+    (s.tableStatus.basicExists && s.tableStatus.basicEmpty) || 
+    (s.tableStatus.metricsExists && s.tableStatus.metricsEmpty)
+  ).length;
   const totalLeads = agentSummaries.reduce((sum, s) => sum + s.uniqueLeads, 0);
   const totalMessages = agentSummaries.reduce((sum, s) => sum + s.basicMessages, 0);
   const totalMetrics = agentSummaries.reduce((sum, s) => sum + s.metricsRecords, 0);
@@ -95,7 +101,7 @@ export const RealDataSyncPanel = () => {
         )}
       </Card>
 
-      {/* Resumo Geral */}
+      {/* Resumo Geral com foco em tabelas vazias */}
       {agentSummaries.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
@@ -104,19 +110,19 @@ export const RealDataSyncPanel = () => {
                 <Users className="h-4 w-4 text-blue-600" />
                 <div>
                   <p className="text-2xl font-bold">{totalValidAgents}</p>
-                  <p className="text-xs text-muted-foreground">Agentes com Dados</p>
+                  <p className="text-xs text-muted-foreground">Com Dados Válidos</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-yellow-200 bg-yellow-50">
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
-                <BarChart3 className="h-4 w-4 text-green-600" />
+                <Inbox className="h-4 w-4 text-yellow-600" />
                 <div>
-                  <p className="text-2xl font-bold">{excellentQuality}</p>
-                  <p className="text-xs text-muted-foreground">Excelente ({goodQuality} bons)</p>
+                  <p className="text-2xl font-bold text-yellow-700">{emptyTables}</p>
+                  <p className="text-xs text-yellow-600">Tabelas Vazias</p>
                 </div>
               </div>
             </CardContent>
@@ -148,6 +154,31 @@ export const RealDataSyncPanel = () => {
         </div>
       )}
 
+      {/* Aviso sobre tabelas vazias */}
+      {emptyTables > 0 && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-orange-700">
+              <AlertCircle className="h-5 w-5" />
+              Atenção: Tabelas Vazias Detectadas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-orange-800 space-y-2">
+              <p className="font-medium">
+                {emptyTables} agentes têm tabelas que existem no banco de dados mas estão vazias.
+              </p>
+              <ul className="text-sm list-disc list-inside space-y-1">
+                <li>As tabelas foram criadas corretamente no Supabase</li>
+                <li>O sistema consegue acessar as tabelas</li>
+                <li>Porém, não há dados inseridos nessas tabelas</li>
+                <li>Verifique se o processo de importação de dados foi executado</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Lista Detalhada de Agentes */}
       {agentSummaries.length > 0 && (
         <Card>
@@ -170,12 +201,19 @@ export const RealDataSyncPanel = () => {
                 .map((agent) => (
                   <div 
                     key={agent.agentName} 
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
+                    className={`flex items-center justify-between p-4 rounded-lg border ${
+                      agent.tableStatus.basicEmpty && agent.tableStatus.metricsEmpty && 
+                      (agent.tableStatus.basicExists || agent.tableStatus.metricsExists)
+                        ? 'bg-yellow-50 border-yellow-200' 
+                        : 'bg-gray-50'
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         {agent.hasValidData ? (
                           <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : agent.tableStatus.basicExists || agent.tableStatus.metricsExists ? (
+                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
                         ) : (
                           <XCircle className="h-4 w-4 text-red-500" />
                         )}
@@ -185,6 +223,15 @@ export const RealDataSyncPanel = () => {
                       <Badge className={`${getDataQualityColor(agent.dataQuality)} border`}>
                         {getDataQualityLabel(agent.dataQuality)}
                       </Badge>
+
+                      {/* Indicador especial para tabelas vazias */}
+                      {(agent.tableStatus.basicEmpty && agent.tableStatus.basicExists) || 
+                       (agent.tableStatus.metricsEmpty && agent.tableStatus.metricsExists) ? (
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                          <Inbox className="h-3 w-3 mr-1" />
+                          Tabela Vazia
+                        </Badge>
+                      ) : null}
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -208,16 +255,28 @@ export const RealDataSyncPanel = () => {
                         )}
                       </div>
 
-                      {/* Status das Tabelas */}
+                      {/* Status das Tabelas com indicador de vazio */}
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${agent.tableStatus.basicExists ? 'bg-green-500' : 'bg-red-500'}`} 
-                               title={`Tabela básica: ${agent.tableStatus.basicTable}`}></div>
+                          <div className={`w-2 h-2 rounded-full ${
+                            !agent.tableStatus.basicExists ? 'bg-red-500' :
+                            agent.tableStatus.basicEmpty ? 'bg-yellow-500' : 'bg-green-500'
+                          }`} 
+                               title={`Tabela básica: ${agent.tableStatus.basicTable} - ${
+                                 !agent.tableStatus.basicExists ? 'Não existe' :
+                                 agent.tableStatus.basicEmpty ? 'Vazia' : 'Com dados'
+                               }`}></div>
                           <span className="text-gray-500">B</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${agent.tableStatus.metricsExists ? 'bg-green-500' : 'bg-red-500'}`} 
-                               title={`Tabela métricas: ${agent.tableStatus.metricsTable}`}></div>
+                          <div className={`w-2 h-2 rounded-full ${
+                            !agent.tableStatus.metricsExists ? 'bg-red-500' :
+                            agent.tableStatus.metricsEmpty ? 'bg-yellow-500' : 'bg-green-500'
+                          }`} 
+                               title={`Tabela métricas: ${agent.tableStatus.metricsTable} - ${
+                                 !agent.tableStatus.metricsExists ? 'Não existe' :
+                                 agent.tableStatus.metricsEmpty ? 'Vazia' : 'Com dados'
+                               }`}></div>
                           <span className="text-gray-500">M</span>
                         </div>
                       </div>
@@ -226,20 +285,23 @@ export const RealDataSyncPanel = () => {
                 ))}
             </div>
             
-            {/* Legenda */}
+            {/* Legenda Atualizada */}
             <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-4 text-xs text-blue-700">
+              <div className="flex items-center gap-6 text-xs text-blue-700 flex-wrap">
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span>B = Tabela Básica</span>
+                  <span>Verde = Com dados</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span>M = Tabela Métricas</span>
+                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                  <span>Amarelo = Tabela vazia</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  <span>Verde = Existe, Vermelho = Não encontrada</span>
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span>Vermelho = Não existe</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>B = Básica | M = Métricas</span>
                 </div>
               </div>
             </div>

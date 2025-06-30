@@ -26,6 +26,8 @@ interface AgentDataSummary {
     metricsTable: string;
     basicExists: boolean;
     metricsExists: boolean;
+    basicEmpty: boolean;
+    metricsEmpty: boolean;
   };
 }
 
@@ -82,6 +84,18 @@ export const useRealDataSync = () => {
     }
   };
 
+  const checkTableEmpty = async (tableName: string): Promise<boolean> => {
+    try {
+      const { count, error } = await supabase
+        .from(tableName as any)
+        .select('*', { count: 'exact', head: true });
+      
+      return !error && (count === 0);
+    } catch (error) {
+      return true; // Assume empty if can't check
+    }
+  };
+
   const validateAgentData = async (agentName: string): Promise<AgentDataSummary> => {
     console.log(`🔍 SYNC - Validando dados para ${agentName}`);
     
@@ -97,17 +111,21 @@ export const useRealDataSync = () => {
     const basicExists = basicTableName ? await validateTableExists(basicTableName) : false;
     const metricsExists = metricsTableName ? await validateTableExists(metricsTableName) : false;
     
-    console.log(`✅ SYNC - Existência das tabelas para ${agentName}:`);
-    console.log(`  - Básica (${basicTableName}): ${basicExists ? '✅' : '❌'}`);
-    console.log(`  - Métricas (${metricsTableName}): ${metricsExists ? '✅' : '❌'}`);
+    // Verificar se as tabelas estão vazias
+    const basicEmpty = basicExists ? await checkTableEmpty(basicTableName!) : true;
+    const metricsEmpty = metricsExists ? await checkTableEmpty(metricsTableName!) : true;
+    
+    console.log(`✅ SYNC - Status das tabelas para ${agentName}:`);
+    console.log(`  - Básica (${basicTableName}): ${basicExists ? '✅ Existe' : '❌ Não existe'} ${basicEmpty ? '📭 Vazia' : '📬 Com dados'}`);
+    console.log(`  - Métricas (${metricsTableName}): ${metricsExists ? '✅ Existe' : '❌ Não existe'} ${metricsEmpty ? '📭 Vazia' : '📬 Com dados'}`);
 
     let basicMessages = 0;
     let metricsRecords = 0;
     let uniqueLeads = 0;
     let hasValidData = false;
 
-    // Processar tabela básica se existir
-    if (basicExists && basicTableName) {
+    // Processar tabela básica se existir e não estiver vazia
+    if (basicExists && !basicEmpty && basicTableName) {
       try {
         console.log(`📊 SYNC - Processando tabela básica: ${basicTableName}`);
         
@@ -121,21 +139,23 @@ export const useRealDataSync = () => {
           console.log(`✅ SYNC - Mensagens básicas encontradas: ${basicMessages}`);
         }
 
-        // Buscar dados para contar leads únicos
-        const { data: leadsData, error: leadsError } = await supabase
-          .from(basicTableName as any)
-          .select('*')
-          .limit(1000);
+        // Buscar dados para contar leads únicos (apenas se houver dados)
+        if (basicMessages > 0) {
+          const { data: leadsData, error: leadsError } = await supabase
+            .from(basicTableName as any)
+            .select('*')
+            .limit(1000);
 
-        if (!leadsError && leadsData) {
-          // Extrair leads únicos de forma robusta
-          const uniqueJids = new Set(leadsData
-            .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
-            .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
-          );
-          
-          uniqueLeads = uniqueJids.size;
-          console.log(`✅ SYNC - Leads únicos encontrados: ${uniqueLeads}`);
+          if (!leadsError && leadsData) {
+            // Extrair leads únicos de forma robusta
+            const uniqueJids = new Set(leadsData
+              .map((row: any) => row.remoteJid || row.remotejid || row.remote_jid)
+              .filter((jid: any) => jid && jid.trim() !== '' && jid !== 'null')
+            );
+            
+            uniqueLeads = uniqueJids.size;
+            console.log(`✅ SYNC - Leads únicos encontrados: ${uniqueLeads}`);
+          }
         }
 
         hasValidData = basicMessages > 0 && uniqueLeads > 0;
@@ -144,8 +164,8 @@ export const useRealDataSync = () => {
       }
     }
 
-    // Processar tabela de métricas se existir
-    if (metricsExists && metricsTableName) {
+    // Processar tabela de métricas se existir e não estiver vazia
+    if (metricsExists && !metricsEmpty && metricsTableName) {
       try {
         console.log(`📊 SYNC - Processando tabela de métricas: ${metricsTableName}`);
         
@@ -162,7 +182,7 @@ export const useRealDataSync = () => {
       }
     }
 
-    // Determinar qualidade dos dados
+    // Determinar qualidade dos dados com informações mais detalhadas
     let dataQuality: 'excellent' | 'good' | 'poor' | 'missing' = 'missing';
     
     if (hasValidData) {
@@ -173,6 +193,9 @@ export const useRealDataSync = () => {
       } else {
         dataQuality = 'poor';
       }
+    } else if (basicExists || metricsExists) {
+      // Tabelas existem mas estão vazias
+      dataQuality = 'missing';
     }
 
     const summary: AgentDataSummary = {
@@ -187,7 +210,9 @@ export const useRealDataSync = () => {
         basicTable: basicTableName || 'N/A',
         metricsTable: metricsTableName || 'N/A',
         basicExists,
-        metricsExists
+        metricsExists,
+        basicEmpty,
+        metricsEmpty
       }
     };
 
@@ -230,12 +255,18 @@ export const useRealDataSync = () => {
         const summary = await validateAgentData(agentName);
         summaries.push(summary);
 
-        // Gerar avisos baseados no status
+        // Gerar avisos mais específicos baseado no status
         if (!summary.tableStatus.basicExists && !summary.tableStatus.metricsExists) {
           warnings.push(`${agentName}: Nenhuma tabela encontrada no banco de dados`);
-        } else if (!summary.hasValidData) {
-          warnings.push(`${agentName}: Tabelas existem mas não contêm dados válidos`);
-        } else if (summary.dataQuality === 'poor') {
+        } else if (summary.tableStatus.basicExists && summary.tableStatus.metricsExists) {
+          if (summary.tableStatus.basicEmpty && summary.tableStatus.metricsEmpty) {
+            warnings.push(`${agentName}: Tabelas existem mas ambas estão vazias - sem dados para processar`);
+          } else if (summary.tableStatus.basicEmpty) {
+            warnings.push(`${agentName}: Tabela básica vazia, apenas métricas disponíveis`);
+          } else if (summary.tableStatus.metricsEmpty) {
+            warnings.push(`${agentName}: Tabela de métricas vazia, análise limitada`);
+          }
+        } else if (!summary.hasValidData && summary.dataQuality === 'poor') {
           warnings.push(`${agentName}: Qualidade de dados baixa (${summary.uniqueLeads} leads únicos)`);
         }
 
@@ -260,7 +291,9 @@ export const useRealDataSync = () => {
             basicTable: 'ERRO',
             metricsTable: 'ERRO',
             basicExists: false,
-            metricsExists: false
+            metricsExists: false,
+            basicEmpty: true,
+            metricsEmpty: true
           }
         });
       }
@@ -282,6 +315,10 @@ export const useRealDataSync = () => {
     const excellentData = summaries.filter(s => s.dataQuality === 'excellent').length;
     const goodData = summaries.filter(s => s.dataQuality === 'good').length;
     const poorData = summaries.filter(s => s.dataQuality === 'poor').length;
+    const emptyTables = summaries.filter(s => 
+      (s.tableStatus.basicExists && s.tableStatus.basicEmpty) || 
+      (s.tableStatus.metricsExists && s.tableStatus.metricsEmpty)
+    ).length;
     const totalLeads = summaries.reduce((sum, s) => sum + s.uniqueLeads, 0);
     const totalMessages = summaries.reduce((sum, s) => sum + s.basicMessages, 0);
     const totalMetrics = summaries.reduce((sum, s) => sum + s.metricsRecords, 0);
@@ -292,6 +329,7 @@ export const useRealDataSync = () => {
     console.log(`🥇 Qualidade excelente: ${excellentData}`);
     console.log(`🥈 Qualidade boa: ${goodData}`);
     console.log(`🥉 Qualidade pobre: ${poorData}`);
+    console.log(`📭 Tabelas vazias: ${emptyTables}`);
     console.log(`👥 Total de leads únicos: ${totalLeads.toLocaleString()}`);
     console.log(`💬 Total de mensagens: ${totalMessages.toLocaleString()}`);
     console.log(`📈 Total de métricas: ${totalMetrics.toLocaleString()}`);
@@ -300,7 +338,7 @@ export const useRealDataSync = () => {
 
     toast({
       title: "Sincronização Completa",
-      description: `${validAgents}/${AGENT_NAMES.length} agentes com dados válidos. ${excellentData} excelentes, ${goodData} bons, ${poorData} pobres. ${totalLeads.toLocaleString()} leads, ${totalMessages.toLocaleString()} mensagens.`,
+      description: `${validAgents}/${AGENT_NAMES.length} agentes com dados válidos. ${emptyTables} com tabelas vazias. ${totalLeads.toLocaleString()} leads processados.`,
     });
 
     setIsSync(false);
@@ -320,7 +358,7 @@ export const useRealDataSync = () => {
       case 'excellent': return 'Excelente (com métricas)';
       case 'good': return 'Boa (dados básicos)';
       case 'poor': return 'Limitada (poucos dados)';
-      case 'missing': return 'Sem dados';
+      case 'missing': return 'Sem dados válidos';
     }
   };
 
