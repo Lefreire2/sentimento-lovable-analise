@@ -133,4 +133,3 @@ export const getTableNamesForAgent = (agentName: string) => {
   console.log(`✅ Tabelas encontradas para ${agentName}:`, tables);
   return tables;
 };
-
