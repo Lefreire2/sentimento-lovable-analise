@@ -33,42 +33,6 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
 
   const analysis = data.lead_source_analysis;
   
-  // Validação e normalização dos dados
-  const sourceDistribution = analysis.source_distribution || {};
-  const sourceDistributionValues = Object.values(sourceDistribution);
-  
-  const totalObjections = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
-    // Properly convert unknown to number with explicit type checking
-    let numericCount: number = 0;
-    if (typeof count === 'number') {
-      numericCount = count;
-    } else if (typeof count === 'string') {
-      const parsed = Number(count);
-      numericCount = isNaN(parsed) ? 0 : parsed;
-    }
-    return sum + numericCount;
-  }, 0);
-
-  const totalSources = Object.keys(sourceDistribution).filter(key => {
-    const value = sourceDistribution[key];
-    // Properly convert unknown to number with explicit type checking
-    let numericValue: number = 0;
-    if (typeof value === 'number') {
-      numericValue = value;
-    } else if (typeof value === 'string') {
-      const parsed = Number(value);
-      numericValue = isNaN(parsed) ? 0 : parsed;
-    }
-    return numericValue > 0;
-  }).length;
-
-  // Verificar qualidade dos dados
-  const dataQuality = analysis.data_quality || {
-    total_messages: 0,
-    total_metrics: 0,
-    data_consistency: false
-  };
-
   // Helper function to safely convert unknown to number
   const safeNumberConversion = (value: unknown): number => {
     if (typeof value === 'number') {
@@ -78,6 +42,26 @@ export const LeadSourceAnalysisCard = ({ data }: LeadSourceAnalysisProps) => {
       return isNaN(parsed) ? 0 : parsed;
     }
     return 0;
+  };
+  
+  // Validação e normalização dos dados
+  const sourceDistribution = analysis.source_distribution || {};
+  const sourceDistributionValues = Object.values(sourceDistribution);
+  
+  const totalObjections = sourceDistributionValues.reduce((sum: number, count: unknown): number => {
+    return sum + safeNumberConversion(count);
+  }, 0);
+
+  const totalSources = Object.keys(sourceDistribution).filter(key => {
+    const value = sourceDistribution[key];
+    return safeNumberConversion(value) > 0;
+  }).length;
+
+  // Verificar qualidade dos dados
+  const dataQuality = analysis.data_quality || {
+    total_messages: 0,
+    total_metrics: 0,
+    data_consistency: false
   };
 
   // Safely convert data quality values
