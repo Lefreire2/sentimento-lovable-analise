@@ -13,11 +13,16 @@ export const LeadSourceDistribution = ({
   sourceDistribution, 
   totalObjections 
 }: LeadSourceDistributionProps) => {
-  // Validar e normalizar dados
+  // Validar e normalizar dados with proper type conversion
   const validatedDistribution = Object.entries(sourceDistribution)
-    .map(([source, count]) => {
-      const numCount = typeof count === 'number' ? count : (Number(count) || 0);
-      return [source, numCount] as [string, number];
+    .map(([source, countValue]) => {
+      // Properly convert unknown to number
+      const count = typeof countValue === 'number' 
+        ? countValue 
+        : typeof countValue === 'string' 
+          ? Number(countValue) || 0
+          : 0;
+      return [source, count] as [string, number];
     })
     .filter(([, count]) => count > 0)
     .sort(([, a], [, b]) => b - a);
@@ -99,4 +104,3 @@ export const LeadSourceDistribution = ({
     </Card>
   );
 };
-

@@ -9,6 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      lead_intelligence: {
+        Row: {
+          created_at: string | null
+          id: string
+          mensagem_id: number | null
+          probabilidade_conversao: number | null
+          proxima_acao: string | null
+          score_total: number | null
+          valor_estimado: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mensagem_id?: number | null
+          probabilidade_conversao?: number | null
+          proxima_acao?: string | null
+          score_total?: number | null
+          valor_estimado?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mensagem_id?: number | null
+          probabilidade_conversao?: number | null
+          proxima_acao?: string | null
+          score_total?: number | null
+          valor_estimado?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_intelligence_mensagem_id_fkey"
+            columns: ["mensagem_id"]
+            isOneToOne: false
+            referencedRelation: "Lista_mensagens_Haila"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_source_metrics: {
         Row: {
           agent_name: string
@@ -341,6 +379,7 @@ export type Database = {
       }
       Lista_de_Mensagens_Haila: {
         Row: {
+          fonte_mkt: string | null
           id: number
           message: string | null
           nome: string | null
@@ -348,6 +387,7 @@ export type Database = {
           Timestamp: string | null
         }
         Insert: {
+          fonte_mkt?: string | null
           id?: number
           message?: string | null
           nome?: string | null
@@ -355,6 +395,7 @@ export type Database = {
           Timestamp?: string | null
         }
         Update: {
+          fonte_mkt?: string | null
           id?: number
           message?: string | null
           nome?: string | null
@@ -1876,6 +1917,7 @@ export type Database = {
           data_inicio_conversa: string | null
           duracao_total_conversa_horas: string | null
           duracao_total_conversa_minutos: string | null
+          fonte_mkt: string | null
           id: number
           indicador_escalonamento_transferencia: string | null
           indicador_resolucao_primeira_resposta: string | null
@@ -1909,6 +1951,7 @@ export type Database = {
           data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
+          fonte_mkt?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
@@ -1942,6 +1985,7 @@ export type Database = {
           data_inicio_conversa?: string | null
           duracao_total_conversa_horas?: string | null
           duracao_total_conversa_minutos?: string | null
+          fonte_mkt?: string | null
           id?: number
           indicador_escalonamento_transferencia?: string | null
           indicador_resolucao_primeira_resposta?: string | null
@@ -4052,7 +4096,52 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dashboard_vendas: {
+        Row: {
+          data: string | null
+          leads_facebook: number | null
+          leads_google: number | null
+          leads_instagram: number | null
+          leads_sem_fonte: number | null
+          leads_site: number | null
+          total_leads: number | null
+        }
+        Relationships: []
+      }
+      fontes_marketing_analise: {
+        Row: {
+          fonte_detectada: string | null
+          id: number | null
+          message: string | null
+        }
+        Insert: {
+          fonte_detectada?: never
+          id?: number | null
+          message?: string | null
+        }
+        Update: {
+          fonte_detectada?: never
+          id?: number | null
+          message?: string | null
+        }
+        Relationships: []
+      }
+      fontes_marketing_resumo: {
+        Row: {
+          fonte_detectada: string | null
+          total_leads: number | null
+        }
+        Relationships: []
+      }
+      taxa_conversao_por_fonte: {
+        Row: {
+          conversoes: number | null
+          fonte_detectada: string | null
+          taxa_conversao_percentual: number | null
+          total_leads: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
