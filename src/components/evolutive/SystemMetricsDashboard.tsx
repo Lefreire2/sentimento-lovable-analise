@@ -26,6 +26,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
   // Usar métricas gerais do sistema, não específicas de agente
   const { data: systemData, isLoading, error } = useSystemMetrics(period);
 
+  console.log('🔍 SYSTEM-METRICS - Dados recebidos:', systemData);
+  console.log('⚡ SYSTEM-METRICS - Status loading:', isLoading);
+  console.log('❌ SYSTEM-METRICS - Erro:', error);
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -90,6 +94,18 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
     );
   }
 
+  // Usar os dados corretos com fallbacks seguros
+  const leadsTotal = systemData.leads_totais || systemData.system_overview?.unique_leads || 0;
+  const taxaQualificacao = systemData.taxa_qualificacao || 0;
+  const leadsQualificados = systemData.leads_qualificados || 0;
+  const agendamentosRealizados = systemData.agendamentos_realizados || 0;
+  const taxaConversaoAgendamento = systemData.taxa_conversao_agendamento || 0;
+  const roiMarketing = systemData.roi_marketing || 0;
+  const taxaComparecimento = systemData.taxa_comparecimento || 0;
+  const custoAquisicaoCliente = systemData.custo_aquisicao_cliente || 0;
+  const valorVidaCliente = systemData.valor_vida_cliente || 0;
+  const tempoMedioConversao = systemData.tempo_medio_conversao || 0;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -117,7 +133,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemData.leads_totais}</div>
+            <div className="text-2xl font-bold">{leadsTotal}</div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3" />
               Todos os agentes
@@ -132,10 +148,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(systemData.taxa_qualificacao)}</div>
-            <Progress value={systemData.taxa_qualificacao} className="mt-2" />
+            <div className="text-2xl font-bold">{formatPercentage(taxaQualificacao)}</div>
+            <Progress value={taxaQualificacao} className="mt-2" />
             <p className="text-xs text-muted-foreground mt-1">
-              {systemData.leads_qualificados} de {systemData.leads_totais} leads
+              {leadsQualificados} de {leadsTotal} leads
             </p>
           </CardContent>
         </Card>
@@ -147,9 +163,9 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemData.agendamentos_realizados}</div>
+            <div className="text-2xl font-bold">{agendamentosRealizados}</div>
             <p className="text-xs text-muted-foreground">
-              {formatPercentage(systemData.taxa_conversao_agendamento)} de conversão
+              {formatPercentage(taxaConversaoAgendamento)} de conversão
             </p>
             <div className="mt-2">
               <Badge variant="outline" className="text-xs">
@@ -166,7 +182,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(systemData.roi_marketing)}</div>
+            <div className="text-2xl font-bold">{formatPercentage(roiMarketing)}</div>
             <div className="flex items-center gap-1 text-xs">
               <TrendingUp className="h-3 w-3 text-green-600" />
               <span className="text-green-600">Positivo</span>
@@ -186,15 +202,15 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Taxa Comparecimento</span>
-              <span className="font-bold">{formatPercentage(systemData.taxa_comparecimento)}</span>
+              <span className="font-bold">{formatPercentage(taxaComparecimento)}</span>
             </div>
-            <Progress value={systemData.taxa_comparecimento} />
+            <Progress value={taxaComparecimento} />
             
             <div className="flex justify-between items-center">
               <span className="text-sm">Leads Qualificados</span>
-              <span className="font-bold">{systemData.leads_qualificados}</span>
+              <span className="font-bold">{leadsQualificados}</span>
             </div>
-            <Progress value={(systemData.leads_qualificados / systemData.leads_totais) * 100} />
+            <Progress value={(leadsQualificados / leadsTotal) * 100} />
           </CardContent>
         </Card>
 
@@ -206,18 +222,18 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">CAC Médio</span>
-              <span className="font-bold">{formatCurrency(systemData.custo_aquisicao_cliente)}</span>
+              <span className="font-bold">{formatCurrency(custoAquisicaoCliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-sm">LTV Médio</span>
-              <span className="font-bold">{formatCurrency(systemData.valor_vida_cliente)}</span>
+              <span className="font-bold">{formatCurrency(valorVidaCliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-sm">LTV/CAC Ratio</span>
               <span className="font-bold">
-                {(systemData.valor_vida_cliente / systemData.custo_aquisicao_cliente).toFixed(1)}x
+                {custoAquisicaoCliente > 0 ? (valorVidaCliente / custoAquisicaoCliente).toFixed(1) : '0'}x
               </span>
             </div>
           </CardContent>
@@ -234,12 +250,12 @@ export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Tempo Médio Conversão</span>
-              <span className="font-bold">{systemData.tempo_medio_conversao} dias</span>
+              <span className="font-bold">{tempoMedioConversao} dias</span>
             </div>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
-                {systemData.tempo_medio_conversao}
+                {tempoMedioConversao}
               </div>
               <div className="text-xs text-muted-foreground">
                 dias até conversão

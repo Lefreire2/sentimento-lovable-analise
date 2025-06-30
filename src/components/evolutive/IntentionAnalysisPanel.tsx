@@ -20,15 +20,22 @@ export const IntentionAnalysisPanel = ({ analysisSettings, selectedAgent = 'Hail
   console.log('🎯 INTENTION-PANEL - Iniciando com agente:', selectedAgent);
   console.log('📅 INTENTION-PANEL - Configurações:', analysisSettings);
   
-  const { data: intentionData, isLoading, error, refetch } = useRealDataAnalysis(
+  const { data: analysisData, isLoading, error, refetch } = useRealDataAnalysis(
     selectedAgent, 
     'intention', 
     analysisSettings
   );
 
-  console.log('📊 INTENTION-PANEL - Dados recebidos:', intentionData);
+  console.log('📊 INTENTION-PANEL - Dados recebidos completos:', analysisData);
   console.log('⚡ INTENTION-PANEL - Status loading:', isLoading);
   console.log('❌ INTENTION-PANEL - Erro:', error);
+
+  // Extrair dados de intenção da estrutura correta
+  const intentionData = analysisData?.intention_analysis || 
+                       analysisData?.complete_analysis?.intention?.intention_analysis || 
+                       analysisData;
+
+  console.log('🧠 INTENTION-PANEL - Dados de intenção extraídos:', intentionData);
 
   const handleRefresh = async () => {
     console.log('🔄 INTENTION-PANEL - Iniciando refresh manual');
@@ -90,7 +97,8 @@ export const IntentionAnalysisPanel = ({ analysisSettings, selectedAgent = 'Hail
             {/* Status Debug */}
             <div className="mt-4 p-3 bg-gray-50 rounded text-xs font-mono">
               <div>Agente: {selectedAgent}</div>
-              <div>Dados: {intentionData ? 'Disponíveis' : 'Não disponíveis'}</div>
+              <div>Dados Brutos: {analysisData ? 'Disponíveis' : 'Não disponíveis'}</div>
+              <div>Dados de Intenção: {intentionData ? 'Disponíveis' : 'Não disponíveis'}</div>
               <div>Loading: {isLoading ? 'Sim' : 'Não'}</div>
               <div>Erro: {error ? error.message : 'Nenhum'}</div>
               <div>Refresh Key: {refreshKey}</div>
