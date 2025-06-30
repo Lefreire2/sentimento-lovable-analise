@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,28 +27,54 @@ export const useEvolutiveSystem = () => {
         console.log('🔍 EVOLUTIVE-SYSTEM - Iniciando análise de dados reais para:', agentName, analysisType);
         console.log('📅 EVOLUTIVE-SYSTEM - Configurações de período:', analysisSettings);
         
+        // Verificar se o agente é válido
+        if (!agentName || agentName.trim() === '') {
+          console.error('❌ EVOLUTIVE-SYSTEM - Nome do agente inválido:', agentName);
+          throw new Error('Nome do agente é obrigatório');
+        }
+        
         try {
           const { data, error } = await supabase.functions.invoke('analyze-real-data', {
-            body: { agentName, analysisType, analysisSettings }
+            body: { 
+              agentName: agentName.trim(), 
+              analysisType: analysisType.trim(), 
+              analysisSettings: analysisSettings || {}
+            }
           });
           
           if (error) {
             console.error('❌ EVOLUTIVE-SYSTEM - Erro na análise de dados reais:', error);
-            throw error;
+            throw new Error(`Erro na análise: ${error.message || 'Erro desconhecido'}`);
+          }
+          
+          if (!data) {
+            console.warn('⚠️ EVOLUTIVE-SYSTEM - Nenhum dado retornado da análise');
+            throw new Error('Nenhum dado retornado da análise');
           }
           
           console.log('✅ EVOLUTIVE-SYSTEM - Análise de dados reais concluída:', data);
           return data;
         } catch (error) {
           console.error('💥 EVOLUTIVE-SYSTEM - Erro crítico na análise:', error);
-          throw error;
+          // Re-throw com mensagem mais clara
+          if (error instanceof Error) {
+            throw error;
+          }
+          throw new Error('Erro desconhecido na análise de dados');
         }
       },
-      enabled: !!agentName,
-      staleTime: 2 * 60 * 1000, // 2 minutos
+      enabled: !!agentName && agentName.trim() !== '',
+      staleTime: 1 * 60 * 1000, // 1 minuto - reduzido para forçar atualizações mais frequentes
       gcTime: 5 * 60 * 1000, // 5 minutos
-      retry: 3,
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retry: (failureCount, error) => {
+        console.log(`🔄 EVOLUTIVE-SYSTEM - Tentativa ${failureCount} falhou:`, error);
+        return failureCount < 2; // Reduzido para 2 tentativas
+      },
+      retryDelay: attemptIndex => {
+        const delay = Math.min(1000 * 2 ** attemptIndex, 10000); // Max 10 segundos
+        console.log(`⏳ EVOLUTIVE-SYSTEM - Aguardando ${delay}ms antes da próxima tentativa`);
+        return delay;
+      },
     });
   };
 
@@ -170,20 +195,34 @@ export const useEvolutiveSystem = () => {
 
   // Função para forçar atualização de dados
   const forceRefreshData = async (agentName?: string, analysisType?: string) => {
-    console.log('🔄 EVOLUTIVE-SYSTEM - Forçando atualização de dados...');
+    console.log('🔄 EVOLUTIVE-SYSTEM - Forçando atualização de dados...', { agentName, analysisType });
     
-    if (agentName && analysisType) {
-      // Invalidar cache específico
-      await queryClient.invalidateQueries({ 
-        queryKey: ['real-data-analysis', agentName, analysisType] 
-      });
-      console.log(`✅ EVOLUTIVE-SYSTEM - Cache invalidado para ${agentName} - ${analysisType}`);
-    } else {
-      // Invalidar todos os caches de análise
-      await queryClient.invalidateQueries({ 
-        queryKey: ['real-data-analysis'] 
-      });
-      console.log('✅ EVOLUTIVE-SYSTEM - Todos os caches invalidados');
+    try {
+      if (agentName && analysisType) {
+        // Invalidar cache específico
+        const queryKey = ['real-data-analysis', agentName, analysisType];
+        console.log('🎯 EVOLUTIVE-SYSTEM - Invalidando cache específico:', queryKey);
+        
+        await queryClient.invalidateQueries({ queryKey });
+        await queryClient.refetchQueries({ queryKey });
+        
+        console.log(`✅ EVOLUTIVE-SYSTEM - Cache invalidado e dados recarregados para ${agentName} - ${analysisType}`);
+      } else {
+        // Invalidar todos os caches de análise
+        console.log('🌐 EVOLUTIVE-SYSTEM - Invalidando todos os caches de análise');
+        
+        await queryClient.invalidateQueries({ 
+          queryKey: ['real-data-analysis'] 
+        });
+        await queryClient.refetchQueries({ 
+          queryKey: ['real-data-analysis'] 
+        });
+        
+        console.log('✅ EVOLUTIVE-SYSTEM - Todos os caches invalidados e dados recarregados');
+      }
+    } catch (error) {
+      console.error('❌ EVOLUTIVE-SYSTEM - Erro ao forçar atualização:', error);
+      throw error;
     }
   };
 

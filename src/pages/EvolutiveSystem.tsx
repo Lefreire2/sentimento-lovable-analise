@@ -28,7 +28,7 @@ import { DataSanitizer } from '@/components/evolutive/DataSanitizer';
 
 const EvolutiveSystem = () => {
   const { systemStatus, forceRefreshData } = useEvolutiveSystem();
-  const [selectedAgent, setSelectedAgent] = useState('André Araújo');
+  const [selectedAgent, setSelectedAgent] = useState('Haila'); // Mudado para Haila como padrão
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodFilter>({
     type: 'last30days'
@@ -69,8 +69,9 @@ const EvolutiveSystem = () => {
     'Stefanie Lee'
   ].sort();
 
-  console.log('📋 Total de agentes disponíveis baseado nos dados reais:', availableAgents.length);
-  console.log('🎯 Agentes carregados:', availableAgents);
+  console.log('📋 EVOLUTIVE-SYSTEM - Total de agentes disponíveis:', availableAgents.length);
+  console.log('🎯 EVOLUTIVE-SYSTEM - Agente selecionado:', selectedAgent);
+  console.log('📅 EVOLUTIVE-SYSTEM - Período selecionado:', selectedPeriod);
 
   const handleRefreshComplete = async () => {
     console.log('🔄 EVOLUTIVE-SYSTEM - Forçando re-render dos componentes');
@@ -96,7 +97,7 @@ const EvolutiveSystem = () => {
   };
 
   const handleAgentChange = async (newAgent: string) => {
-    console.log('👤 EVOLUTIVE-SYSTEM - Alteração de agente:', newAgent);
+    console.log('👤 EVOLUTIVE-SYSTEM - Alteração de agente:', selectedAgent, '->', newAgent);
     setSelectedAgent(newAgent);
     
     // Forçar atualização dos dados para o novo agente
@@ -105,6 +106,8 @@ const EvolutiveSystem = () => {
     // Forçar atualização dos componentes
     setRefreshKey(prev => prev + 1);
   };
+
+  // ... keep existing code (getStatusColor, getStatusText functions)
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -296,6 +299,7 @@ const EvolutiveSystem = () => {
             <IntentionAnalysisPanel 
               key={`intention-${refreshKey}-${selectedAgent}-${selectedPeriod.type}`}
               analysisSettings={getAnalysisSettings()}
+              selectedAgent={selectedAgent}
             />
           </TabsContent>
 
