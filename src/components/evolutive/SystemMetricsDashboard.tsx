@@ -13,15 +13,18 @@ import {
   BarChart3,
   AlertCircle
 } from 'lucide-react';
-import { useEvolutiveSystem } from '@/hooks/useEvolutiveSystem';
+import { useEvolutiveSystem, AnalysisSettings } from '@/hooks/useEvolutiveSystem';
 
 interface SystemMetricsDashboardProps {
   period?: string;
+  analysisSettings?: AnalysisSettings;
 }
 
-export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsDashboardProps) => {
-  const { useSystemMetrics } = useEvolutiveSystem();
-  const { data: metrics, isLoading, error } = useSystemMetrics(period);
+export const SystemMetricsDashboard = ({ period = 'last30days', analysisSettings }: SystemMetricsDashboardProps) => {
+  const { useRealDataAnalysis } = useEvolutiveSystem();
+  
+  // Usar análise de dados reais do agente Haila para métricas do sistema
+  const { data: systemData, isLoading, error } = useRealDataAnalysis('Haila', 'system_metrics', analysisSettings);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -40,20 +43,8 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
       <TrendingDown className="h-4 w-4 text-red-600" />;
   };
 
-  // Dados realistas baseados nos dados reais do projeto
-  const realisticMetrics = {
-    leads_totais: 170,
-    leads_qualificados: 64,
-    taxa_qualificacao: 37.6,
-    agendamentos_realizados: 25, // Dados reais validados para Haila
-    taxa_conversao_agendamento: 14.7,
-    comparecimento_agendamentos: 21,
-    taxa_comparecimento: 84.0,
-    roi_marketing: 185.5,
-    custo_aquisicao_cliente: 42.50,
-    valor_vida_cliente: 1250.00,
-    tempo_medio_conversao: 2.8
-  };
+  // Extrair métricas do sistema dos dados de análise real
+  const metrics = systemData?.system_metrics_analysis || systemData;
 
   if (isLoading) {
     return (
@@ -88,8 +79,19 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
     );
   }
 
-  // Usar dados realistas se não houver dados do servidor
-  const displayMetrics = metrics || realisticMetrics;
+  // Se não temos dados, mostrar estado de carregamento
+  if (!metrics) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-muted rounded w-3/4 mx-auto"></div>
+            <div className="h-8 bg-muted rounded w-1/2 mx-auto"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -102,11 +104,9 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
              period === 'last30days' ? 'Últimos 30 dias' : 
              'Últimos 90 dias'}
           </Badge>
-          {!metrics && (
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700">
-              Dados Realistas
-            </Badge>
-          )}
+          <Badge variant="secondary" className="bg-blue-50 text-blue-700">
+            Agente Haila
+          </Badge>
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{displayMetrics.leads_totais}</div>
+            <div className="text-2xl font-bold">{metrics.leads_totais}</div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3" />
               Baseado em dados reais
@@ -135,10 +135,10 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(displayMetrics.taxa_qualificacao)}</div>
-            <Progress value={displayMetrics.taxa_qualificacao} className="mt-2" />
+            <div className="text-2xl font-bold">{formatPercentage(metrics.taxa_qualificacao)}</div>
+            <Progress value={metrics.taxa_qualificacao} className="mt-2" />
             <p className="text-xs text-muted-foreground mt-1">
-              {displayMetrics.leads_qualificados} de {displayMetrics.leads_totais} leads
+              {metrics.leads_qualificados} de {metrics.leads_totais} leads
             </p>
           </CardContent>
         </Card>
@@ -150,9 +150,9 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{displayMetrics.agendamentos_realizados}</div>
+            <div className="text-2xl font-bold">{metrics.agendamentos_realizados}</div>
             <p className="text-xs text-muted-foreground">
-              {formatPercentage(displayMetrics.taxa_conversao_agendamento)} de conversão
+              {formatPercentage(metrics.taxa_conversao_agendamento)} de conversão
             </p>
             <div className="mt-2">
               <Badge variant="outline" className="text-xs">
@@ -169,7 +169,7 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatPercentage(displayMetrics.roi_marketing)}</div>
+            <div className="text-2xl font-bold">{formatPercentage(metrics.roi_marketing)}</div>
             <div className="flex items-center gap-1 text-xs">
               <TrendingUp className="h-3 w-3 text-green-600" />
               <span className="text-green-600">Positivo</span>
@@ -189,15 +189,15 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Taxa Comparecimento</span>
-              <span className="font-bold">{formatPercentage(displayMetrics.taxa_comparecimento)}</span>
+              <span className="font-bold">{formatPercentage(metrics.taxa_comparecimento)}</span>
             </div>
-            <Progress value={displayMetrics.taxa_comparecimento} />
+            <Progress value={metrics.taxa_comparecimento} />
             
             <div className="flex justify-between items-center">
               <span className="text-sm">Leads Qualificados</span>
-              <span className="font-bold">{displayMetrics.leads_qualificados}</span>
+              <span className="font-bold">{metrics.leads_qualificados}</span>
             </div>
-            <Progress value={(displayMetrics.leads_qualificados / displayMetrics.leads_totais) * 100} />
+            <Progress value={(metrics.leads_qualificados / metrics.leads_totais) * 100} />
           </CardContent>
         </Card>
 
@@ -209,18 +209,18 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">CAC</span>
-              <span className="font-bold">{formatCurrency(displayMetrics.custo_aquisicao_cliente)}</span>
+              <span className="font-bold">{formatCurrency(metrics.custo_aquisicao_cliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-sm">LTV</span>
-              <span className="font-bold">{formatCurrency(displayMetrics.valor_vida_cliente)}</span>
+              <span className="font-bold">{formatCurrency(metrics.valor_vida_cliente)}</span>
             </div>
             
             <div className="flex justify-between items-center">
               <span className="text-sm">LTV/CAC Ratio</span>
               <span className="font-bold">
-                {(displayMetrics.valor_vida_cliente / displayMetrics.custo_aquisicao_cliente).toFixed(1)}x
+                {(metrics.valor_vida_cliente / metrics.custo_aquisicao_cliente).toFixed(1)}x
               </span>
             </div>
           </CardContent>
@@ -237,12 +237,12 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Tempo Médio Conversão</span>
-              <span className="font-bold">{displayMetrics.tempo_medio_conversao} dias</span>
+              <span className="font-bold">{metrics.tempo_medio_conversao} dias</span>
             </div>
             
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">
-                {displayMetrics.tempo_medio_conversao}
+                {metrics.tempo_medio_conversao}
               </div>
               <div className="text-xs text-muted-foreground">
                 dias até conversão
@@ -260,8 +260,8 @@ export const SystemMetricsDashboard = ({ period = 'last30days' }: SystemMetricsD
             <span className="text-sm font-medium">Informações sobre os dados</span>
           </div>
           <p className="text-xs text-blue-700 mt-1">
-            Métricas baseadas em análise real dos dados do agente Haila. Os valores de agendamentos foram validados 
-            com dados reais do sistema. Outras métricas são estimativas realistas baseadas no desempenho observado.
+            Métricas baseadas em análise real dos dados do agente Haila. Os valores são calculados 
+            diretamente dos dados reais do sistema para garantir precisão e confiabilidade.
           </p>
         </CardContent>
       </Card>
