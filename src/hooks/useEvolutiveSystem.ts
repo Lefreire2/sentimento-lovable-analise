@@ -52,8 +52,11 @@ export const useEvolutiveSystem = () => {
             throw new Error('Nenhum dado retornado da análise');
           }
           
-          console.log('✅ EVOLUTIVE-SYSTEM - Análise de dados reais concluída:', data);
-          return data;
+          // Validar estrutura dos dados retornados
+          const validatedData = validateAndNormalizeData(data, analysisType);
+          
+          console.log('✅ EVOLUTIVE-SYSTEM - Análise de dados reais concluída:', validatedData);
+          return validatedData;
         } catch (error) {
           console.error('💥 EVOLUTIVE-SYSTEM - Erro crítico na análise:', error);
           // Re-throw com mensagem mais clara
@@ -64,17 +67,13 @@ export const useEvolutiveSystem = () => {
         }
       },
       enabled: !!agentName && agentName.trim() !== '',
-      staleTime: 1 * 60 * 1000, // 1 minuto - reduzido para forçar atualizações mais frequentes
-      gcTime: 5 * 60 * 1000, // 5 minutos
+      staleTime: 30 * 1000, // 30 segundos - dados mais frescos
+      gcTime: 2 * 60 * 1000, // 2 minutos
       retry: (failureCount, error) => {
         console.log(`🔄 EVOLUTIVE-SYSTEM - Tentativa ${failureCount} falhou:`, error);
-        return failureCount < 2; // Reduzido para 2 tentativas
+        return failureCount < 1; // Apenas 1 retry para evitar loops
       },
-      retryDelay: attemptIndex => {
-        const delay = Math.min(1000 * 2 ** attemptIndex, 10000); // Max 10 segundos
-        console.log(`⏳ EVOLUTIVE-SYSTEM - Aguardando ${delay}ms antes da próxima tentativa`);
-        return delay;
-      },
+      retryDelay: 2000, // 2 segundos entre tentativas
     });
   };
 
@@ -192,6 +191,55 @@ export const useEvolutiveSystem = () => {
       queryClient.invalidateQueries({ queryKey: ['system-metrics'] });
     }
   });
+
+  // Função para validar e normalizar dados
+  const validateAndNormalizeData = (data: any, analysisType: string) => {
+    if (!data) return null;
+
+    // Para system_metrics, garantir estrutura completa
+    if (analysisType === 'system_metrics' && data.system_metrics_analysis) {
+      const metrics = data.system_metrics_analysis;
+      
+      // Garantir que todas as propriedades obrigatórias existam
+      return {
+        ...metrics,
+        leads_totais: metrics.leads_totais || 0,
+        leads_qualificados: metrics.leads_qualificados || 0,
+        taxa_qualificacao: metrics.taxa_qualificacao || 0,
+        agendamentos_realizados: metrics.agendamentos_realizados || 0,
+        taxa_conversao_agendamento: metrics.taxa_conversao_agendamento || 0,
+        comparecimento_agendamentos: metrics.comparecimento_agendamentos || 0,
+        taxa_comparecimento: metrics.taxa_comparecimento || 0,
+        roi_marketing: metrics.roi_marketing || 0,
+        custo_aquisicao_cliente: metrics.custo_aquisicao_cliente || 0,
+        valor_vida_cliente: metrics.valor_vida_cliente || 0,
+        tempo_medio_conversao: metrics.tempo_medio_conversao || 0,
+        system_overview: {
+          total_messages: metrics.system_overview?.total_messages || 0,
+          total_conversations: metrics.system_overview?.total_conversations || 0,
+          unique_leads: metrics.system_overview?.unique_leads || 0,
+          conversion_rate: metrics.system_overview?.conversion_rate || 0,
+          avg_response_time_minutes: metrics.system_overview?.avg_response_time_minutes || 0,
+          quality_score: metrics.system_overview?.quality_score || 0,
+        },
+        performance_indicators: {
+          message_volume: metrics.performance_indicators?.message_volume || 0,
+          conversation_completion_rate: metrics.performance_indicators?.conversation_completion_rate || 0,
+          response_efficiency: metrics.performance_indicators?.response_efficiency || 0,
+          quality_adherence: metrics.performance_indicators?.quality_adherence || 0,
+        },
+        operational_metrics: {
+          peak_activity_hours: metrics.operational_metrics?.peak_activity_hours || '14:00-16:00',
+          avg_session_duration: metrics.operational_metrics?.avg_session_duration || 0,
+          system_availability: metrics.operational_metrics?.system_availability || 0,
+          data_processing_speed: metrics.operational_metrics?.data_processing_speed || 0,
+        }
+      };
+    }
+
+    // Para outros tipos de análise, retornar como está
+    return data;
+  };
 
   // Função para forçar atualização de dados
   const forceRefreshData = async (agentName?: string, analysisType?: string) => {

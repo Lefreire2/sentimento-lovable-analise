@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useCacheManager } from '@/hooks/useCacheManager';
-import { RefreshCw, Database } from 'lucide-react';
+import { RefreshCw, Database, AlertCircle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface SystemRefreshButtonProps {
@@ -25,21 +25,34 @@ export const SystemRefreshButton = ({ selectedAgent, onRefreshComplete }: System
       if (selectedAgent) {
         console.log('🎯 SYSTEM-REFRESH - Atualizando dados específicos do agente:', selectedAgent);
         
-        // Limpar cache específico do agente
+        // Limpar todos os caches relacionados ao agente
         await clearAgentCache(selectedAgent);
         
-        // Invalidar queries específicas de análise de dados reais
-        await queryClient.invalidateQueries({ 
-          queryKey: ['real-data-analysis', selectedAgent] 
-        });
+        // Invalidar todas as queries do agente
+        const queryKeysToInvalidate = [
+          ['real-data-analysis', selectedAgent],
+          ['agent-data', selectedAgent],
+          ['funnel-data', selectedAgent],
+          ['performance-metrics', selectedAgent],
+          ['sentiment-metrics', selectedAgent],
+          ['time-metrics', selectedAgent]
+        ];
+
+        for (const queryKey of queryKeysToInvalidate) {
+          await queryClient.invalidateQueries({ queryKey });
+          await queryClient.removeQueries({ queryKey });
+        }
         
         // Força refetch de todas as queries deste agente
         await queryClient.refetchQueries({ 
-          queryKey: ['real-data-analysis', selectedAgent] 
+          predicate: (query) => {
+            const key = query.queryKey;
+            return Array.isArray(key) && key.includes(selectedAgent);
+          }
         });
         
         toast({
-          title: "Dados Atualizados",
+          title: "Dados Atualizados com Sucesso",
           description: `Cache do agente ${selectedAgent} limpo e dados recarregados`,
         });
       } else {
@@ -49,23 +62,16 @@ export const SystemRefreshButton = ({ selectedAgent, onRefreshComplete }: System
         await forceRefreshAllData();
         
         // Invalidar todas as queries de análise
-        await queryClient.invalidateQueries({ 
-          queryKey: ['real-data-analysis'] 
-        });
-        
-        // Força refetch de todas as queries
-        await queryClient.refetchQueries({ 
-          queryKey: ['real-data-analysis'] 
-        });
+        await queryClient.clear();
         
         toast({
-          title: "Sistema Atualizado",
-          description: "Todos os dados foram atualizados do banco de dados",
+          title: "Sistema Completamente Atualizado",
+          description: "Todos os dados foram limpos e recarregados do banco de dados",
         });
       }
 
       // Aguardar um pouco para garantir que o cache foi limpo
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       onRefreshComplete?.();
       
@@ -74,7 +80,7 @@ export const SystemRefreshButton = ({ selectedAgent, onRefreshComplete }: System
       console.error('❌ SYSTEM-REFRESH - Erro na atualização:', error);
       toast({
         title: "Erro na Atualização",
-        description: "Não foi possível atualizar os dados. Tente novamente.",
+        description: "Não foi possível atualizar os dados. Verifique a conexão e tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -83,15 +89,24 @@ export const SystemRefreshButton = ({ selectedAgent, onRefreshComplete }: System
   };
 
   return (
-    <Button
-      onClick={handleRefresh}
-      disabled={isRefreshing}
-      variant="outline"
-      className="flex items-center gap-2"
-    >
-      <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-      <Database className="h-4 w-4" />
-      {isRefreshing ? 'Atualizando...' : 'Atualizar Sistema'}
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button
+        onClick={handleRefresh}
+        disabled={isRefreshing}
+        variant="outline"
+        className="flex items-center gap-2"
+      >
+        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+        <Database className="h-4 w-4" />
+        {isRefreshing ? 'Atualizando...' : 'Forçar Atualização'}
+      </Button>
+      
+      {isRefreshing && (
+        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <AlertCircle className="h-3 w-3" />
+          Limpando cache e recarregando...
+        </div>
+      )}
+    </div>
   );
 };
