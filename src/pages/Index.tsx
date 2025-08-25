@@ -1,191 +1,422 @@
 
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Brain, 
-  Target, 
-  TrendingUp, 
-  BarChart3,
-  ArrowRight,
+  Play, 
+  Clock, 
   Zap,
-  RefreshCw,
-  Sparkles
+  TrendingUp,
+  BarChart3,
+  MessageSquare,
+  Star,
+  CheckCircle
 } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-16">
+    <div className="min-h-screen bg-background">
+      {/* Header with demo badge */}
+      <div className="bg-marcus-cyan text-white py-2 text-center text-sm font-medium">
+        Demonstração Real em &lt; de 3 Minutos
+      </div>
+
+      <div className="container mx-auto px-4">
         
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Sistema Evolutivo
-            </h1>
-          </div>
+        <div className="py-16 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            Se você acha que uma IA ainda não consegue fazer o trabalho inteiro de uma equipe de marketing...{" "}
+            <span className="text-marcus-cyan">Então veja esse vídeo por 3 minutos</span>
+          </h1>
           
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Transforme seu atendimento reativo em um sistema preditivo e otimizado. 
-            Análise de intenção por IA, otimização de agendamentos e closed-loop marketing.
+          <p className="text-lg text-muted-foreground mb-8 max-w-4xl mx-auto">
+            Veja como o Marcus criou uma campanha completa de Dia dos Pais em menos de 3 minutos, 
+            analisou resultados em tempo real e otimizou automaticamente para reduzir o custo por lead.
           </p>
+
+          {/* Video placeholder */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Button size="lg" className="bg-marcus-cyan hover:bg-marcus-cyan/90 text-white rounded-full w-20 h-20">
+                  <Play className="w-8 h-8 ml-1" />
+                </Button>
+              </div>
+              <div className="absolute bottom-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                🔇
+              </div>
+            </div>
+          </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/evolutive-system">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Brain className="mr-2 h-5 w-5" />
-                Acessar Sistema Evolutivo
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            
-            <Link to="/dashboard">
-              <Button size="lg" variant="outline">
-                <BarChart3 className="mr-2 h-5 w-5" />
-                Dashboard Legado
-              </Button>
-            </Link>
+          <Button size="lg" className="bg-marcus-cyan hover:bg-marcus-cyan/90 text-white px-8 py-6 text-lg">
+            Contratar o Marcus
+          </Button>
+
+          {/* Support logos */}
+          <div className="mt-12 flex justify-center items-center gap-8 opacity-60">
+            <span className="text-sm font-medium">Apoio</span>
+            <div className="flex items-center gap-6">
+              <img src="/placeholder.svg" alt="Antler" className="h-8" />
+              <img src="/placeholder.svg" alt="Microsoft for Startups" className="h-8" />
+            </div>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          
-          <Card className="border-2 border-blue-200 dark:border-blue-800 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <Brain className="h-8 w-8 text-blue-600" />
-                <Badge variant="secondary">IA</Badge>
-              </div>
-              <CardTitle className="text-lg">Análise de Intenção</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Algoritmos de IA analisam conversas em tempo real, identificando nível de intenção e probabilidade de conversão
-              </p>
-            </CardContent>
-          </Card>
+        {/* How Marcus Works */}
+        <section className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Como o Marcus Funciona na Prática</h2>
+            <h3 className="text-xl md:text-2xl font-semibold text-muted-foreground">
+              Resultados que você vai ver desde o primeiro dia
+            </h3>
+            <p className="text-muted-foreground mt-2">
+              Não é só tecnologia. São resultados práticos que impactam diretamente no seu faturamento.
+            </p>
+          </div>
 
-          <Card className="border-2 border-green-200 dark:border-green-800 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <Target className="h-8 w-8 text-green-600" />
-                <Badge variant="secondary">Otimização</Badge>
-              </div>
-              <CardTitle className="text-lg">Agendamentos Inteligentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Sistema preditivo que otimiza horários, canais e abordagens para maximizar conversões
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-marcus-cyan/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-marcus-cyan">3 min</span>
+                </div>
+                <CardTitle className="text-lg">Criação de Campanhas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Crie campanhas completas no Meta Ads com público, orçamento e criativos
+                </p>
+                <div className="bg-gray-100 p-3 rounded-lg text-xs text-left italic">
+                  "Marcus, cria uma campanha para promover meu curso de inglês, público de 25-45 anos interessados em idiomas"
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card className="border-2 border-purple-200 dark:border-purple-800 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <RefreshCw className="h-8 w-8 text-purple-600" />
-                <Badge variant="secondary">Closed-Loop</Badge>
-              </div>
-              <CardTitle className="text-lg">Feedback Contínuo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Dados de conversão alimentam otimizações de marketing, criando um ciclo de melhoria contínua
-              </p>
-            </CardContent>
-          </Card>
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-marcus-cyan/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-lg font-bold text-marcus-cyan">24/7</span>
+                </div>
+                <CardTitle className="text-lg">Otimização Inteligente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Otimiza suas campanhas existentes para reduzir custos e melhorar resultados
+                </p>
+                <div className="bg-gray-100 p-3 rounded-lg text-xs text-left italic">
+                  "Analisa minhas campanhas ativas e otimiza as que estão com CPL alto"
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card className="border-2 border-orange-200 dark:border-orange-800 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <TrendingUp className="h-8 w-8 text-orange-600" />
-                <Badge variant="secondary">Preditivo</Badge>
-              </div>
-              <CardTitle className="text-lg">Machine Learning</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Modelos preditivos aprendem continuamente, melhorando a precisão das análises e recomendações
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-marcus-cyan/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-marcus-cyan">5 min</span>
+                </div>
+                <CardTitle className="text-lg">Criativos de Alto Impacto</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Gera anúncios, textos e imagens que convertem baseados em templates comprovados
+                </p>
+                <div className="bg-gray-100 p-3 rounded-lg text-xs text-left italic">
+                  "Cria 5 criativos diferentes para minha academia, estilo antes e depois"
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Process Flow */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 mb-16 shadow-lg">
-          <h2 className="text-2xl font-bold text-center mb-8">Como Funciona o Sistema Evolutivo</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">1</span>
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-marcus-cyan/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-marcus-cyan">2 min</span>
+                </div>
+                <CardTitle className="text-lg">Posts para Redes Sociais</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Produz conteúdo orgânico para Instagram e Facebook alinhado com suas campanhas
+                </p>
+                <div className="bg-gray-100 p-3 rounded-lg text-xs text-left italic">
+                  "Faz 10 posts para Instagram sobre meu restaurante, com dicas e promoções"
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Creative Templates Section */}
+        <section className="py-16 bg-gray-50 -mx-4 px-4 rounded-3xl mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Criativos de Alto Impacto</h2>
+            <h3 className="text-xl font-semibold text-muted-foreground mb-4">
+              Templates testados que realmente convertem
+            </h3>
+            <p className="text-muted-foreground max-w-3xl mx-auto">
+              Temos uma base de templates dos criativos que mais convertem. O Marcus adapta cada um especificamente para sua marca e nicho.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <img src="/placeholder.svg" alt="Criativo para academia - exemplo 1" className="rounded-lg aspect-square object-cover" />
+            <img src="/placeholder.svg" alt="Criativo para academia - exemplo 2" className="rounded-lg aspect-square object-cover" />
+            <img src="/placeholder.svg" alt="Criativo para academia - exemplo 3" className="rounded-lg aspect-square object-cover" />
+          </div>
+
+          <div className="text-center">
+            <h4 className="text-lg font-semibold mb-4">Por que nossos criativos convertem mais?</h4>
+            <p className="text-muted-foreground max-w-4xl mx-auto">
+              Estamos ativamente treinando o Marcus com templates de criativos que comprovadamente geraram resultados. 
+              O Marcus pega esses templates e adapta com as fotos do seu produto, identidade de marca e textos personalizados.
+            </p>
+          </div>
+        </section>
+
+        {/* WhatsApp Management Section */}
+        <section className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Gestão simples via WhatsApp</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Esqueça plataformas complexas e interfaces complicadas. Com o Marcus, você gerencia todo o marketing da sua empresa via WhatsApp, de forma natural e eficiente.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <div className="flex items-start gap-4">
+                <MessageSquare className="w-8 h-8 text-marcus-cyan mt-1" />
+                <div>
+                  <h3 className="font-semibold mb-2">Comunicação natural</h3>
+                  <p className="text-muted-foreground">Converse com o Marcus como se fosse um funcionário real via WhatsApp</p>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Captura de Dados</h3>
-              <p className="text-sm text-muted-foreground">
-                Conversas do WhatsApp são analisadas em tempo real
-              </p>
+              
+              <div className="flex items-start gap-4">
+                <Zap className="w-8 h-8 text-marcus-cyan mt-1" />
+                <div>
+                  <h3 className="font-semibold mb-2">Respostas instantâneas</h3>
+                  <p className="text-muted-foreground">Receba atualizações sempre que solicitar</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <BarChart3 className="w-8 h-8 text-marcus-cyan mt-1" />
+                <div>
+                  <h3 className="font-semibold mb-2">Relatórios automatizados</h3>
+                  <p className="text-muted-foreground">Receba análises de performance semanais diretamente no WhatsApp</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <Clock className="w-8 h-8 text-marcus-cyan mt-1" />
+                <div>
+                  <h3 className="font-semibold mb-2">Execução Rápida</h3>
+                  <p className="text-muted-foreground">Solicite mudanças e veja o Marcus executando em tempo real</p>
+                </div>
+              </div>
             </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600">2</span>
+            {/* WhatsApp Chat Mockup */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="bg-green-500 text-white p-3 rounded-t-2xl flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full"></div>
+                <div>
+                  <div className="font-semibold">Marcus</div>
+                  <div className="text-sm opacity-90">● online</div>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Análise IA</h3>
-              <p className="text-sm text-muted-foreground">
-                Algoritmos determinam intenção e momento ideal de contato
-              </p>
-            </div>
+              
+              <div className="p-4 space-y-4 bg-green-50 min-h-[300px]">
+                <div className="bg-white p-3 rounded-lg max-w-[80%]">
+                  <p className="text-sm">Oi! Acabei de ajustar o público da campanha - foquei em empresários de 25-45 anos interessados em marketing.</p>
+                  <span className="text-xs text-gray-500">09:15</span>
+                </div>
+                
+                <div className="bg-white p-3 rounded-lg max-w-[80%]">
+                  <p className="text-sm">Melhorei os anúncios e já temos 47 pessoas interessadas hoje! 8 de cada 100 viram clientes e cada contato custa só R$ 18,50.</p>
+                  <span className="text-xs text-gray-500">09:16</span>
+                </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-purple-600">3</span>
-              </div>
-              <h3 className="font-semibold mb-2">Otimização</h3>
-              <p className="text-sm text-muted-foreground">
-                Sistema gera estratégias personalizadas de agendamento
-              </p>
-            </div>
+                <div className="bg-green-500 text-white p-3 rounded-lg max-w-[70%] ml-auto">
+                  <p className="text-sm">Ótimo! Como está a qualidade dos contatos?</p>
+                  <span className="text-xs opacity-70">09:17</span>
+                </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-orange-600">4</span>
+                <div className="bg-white p-3 rounded-lg max-w-[80%]">
+                  <p className="text-sm">Excelente! 85% dos contatos são realmente interessados. Custo 40% menor que o planejado e 12 de cada 100 pessoas clicam. Vou aumentar o orçamento para trazer mais contatos!</p>
+                  <span className="text-xs text-gray-500">09:18</span>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">Closed-Loop</h3>
-              <p className="text-sm text-muted-foreground">
-                Resultados otimizam campanhas futuras automaticamente
-              </p>
+              
+              <div className="p-3 border-t flex items-center gap-2">
+                <input 
+                  className="flex-1 p-2 border rounded-full text-sm" 
+                  placeholder="Digite uma mensagem..."
+                  disabled
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Contrate o funcionário que mais vai trazer resultado e que você vai pagar o menor salário.
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Enquanto uma agência ou time de marketing pode custar R$3.000+ por mês, o Marcus trabalha 24/7 por menos de R$500. Não há comparação de custo-benefício.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <Card className="relative border-2">
+              <CardHeader className="text-center">
+                <h3 className="text-lg font-semibold">Plano Essential</h3>
+                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 287/mês</div>
+                <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Gerenciamento de até R$1.000 de investimento mensal no Meta Ads</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Criativos automatizados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Landing pages de alta conversão</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Gerenciamento automático de campanhas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Otimização contínua de performance</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Relatórios semanais detalhados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Suporte via WhatsApp</span>
+                </div>
+                <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
+                  Contratar o Marcus
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="relative border-2 border-marcus-cyan shadow-lg">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-marcus-cyan text-white px-4 py-1 rounded-full text-sm">
+                Mais Popular
+              </div>
+              <CardHeader className="text-center">
+                <h3 className="text-lg font-semibold">Plano Growth</h3>
+                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 377/mês</div>
+                <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Gerenciamento de até R$2.000 de investimento mensal no Meta Ads</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Criativos automatizados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Landing pages de alta conversão</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Gerenciamento automático de campanhas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Otimização contínua de performance</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Relatórios semanais detalhados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Suporte via WhatsApp</span>
+                </div>
+                <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
+                  Contratar o Marcus
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="relative border-2">
+              <CardHeader className="text-center">
+                <h3 className="text-lg font-semibold">Plano Premium</h3>
+                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 497/mês</div>
+                <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Sem limite de investimento mensal no Meta Ads</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Acompanhamento humano de especialistas nas suas campanhas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Criativos automatizados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Landing pages de alta conversão</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Gerenciamento automático de campanhas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Otimização contínua de performance</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Relatórios semanais detalhados</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                  <span className="text-sm">Suporte via WhatsApp</span>
+                </div>
+                <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
+                  Contratar o Marcus
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center text-sm text-muted-foreground mb-8">
+            ✅ Cancele quando quiser • ✅ 7 dias de garantia
+          </div>
+          <div className="text-center text-sm text-muted-foreground">
+            Todos os preços em reais (BRL). Cobrança mensal sem fidelidade.
+          </div>
+        </section>
 
         {/* CTA Section */}
-        <div className="text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
-          <h2 className="text-3xl font-bold mb-4">
-            Pronto para Revolucionar seu Atendimento?
-          </h2>
-          <p className="text-xl mb-6 opacity-90">
-            Transforme leads em agendamentos qualificados com inteligência artificial
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/evolutive-system">
-              <Button size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100">
-                <Zap className="mr-2 h-5 w-5" />
-                Começar Agora
-              </Button>
-            </Link>
-            
-            <Link to="/dashboard-optimized">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                Ver Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <section className="py-16 text-center">
+          <Button size="lg" className="bg-marcus-cyan hover:bg-marcus-cyan/90 text-white px-12 py-6 text-xl">
+            Quero Começar Agora
+          </Button>
+        </section>
       </div>
     </div>
   );
