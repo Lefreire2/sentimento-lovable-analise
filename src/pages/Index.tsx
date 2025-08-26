@@ -31,7 +31,7 @@ const Index = () => {
           </h1>
           
           <p className="text-lg text-muted-foreground mb-8 max-w-4xl mx-auto">
-            Veja como o Marcus criou uma campanha completa de Dia dos Pais em menos de 3 minutos, 
+            Veja como o Léo.AI criou uma campanha completa de Dia dos Pais em menos de 3 minutos, 
             analisou resultados em tempo real e otimizou automaticamente para reduzir o custo por lead.
           </p>
 
@@ -50,7 +50,7 @@ const Index = () => {
           </div>
           
           <Button size="lg" className="bg-marcus-cyan hover:bg-marcus-cyan/90 text-white px-8 py-6 text-lg">
-            Contratar o Marcus
+            Contratar o Léo.AI
           </Button>
 
           {/* Support logos */}
@@ -66,7 +66,7 @@ const Index = () => {
         {/* How Marcus Works */}
         <section className="py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Como o Marcus Funciona na Prática</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Como o Léo.AI Funciona na Prática</h2>
             <h3 className="text-xl md:text-2xl font-semibold text-muted-foreground">
               Resultados que você vai ver desde o primeiro dia
             </h3>
@@ -88,7 +88,7 @@ const Index = () => {
                   Crie campanhas completas no Meta Ads com público, orçamento e criativos
                 </p>
                 <div className="bg-gray-100 p-3 rounded-lg text-xs text-left italic">
-                  "Marcus, cria uma campanha para promover meu curso de inglês, público de 25-45 anos interessados em idiomas"
+                  "Léo.AI, cria uma campanha para promover meu curso de inglês, público de 25-45 anos interessados em idiomas"
                 </div>
               </CardContent>
             </Card>
@@ -167,8 +167,8 @@ const Index = () => {
           <div className="text-center">
             <h4 className="text-lg font-semibold mb-4">Por que nossos criativos convertem mais?</h4>
             <p className="text-muted-foreground max-w-4xl mx-auto">
-              Estamos ativamente treinando o Marcus com templates de criativos que comprovadamente geraram resultados. 
-              O Marcus pega esses templates e adapta com as fotos do seu produto, identidade de marca e textos personalizados.
+              Estamos ativamente treinando o Léo.AI com templates de criativos que comprovadamente geraram resultados. 
+              O Léo.AI pega esses templates e adapta com as fotos do seu produto, identidade de marca e textos personalizados.
             </p>
           </div>
         </section>
@@ -178,7 +178,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Gestão simples via WhatsApp</h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Esqueça plataformas complexas e interfaces complicadas. Com o Marcus, você gerencia todo o marketing da sua empresa via WhatsApp, de forma natural e eficiente.
+              Esqueça plataformas complexas e interfaces complicadas. Com o Léo.AI, você gerencia todo o marketing da sua empresa via WhatsApp, de forma natural e eficiente.
             </p>
           </div>
 
@@ -188,7 +188,7 @@ const Index = () => {
                 <MessageSquare className="w-8 h-8 text-marcus-cyan mt-1" />
                 <div>
                   <h3 className="font-semibold mb-2">Comunicação natural</h3>
-                  <p className="text-muted-foreground">Converse com o Marcus como se fosse um funcionário real via WhatsApp</p>
+                  <p className="text-muted-foreground">Converse com o Léo.AI como se fosse um funcionário real via WhatsApp</p>
                 </div>
               </div>
               
@@ -212,7 +212,7 @@ const Index = () => {
                 <Clock className="w-8 h-8 text-marcus-cyan mt-1" />
                 <div>
                   <h3 className="font-semibold mb-2">Execução Rápida</h3>
-                  <p className="text-muted-foreground">Solicite mudanças e veja o Marcus executando em tempo real</p>
+                  <p className="text-muted-foreground">Solicite mudanças e veja o Léo.AI executando em tempo real</p>
                 </div>
               </div>
             </div>
@@ -222,7 +222,7 @@ const Index = () => {
               <div className="bg-green-500 text-white p-3 rounded-t-2xl flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/20 rounded-full"></div>
                 <div>
-                  <div className="font-semibold">Marcus</div>
+                  <div className="font-semibold">Léo.AI</div>
                   <div className="text-sm opacity-90">● online</div>
                 </div>
               </div>
@@ -267,7 +267,7 @@ const Index = () => {
               Contrate o funcionário que mais vai trazer resultado e que você vai pagar o menor salário.
             </h2>
             <p className="text-lg text-muted-foreground">
-              Enquanto uma agência ou time de marketing pode custar R$3.000+ por mês, o Marcus trabalha 24/7 por menos de R$500. Não há comparação de custo-benefício.
+              Enquanto uma agência ou time de marketing pode custar R$3.000+ por mês, o Léo.AI trabalha 24/7 por menos de R$500. Não há comparação de custo-benefício.
             </p>
           </div>
 
@@ -308,7 +308,7 @@ const Index = () => {
                   <span className="text-sm">Suporte via WhatsApp</span>
                 </div>
                 <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
-                  Contratar o Marcus
+                  Contratar o Léo.AI
                 </Button>
               </CardContent>
             </Card>
@@ -352,7 +352,7 @@ const Index = () => {
                   <span className="text-sm">Suporte via WhatsApp</span>
                 </div>
                 <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
-                  Contratar o Marcus
+                  Contratar o Léo.AI
                 </Button>
               </CardContent>
             </Card>
@@ -397,7 +397,7 @@ const Index = () => {
                   <span className="text-sm">Suporte via WhatsApp</span>
                 </div>
                 <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
-                  Contratar o Marcus
+                  Contratar o Léo.AI
                 </Button>
               </CardContent>
             </Card>
