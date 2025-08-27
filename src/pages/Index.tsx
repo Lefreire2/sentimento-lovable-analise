@@ -271,11 +271,11 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-4xl mx-auto">
             <Card className="relative border-2">
               <CardHeader className="text-center">
                 <h3 className="text-lg font-semibold">Plano Essential</h3>
-                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 287/mês</div>
+                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 797/mês</div>
                 <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -313,54 +313,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="relative border-2 border-marcus-cyan shadow-lg">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-marcus-cyan text-white px-4 py-1 rounded-full text-sm">
-                Mais Popular
-              </div>
-              <CardHeader className="text-center">
-                <h3 className="text-lg font-semibold">Plano Growth</h3>
-                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 377/mês</div>
-                <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Gerenciamento de até R$2.000 de investimento mensal no Meta Ads</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Criativos automatizados</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Landing pages de alta conversão</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Gerenciamento automático de campanhas</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Otimização contínua de performance</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Relatórios semanais detalhados</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
-                  <span className="text-sm">Suporte via WhatsApp</span>
-                </div>
-                <Button className="w-full mt-4 bg-marcus-cyan hover:bg-marcus-cyan/90">
-                  Contratar o Léo.AI
-                </Button>
-              </CardContent>
-            </Card>
-
             <Card className="relative border-2">
               <CardHeader className="text-center">
                 <h3 className="text-lg font-semibold">Plano Premium</h3>
-                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 497/mês</div>
+                <div className="text-3xl font-bold text-marcus-cyan mb-2">R$ 997/mês</div>
                 <p className="text-sm text-muted-foreground">"Salário" do seu gerente de marketing</p>
               </CardHeader>
               <CardContent className="space-y-3">
