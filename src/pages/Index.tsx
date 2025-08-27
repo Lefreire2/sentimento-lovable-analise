@@ -260,6 +260,132 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Business Success Section */}
+        <section className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Empresas que já estão <span className="text-marcus-cyan">dominando seus mercados</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-4xl mx-auto">
+              Veja os resultados que diferentes tipos de empresas estão alcançando com o Léo.AI
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Academias e Fitness</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Geração de leads qualificados de pessoas interessadas em treinar
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Clínicas e Consultórios</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Captação de pacientes em potencial direto no WhatsApp
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Consultorias Financeiras</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Leads interessados em soluções financeiras e investimentos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Distribuidoras</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Geração de leads B2B para aumento de vendas corporativas
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Restaurantes e Delivery</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Captação de novos clientes famintos na região de entrega
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Agências de Marketing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Eliminação do trabalho operacional para foco em estratégia
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Imobiliárias</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Leads qualificados de pessoas procurando imóveis para comprar
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-2 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Escolas e Cursos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Captação de estudantes interessados em se matricular
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section className="py-16">
           <div className="text-center mb-12">
