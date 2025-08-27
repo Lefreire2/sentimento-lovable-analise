@@ -260,6 +260,152 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Detailed Reports Section */}
+        <section className="py-16 bg-gray-50 -mx-4 px-4 rounded-3xl mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Relatórios Detalhados Automatizados</h2>
+            <h3 className="text-xl font-semibold text-muted-foreground mb-4">
+              Análises completas enviadas diretamente no WhatsApp
+            </h3>
+            <p className="text-muted-foreground max-w-3xl mx-auto">
+              Receba relatórios completos com métricas, análises por campanha e recomendações estratégicas para otimizar seus resultados.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* WhatsApp Report Chat */}
+            <div className="bg-white rounded-2xl shadow-lg">
+              <div className="bg-green-500 text-white p-3 rounded-t-2xl flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full"></div>
+                <div>
+                  <div className="font-semibold">Léo.AI</div>
+                  <div className="text-sm opacity-90">● online</div>
+                </div>
+              </div>
+              
+              <div className="p-4 space-y-4 bg-green-50 max-h-[600px] overflow-y-auto">
+                <div className="bg-white p-4 rounded-lg max-w-[90%] text-sm">
+                  <div className="font-semibold mb-2">Aqui está o relatório do dia (27/08/2025) e o resumo dos ajustes ideais para sua operação:</div>
+                  
+                  <div className="mb-3">
+                    <div className="font-semibold text-green-600 mb-1">RELATÓRIO DO DIA</div>
+                    <div className="space-y-1 text-xs">
+                      <div>• Investimento total: R$ 14,93</div>
+                      <div>• Leads gerados (Messenger): 3</div>
+                      <div>• CPL médio: R$ 4,98</div>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="font-semibold text-blue-600 mb-1">DESEMPENHO POR CAMPANHA</div>
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <div className="font-medium">1. [FUNDO] Captação de Leads – 14/05/25</div>
+                        <div className="ml-2 space-y-0.5">
+                          <div>- Investido: R$ 8,41</div>
+                          <div>- Leads: 2 (faixa 45-54, feminino)</div>
+                          <div>- CPL: R$ 4,20</div>
+                          <div>- Destaque: campanha mais eficiente do dia</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-medium">2. [FUNDO] Captação de Leads – 26/02/25</div>
+                        <div className="ml-2 space-y-0.5">
+                          <div>- Investido: R$ 7,14</div>
+                          <div>- Leads: 1 (faixa 55-64, feminino)</div>
+                          <div>- CPL: R$ 7,14</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="text-xs text-gray-500">09:37 ✓✓</span>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg max-w-[90%] text-sm">
+                  <div className="bg-green-100 p-3 rounded-lg">
+                    <div className="font-semibold text-green-700 mb-1">AJUSTES RECOMENDADOS PARA HOJE</div>
+                    <div className="space-y-1 text-xs text-green-600">
+                      <div>1. Escalar lentamente o orçamento da campanha 14/05/25, mantendo o público 45-54 feminino.</div>
+                      <div>2. Observar o desempenho da 26/02/25: se não gerar pelo menos 1 lead/dia, considerar pausar ou ajustar criativo.</div>
+                      <div>3. Manter as campanhas de engajamento/awareness com verba mínima — só para suporte visual, não para captação.</div>
+                      <div>4. Testar pequenas variações de copy e criativo só dentro do público campeão (45-64 anos).</div>
+                      <div>5. Monitorar frequência dos anúncios para evitar saturação do público, já que o segmento é enxuto.</div>
+                    </div>
+                    
+                    <div className="mt-3 pt-2 border-t border-green-200">
+                      <div className="font-medium text-green-700 text-xs">Resumo estratégico:</div>
+                      <div className="text-xs text-green-600">Continue focado no público feminino maduro de São Paulo, capitalize as campanhas que mais convertem e evite diluir investimento onde não gera resultado.</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2 text-xs text-gray-500">Se quiser detalhar por criativo, breakdown ou outro ajuste mais fino, só avisar!</div>
+                  <span className="text-xs text-gray-500">09:39</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefits List */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold mb-6">O que você recebe nos relatórios:</h3>
+                
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-marcus-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BarChart3 className="w-5 h-5 text-marcus-cyan" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">Métricas Detalhadas</h4>
+                      <p className="text-sm text-muted-foreground">Investimento total, leads gerados, CPL médio e performance individual por campanha</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-marcus-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <TrendingUp className="w-5 h-5 text-marcus-cyan" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">Análise por Campanha</h4>
+                      <p className="text-sm text-muted-foreground">Breakdown completo do desempenho, público-alvo e custo por lead de cada campanha</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-marcus-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-5 h-5 text-marcus-cyan" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">Recomendações Estratégicas</h4>
+                      <p className="text-sm text-muted-foreground">Ajustes específicos para otimizar orçamento, público e criativos baseados nos dados</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-marcus-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Star className="w-5 h-5 text-marcus-cyan" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">Insights Personalizados</h4>
+                      <p className="text-sm text-muted-foreground">Análises estratégicas focadas no seu nicho e segmento de mercado específico</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-marcus-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-5 h-5 text-marcus-cyan" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">Envio Automático</h4>
+                      <p className="text-sm text-muted-foreground">Relatórios enviados automaticamente no WhatsApp no horário que preferir</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Business Success Section */}
         <section className="py-16">
           <div className="text-center mb-12">
