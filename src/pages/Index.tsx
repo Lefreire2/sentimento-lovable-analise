@@ -1,21 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Play, 
-  Clock, 
-  Zap,
-  TrendingUp,
-  BarChart3,
-  MessageSquare,
-  Star,
-  CheckCircle
-} from "lucide-react";
-
+import { Play, Clock, Zap, TrendingUp, BarChart3, MessageSquare, Star, CheckCircle } from "lucide-react";
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Header with demo badge */}
       <div className="bg-marcus-cyan text-white py-2 text-center text-sm font-medium">
         Demonstração Real em &lt; de 3 Minutos
@@ -250,11 +238,7 @@ const Index = () => {
               </div>
               
               <div className="p-3 border-t flex items-center gap-2">
-                <input 
-                  className="flex-1 p-2 border rounded-full text-sm" 
-                  placeholder="Digite uma mensagem..."
-                  disabled
-                />
+                <input className="flex-1 p-2 border rounded-full text-sm" placeholder="Digite uma mensagem..." disabled />
               </div>
             </div>
           </div>
@@ -538,9 +522,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Contrate o funcionário que mais vai trazer resultado e que você vai pagar o menor salário.
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Enquanto uma agência ou time de marketing pode custar R$3.000+ por mês, o Léo.AI trabalha 24/7 por menos de R$500. Não há comparação de custo-benefício.
-            </p>
+            <p className="text-lg text-muted-foreground">Enquanto uma agência ou time de marketing pode custar R$3.000 + por mês, o Léo.AI trabalha 24/7 por menos de R$1000 por mês. Não há comparação de custo-benefício.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 max-w-4xl mx-auto">
@@ -646,8 +628,6 @@ const Index = () => {
           </Button>
         </section>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
